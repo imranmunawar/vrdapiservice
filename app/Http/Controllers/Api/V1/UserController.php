@@ -49,9 +49,23 @@ class UserController extends Controller
                'password'  => $data['password'],
            ]);
            $user->roles()->attach($role);
-           return response()->json($user, 201);
+           if ($user) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'User Created Successfully'
+                ],200); 
+           }else{
+                return response()->json([
+                   'error' => true,
+                   'message' => 'User Not Created Successfully'
+                ], 401);
+            }
+            
         }else{
-           return response()->json(['error'=>'Roles does not exist'], 401);
+           return response()->json([
+               'error' => true,
+               'message' => 'User Role Not Find'
+            ], 401);
         }
     }
 
@@ -74,7 +88,7 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        //
+        return User::find($id);
     }
 
     /**
