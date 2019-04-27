@@ -15,7 +15,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        echo "Index method"; die;
+        return response()->json(User::all());
     }
 
     /**
