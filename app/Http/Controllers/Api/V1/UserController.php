@@ -36,15 +36,15 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $input = $request;
-        return $input['fname'];
+        $input = $request->all();
+        $data  = $input['formData'];
         $data['password'] = bcrypt($data['password']);
         $role = Role::IsRoleExist($data['role']);
         if($role){
            $user = User::create([
                'first_name'=> $data['fname'],
                'last_name' => $data['lname'],
-               'name'      => $data['fname'].' '.$input['lname'],
+               'name'      => $data['fname'].' '.$data['lname'],
                'email'     => $data['email'],
                'password'  => $data['password'],
            ]);
