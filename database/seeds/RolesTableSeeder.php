@@ -19,7 +19,7 @@ class RolesTableSeeder extends Seeder
         $role_user->status = 0;
         $role_author->save();
         $role_admin = new Role();
-        $role_admin->name = 'Organizser';
+        $role_admin->name = 'Organizer';
         $role_user->status = 0;
         $role_admin->save();
         $role_admin = new Role();
@@ -27,7 +27,7 @@ class RolesTableSeeder extends Seeder
         $role_user->status = 0;
         $role_admin->save();
         $role_admin = new Role();
-        $role_admin->name = 'Company';
+        $role_admin->name = 'Company Admin';
         $role_user->status = 0;
         $role_admin->save();
     }
