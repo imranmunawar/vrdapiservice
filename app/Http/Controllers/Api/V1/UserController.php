@@ -6,6 +6,7 @@ use App\UserSettings;
 use App\Role;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -42,7 +43,7 @@ class UserController extends Controller
     {   
         $input = $request->all(); 
         $data  = $input['formData'];
-        $data['password'] = bcrypt($data['password']);
+        
         $user_id = '';
         $role = Role::IsRoleExist($data['role']);
         if($role){
@@ -52,7 +53,8 @@ class UserController extends Controller
               'last_name' => $data['lname'],
               'name'      => $data['fname'].' '.$data['lname'],
               'email'     => $data['email'],
-              'password'  => $data['password'],
+              'password'  => bcrypt($data['password']),
+              'plan_password' => $data['password'],
             ]);
             $user->roles()->attach($role);
             $user_id = $user->id;
@@ -108,7 +110,12 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        //
+        $user = User::find($id);
+        return response()->json([
+            "code"   => 200,
+            "status" => "success",
+            "data" => $user,
+        ]); 
     }
 
     /**
@@ -134,16 +141,15 @@ class UserController extends Controller
     {
     	$input = $request->all();
     	$data  = $input['formData'];
-    	$data['password'] = bcrypt($data['password']);
-
 		  if ($input['userType'] == 'Admin' || $input['userType'] == 'Organizer' || $input['userType'] == 'Company Admin') {
 		  	$user  = User::findOrFail($id);
 		    $userDataToUpdate = [
-		      'first_name'=> $data['fname'],
-		      'last_name' => $data['lname'],
-		      'name'      => $data['fname'].' '.$data['lname'],
-		      'email'     => $data['email'],
-		      'password'  => $data['password'],
+		      'first_name'    => $data['fname'],
+		      'last_name'     => $data['lname'],
+		      'name'          => $data['fname'].' '.$data['lname'],
+		      'email'         => $data['email'],
+		      'password'      => bcrypt($data['password']),
+              'plan_password' => $data['password'],
 		    ];
 		    $user->fill($userDataToUpdate)->save();
     	   }

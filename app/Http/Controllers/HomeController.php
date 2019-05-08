@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\User;
 
 class HomeController extends Controller
 {
@@ -23,6 +25,18 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $users = User::where('id','!=', Auth::id(1))->get();
+        return view('home',['users'=>$users]);
+    }
+    public function impersonate($user_id){
+        // echo $user_id; die;
+        $user = User::find($user_id);
+        Auth::user()->impersonate($user);
+        return redirect()->route('home');
+    }
+
+    public function impersonate_leave(){
+       Auth::user()->leaveImpersonation();
+       return redirect()->route('home');
     }
 }

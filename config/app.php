@@ -165,6 +165,8 @@ return [
         /*
          * Package Service Providers...
          */
+         Lab404\Impersonate\ImpersonateServiceProvider::class,
+         Laravel\Passport\PassportServiceProvider::class,
 
         /*
          * Application Service Providers...

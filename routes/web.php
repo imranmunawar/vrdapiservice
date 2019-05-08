@@ -11,9 +11,10 @@
 |
 */
 
-Route::get('/', function () { return redirect('/admin/home'); });
+// Route::get('/', function () { return redirect('/home'); });
 
 Auth::routes();
+// Route::impersonate();
 
 // Route::get('login', 'Auth\LoginController@showLoginForm')->name('login');
 // Route::post('login', 'Auth\LoginController@login')->name('auth.login');
@@ -28,21 +29,6 @@ Auth::routes();
 // Route::post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('auth.password.reset');
 // Route::get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
 // Route::post('password/reset', 'Auth\ResetPasswordController@reset')->name('auth.password.reset');
-
-// Route::get('/home', 'HomeController@index')->name('home');
-
-
-
-// Route::namespace('Api\V1')->group(function () {
-//     Route::get('/users', 'UserController@index')->name('users');
-//     Route::post('users/create',[ 'uses'            => 'UserController@store', 'as'  => 'create_user']);
-//     Route::get('users/{user}/edit',['uses'         => 'UserController@edit','as'    => 'edit_user']);
-//     Route::patch('users/update/{id?}',['uses'      => 'users@update','as'           => 'update_user']);
-//     Route::delete('users/delete/{branch?}',['uses' => 'UserController@destroy','as' => 'delete_user']);
-// });
-
-
-// Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 

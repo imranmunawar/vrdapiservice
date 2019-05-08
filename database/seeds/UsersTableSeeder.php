@@ -21,6 +21,7 @@ class UsersTableSeeder extends Seeder
         $user->name = 'Imran Khan';
         $user->email = 'imran@gmail.com';
         $user->password = bcrypt('geopak123');
+        $user->plan_password = 'geopak123';
         $user->save();
         $user->roles()->attach($admin);
         $user = new User();
@@ -29,6 +30,7 @@ class UsersTableSeeder extends Seeder
         $user->name = 'Ahmed Khan';
         $user->email = 'ahmed@gmail.com';
         $user->password = bcrypt('geopak123');
+        $user->plan_password = 'geopak123';
         $user->save();
         $user->roles()->attach($organizer);
         $user = new User();
@@ -37,6 +39,7 @@ class UsersTableSeeder extends Seeder
         $user->name = 'Ali Khan';
         $user->email = 'ali@gmail.com';
         $user->password = bcrypt('geopak123');
+        $user->plan_password = 'geopak123';
         $user->save();
         $user->roles()->attach($company);
         $user = new User();
@@ -45,6 +48,7 @@ class UsersTableSeeder extends Seeder
         $user->name = 'Umar Khan';
         $user->email = 'umar@gmail.com';
         $user->password = bcrypt('geopak123');
+        $user->plan_password = 'geopak123';
         $user->save();
         $user->roles()->attach($nuser);
     }
