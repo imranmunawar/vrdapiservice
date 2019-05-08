@@ -43,7 +43,6 @@ class UserController extends Controller
     {   
         $input = $request->all(); 
         $data  = $input['formData'];
-        
         $user_id = '';
         $role = Role::IsRoleExist($data['role']);
         if($role){

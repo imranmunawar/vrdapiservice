@@ -12,7 +12,7 @@ Route::group(['prefix' => 'auth','namespace' => 'Api\V1'], function () {
 });
 
 Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
-
+    
     /* Users Crud Routes */
     Route::get('users/show/{id}', ['uses' => 'UserController@show', 'as'  => 'showUser']);
     Route::get('users/list/{type}', ['uses' => 'UserController@index', 'as'  => 'listUsers']);
