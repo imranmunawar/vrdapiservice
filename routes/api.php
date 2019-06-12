@@ -21,4 +21,7 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
     Route::patch('users/update/{id}',  ['uses' => 'UserController@update','as'  => 'updateUser']);
     Route::delete('users/delete/{id}', ['uses' => 'UserController@destroy','as' => 'deleteUser']);
 
+    Route::get('users/{type}', ['uses' => 'UserController@getUsersByRole', 'as'  => 'getUsersByRole']);
+    Route::post('fairs/create', ['uses' => 'FairController@store', 'as'  => 'storeFair']);
+
 });

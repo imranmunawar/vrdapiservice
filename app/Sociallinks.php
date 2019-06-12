@@ -8,6 +8,6 @@ class Sociallinks extends Model
 {
     public function fairs()
     {
-        return $this->belongsToMany(Fair::class);
+       return $this->belongsTo(Fair::class);
     }
 }

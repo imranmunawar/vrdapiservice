@@ -33,6 +33,12 @@ class CreateFairsTable extends Migration
             $table->timestamp('start_time')->nullable();
             $table->timestamp('end_time')->nullable();
             $table->tinyInteger('fair_type')->default(0);
+            $table->string('website', 60);
+            $table->string('facebook', 60);
+            $table->string('youtube', 60);
+            $table->string('twitter', 60);
+            $table->string('linkedin', 60);
+            $table->string('instagram', 60);
             $table->tinyInteger('status')->default(0);
 
             $table->timestamps();

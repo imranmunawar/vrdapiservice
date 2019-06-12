@@ -206,4 +206,12 @@ class UserController extends Controller
           return response()->json(['success'=>'User Delete Successfully'], 200); 
         }
     }
+    public function getUsersByRole($type){
+        $users = User::whereHas('roles', function ($query) use ($type) {
+            $query->where('name', '=', $type);
+        })->get();
+        if ($users) {
+            return response()->json($users, 200);
+        }
+    }
 }

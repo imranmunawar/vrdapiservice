@@ -17,6 +17,11 @@ class Fair extends Model
         'email',
         'phone',
         'website',
+        'facebook',
+        'twitter',
+        'linkedin',
+        'youtube',
+        'instagram',
         'presenter_id',
         'organiser_id',
         'receptionist_id',
@@ -25,10 +30,4 @@ class Fair extends Model
         'fair_type',
         'status'
     ];
-
-    public function sociallink()
-    {
-        return $this->belongsToMany(Sociallinks::class)->withPivot('link_url');
-    }
-
 }
