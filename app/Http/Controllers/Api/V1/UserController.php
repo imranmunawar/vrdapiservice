@@ -41,12 +41,11 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {   
-        $input = $request->all(); 
-        $data  = $input['formData'];
+        $data = $request->all(); 
         $user_id = '';
         $role = Role::IsRoleExist($data['role']);
         if($role){
-          if ($input['userType'] == 'Admin' || $input['userType'] == 'Organizer' || $input['userType'] == 'Company Admin') {
+          if ($data['role'] == 'Admin' || $data['role'] == 'Organizer' || $data['role'] == 'Company Admin') {
             $user = User::create([
               'first_name'=> $data['fname'],
               'last_name' => $data['lname'],
@@ -54,12 +53,13 @@ class UserController extends Controller
               'email'     => $data['email'],
               'password'  => bcrypt($data['password']),
               'plan_password' => $data['password'],
+              'user_image'    => array_key_exists('fileToUpload', $data) ? $data['fileToUpload'] : ''
             ]);
             $user->roles()->attach($role);
             $user_id = $user->id;
           }
            
-          if ($input['userType'] == 'Organizer') {
+          if ($data['role'] == 'Organizer') {
               $user = UserSettings::create([
                 'user_id'          => $user_id,
                 'company_name'     => $data['company_name'],
@@ -70,7 +70,7 @@ class UserController extends Controller
              ]);
            }
 
-           if ($input['userType'] == 'Company Admin') {
+           if ($data['role'] == 'Company Admin') {
                $user = UserSettings::create([
                 'user_id'               => $user_id,
                 'company_id'            => $data['company_id'],
@@ -113,7 +113,7 @@ class UserController extends Controller
         return response()->json([
             "code"   => 200,
             "status" => "success",
-            "data" => $user,
+            "data"   => $user,
         ]); 
     }
 
@@ -138,9 +138,9 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-    	$input = $request->all();
-    	$data  = $input['formData'];
-		  if ($input['userType'] == 'Admin' || $input['userType'] == 'Organizer' || $input['userType'] == 'Company Admin') {
+    	$data = $request->all();
+    	$data  = $data['formData'];
+		  if ($data['role'] == 'Admin' || $data['role'] == 'Organizer' || $data['role'] == 'Company Admin') {
 		  	$user  = User::findOrFail($id);
 		    $userDataToUpdate = [
 		      'first_name'    => $data['fname'],
@@ -152,7 +152,7 @@ class UserController extends Controller
 		    ];
 		    $user->fill($userDataToUpdate)->save();
     	   }
-    	  if ($input['userType'] == 'Organizer') {
+    	  if ($data['role'] == 'Organizer') {
 		  	$setting = UserSettings::where('user_id', $id);
 		    $settingDataToUpdate = [
 		        'company_name'     => $data['company_name'],
@@ -164,7 +164,7 @@ class UserController extends Controller
 		    $setting->update($settingDataToUpdate);
     	   }
 
-    	   if ($input['userType'] == 'Company Admin') {
+    	   if ($data['role'] == 'Company Admin') {
     	       $setting = UserSettings::where('user_id', $id);
     	       $settingDataToUpdate = [
     	        'company_id' => $data['company_id'],
