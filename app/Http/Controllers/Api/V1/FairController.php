@@ -2,15 +2,33 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Fair;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Fair;
 
 class FairController extends Controller
 {
-    public function create(){
-        dd('test');
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        $fairs = Fair::with('organizer')->get();
+        return response()->json($fairs);
     }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        //
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -19,39 +37,78 @@ class FairController extends Controller
      */
     public function store(Request $request)
     {
-        $input = $request->all();
-        $data  = $input['formData'];
-        $fair_mobile = '';
-        if(isset($data['fair_mobile'])){
-            $fair_mobile = $data['fair_mobile'];
+        // Create a new Fair in the database...
+         $fair = Fair::create($request->all());
+        if (!$fair) {
+            return response()->json(
+                [ 
+                    'success' => false,
+                    'message' => 'Fair Not Created Successfully'
+                ],200); 
         }
-        $fair_video = '';
-        if(isset($data['fair_video'])){
-            $fair_video = $data['fair_video'];
+
+        return response()->json(
+            [ 
+                'success' => true, 
+                'message' => 'Fair Created Successfully' ],200);
+
+
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        $fair = Fair::find($id);
+        return response()->json($fair); 
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        $data = $request->all(); 
+        $fair  = Fair::findOrFail($id);
+        $fair->fill($data)->save();
+            return response()->json([
+               'success' => true,
+               'message' => 'Fair Updated Successfully'
+            ], 200);
+        
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        $fair  = Fair::findOrFail($id);
+        if ($fair) {
+          $deleteFair = Fair::destroy($id);
+          return response()->json(['success'=>true, 'message'=> 'Fair Delete Successfully'], 200); 
         }
-        $fair = Fair::create([
-            'presenter_id'=> $data['presenters'],
-            'organiser_id'=> $data['organizer'],
-            'receptionist_id'=> $data['receptionists'],
-            'name'=> $data['fair_name'],
-            'short_name'=> $data['short_name'],
-            'phone'=> $data['phone'],
-            'email'=> $data['email'],
-            'fair_image'=> $fair_mobile,
-            'fair_video'=> $fair_video,
-            'timezone'=> $data['ftimezone'],
-            'register_time'=> $data['regdate'],
-            'start_time'=> $data['startdate'],
-            'end_time'=> $data['enddate'],
-            'fair_type'=> $data['ftype'],
-            'status'=> 0,
-            'website'=> (isset($data['website']))?$data['website']:'',
-            'facebook'=> (isset($data['facebook']))?$data['facebook']:'',
-            'youtube'=> (isset($data['youtube']))?$data['youtube']:'',
-            'twitter'=> (isset($data['twitter']))?$data['twitter']:'',
-            'linkedin'=> (isset($data['linkedin']))?$data['linkedin']:'',
-            'instagram'=> (isset($data['instagram']))?$data['instagram']:'',
-        ]);
-        return response()->json($fair, 201);
     }
 }

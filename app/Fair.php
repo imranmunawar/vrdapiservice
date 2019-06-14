@@ -30,4 +30,9 @@ class Fair extends Model
         'fair_type',
         'status'
     ];
+
+    public function organizer()
+    {
+        return $this->belongsTo('App\User', 'organiser_id','id');
+    }
 }
