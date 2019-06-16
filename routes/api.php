@@ -38,4 +38,6 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
     Route::get('users/{type}', ['uses' => 'UserController@getUsersByRole', 'as'  => 'getUsersByRole']);
     Route::post('fairs/create', ['uses' => 'FairController@store', 'as'  => 'storeFair']);
 
+    Route::get('admin/stats', ['uses' => 'StatsController@index', 'as'  => 'adminStats']);
+
 });
