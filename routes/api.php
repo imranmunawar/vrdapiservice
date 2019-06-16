@@ -36,7 +36,14 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
     Route::delete('company/delete/{id}', ['uses' => 'CompanyController@destroy','as'  => 'deleteCompany']);
 
     Route::get('users/{type}', ['uses' => 'UserController@getUsersByRole', 'as'  => 'getUsersByRole']);
-    Route::post('fairs/create', ['uses' => 'FairController@store', 'as'  => 'storeFair']);
+    
+    /* Fair Crud Routes */
+    Route::get('fair/show/{id}',      ['uses' => 'FairController@show',   'as'  => 'showFair']);
+    Route::get('fairs/list',          ['uses' => 'FairController@index',  'as'  => 'listFairs']);
+    Route::post('fairs',              ['uses' => 'FairController@store',  'as'  => 'createFair']);
+    Route::get('fair/edit/{fair}',    ['uses' => 'FairController@edit',  'as'  => 'editFair']);
+    Route::patch('fair/update/{id}',  ['uses' => 'FairController@update', 'as'  => 'updateFair']);
+    Route::delete('fair/delete/{id}', ['uses' => 'FairController@destroy','as'  => 'deleteFair']);
 
     Route::get('admin/stats', ['uses' => 'StatsController@index', 'as'  => 'adminStats']);
 

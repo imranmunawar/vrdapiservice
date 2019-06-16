@@ -87,7 +87,14 @@ class CompanyController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $data = $request->all(); 
+        $company  = Company::findOrFail($id);
+        $company->fill($data)->save();
+            return response()->json([
+               'success' => true,
+               'message' => 'Company Updated Successfully'
+            ], 200);
+        
     }
 
     /**
@@ -98,6 +105,10 @@ class CompanyController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $company  = Company::findOrFail($id);
+        if ($company) {
+          $deleteUser = Company::destroy($id);
+          return response()->json(['success'=>true, 'message'=> 'Company Delete Successfully'], 200); 
+        }
     }
 }

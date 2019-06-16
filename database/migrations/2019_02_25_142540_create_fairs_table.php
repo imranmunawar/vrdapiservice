@@ -15,7 +15,6 @@ class CreateFairsTable extends Migration
     {
         Schema::create('fairs', function (Blueprint $table) {
             $table->increments('id');
-
             $table->integer('presenter_id')->unsigned();
             $table->foreign('presenter_id')->references('id')->on('frontdesks');
             $table->integer('organiser_id')->unsigned();
