@@ -4,19 +4,19 @@ namespace App\Http\Controllers\Api\V1;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Company;
+use App\FairMedia;
 
-class CompanyController extends Controller
+class FairMediaController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($fair_id = '')
+    public function index($id)
     {
-        $companies = !empty($fair_id) ? Company::all()->where('fair_id', $fair_id) :  Company::all();;
-        return response()->json($companies);
+        $FairMedias = FairMedia::all()->where('FairMedia_id',$id);
+        return response()->json($FairMedias);
     }
 
     /**
@@ -37,20 +37,13 @@ class CompanyController extends Controller
      */
     public function store(Request $request)
     {
-        // Create a new company in the database...
-         $company = Company::create($request->all());
-        if (!$company) {
-            return response()->json(
-                [ 
-                    'success' => false,
-                    'message' => 'Company Not Created Successfully'
-                ],200); 
+        // Create a new FairMedia in the database...
+         $FairMedia = FairMedia::create($request->all());
+        if (!$FairMedia) {
+            return response()->json(['success' => false,'message' => 'FairMedia Media Not Created Successfully'],200); 
         }
-
-        return response()->json(
-            [ 
-                'success' => true, 
-                'message' => 'Company Created Successfully' ],200);
+        
+        return response()->json(['success' => true,'message' => 'FairMedia Created Successfully' ],200);
 
 
     }
@@ -74,8 +67,8 @@ class CompanyController extends Controller
      */
     public function edit($id)
     {
-        $company = Company::find($id);
-        return response()->json($company); 
+        $FairMedia = FairMedia::find($id);
+        return response()->json($FairMedia); 
     }
 
     /**
@@ -88,11 +81,11 @@ class CompanyController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->all(); 
-        $company  = Company::findOrFail($id);
-        $company->fill($data)->save();
+        $FairMedia  = FairMedia::findOrFail($id);
+        $FairMedia->fill($data)->save();
             return response()->json([
                'success' => true,
-               'message' => 'Company Updated Successfully'
+               'message' => 'FairMedia Updated Successfully'
             ], 200);
         
     }
@@ -105,10 +98,10 @@ class CompanyController extends Controller
      */
     public function destroy($id)
     {
-        $company  = Company::findOrFail($id);
-        if ($company) {
-          $deleteUser = Company::destroy($id);
-          return response()->json(['success'=>true, 'message'=> 'Company Delete Successfully'], 200); 
+        $FairMedia  = FairMedia::findOrFail($id);
+        if ($FairMedia) {
+          $deleteFairMedia = FairMedia::destroy($id);
+          return response()->json(['success'=>true, 'message'=> 'FairMedia Delete Successfully'], 200); 
         }
     }
 }
