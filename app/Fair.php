@@ -30,7 +30,8 @@ class Fair extends Model
         'fair_image',
         'fair_video',
         'fair_type',
-        'status'
+        'fair_status',
+        'chat_status'
     ];
 
     public function organizer()
