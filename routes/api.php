@@ -69,6 +69,9 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
     Route::patch('career/test/answer/{id}',    ['uses'    => 'CareerTestAnswerController@update', 'as'  => 'updateTestAnswer']);
     Route::delete('career/test/answer/{id}',   ['uses'    => 'CareerTestAnswerController@destroy','as'  => 'deleteTestAnswer']);
 
+     Route::get('job/questionnaire/criteria/{fair_id}/{job_id}', ['uses' => 'JobQuestionnaireController@index','as'  => 'JobQuestionnaire']);
+
+
     Route::get('admin/stats', ['uses' => 'StatsController@index', 'as'  => 'adminStats']);
 
 });

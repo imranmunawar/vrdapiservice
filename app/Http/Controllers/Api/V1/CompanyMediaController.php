@@ -4,22 +4,19 @@ namespace App\Http\Controllers\Api\V1;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\CareerTest;
-use App\JobQuestionnaire;
+use App\CompanyMedia;
 
-class JobQuestionnaireController extends Controller
+class CompanyMediaController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index( $fair_id = '', $job_id = '')
+    public function index($id)
     {
-        $data = CareerTest::with('answers')->where('fair_id', $fair_id)->get();
-
-        return response()->json($data);
-
+        $CompanyMedia = CompanyMedia::all()->where('fair_id',$id);
+        return response()->json($CompanyMedia);
     }
 
     /**
@@ -40,13 +37,13 @@ class JobQuestionnaireController extends Controller
      */
     public function store(Request $request)
     {
-        // Create a new CareerTestAnswer in the database...
-         $CareerTestAnswer = CareerTestAnswer::create($request->all());
-        if (!$CareerTestAnswer) {
-            return response()->json(['success' => false,'message' => 'Career Test Answer Not Created Successfully'],200); 
+        // Create a new CompanyMedia in the database...
+         $CompanyMedia = CompanyMedia::create($request->all());
+        if (!$CompanyMedia) {
+            return response()->json(['success' => false,'message' => 'CompanyMedia Media Not Created Successfully'],200); 
         }
         
-        return response()->json(['success' => true,'message' => 'Career Test Answer Created Successfully' ],200);
+        return response()->json(['success' => true,'message' => 'CompanyMedia Created Successfully' ],200);
 
 
     }
@@ -70,8 +67,8 @@ class JobQuestionnaireController extends Controller
      */
     public function edit($id)
     {
-        $CareerTestAnswer = CareerTestAnswer::find($id);
-        return response()->json($CareerTestAnswer); 
+        $CompanyMedia = CompanyMedia::find($id);
+        return response()->json($CompanyMedia); 
     }
 
     /**
@@ -84,11 +81,11 @@ class JobQuestionnaireController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->all(); 
-        $CareerTestAnswer  = CareerTestAnswer::findOrFail($id);
-        $CareerTestAnswer->fill($data)->save();
+        $CompanyMedia  = CompanyMedia::findOrFail($id);
+        $CompanyMedia->fill($data)->save();
             return response()->json([
                'success' => true,
-               'message' => 'Career Test Answer Updated Successfully'
+               'message' => 'Fair Media Updated Successfully'
             ], 200);
         
     }
@@ -101,10 +98,10 @@ class JobQuestionnaireController extends Controller
      */
     public function destroy($id)
     {
-        $CareerTestAnswer  = CareerTestAnswer::findOrFail($id);
-        if ($CareerTestAnswer) {
-          $deleteCareerTestAnswer = CareerTestAnswer::destroy($id);
-          return response()->json(['success'=>true, 'message'=> 'Career Test Answer Delete Successfully'], 200); 
+        $CompanyMedia  = CompanyMedia::findOrFail($id);
+        if ($CompanyMedia) {
+          $deleteCompanyMedia = CompanyMedia::destroy($id);
+          return response()->json(['success'=>true, 'message'=> 'Fair Media Delete Successfully'], 200); 
         }
     }
 }
