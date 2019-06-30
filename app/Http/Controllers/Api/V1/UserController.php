@@ -15,11 +15,24 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($type)
+    public function index($type, $company_id = '')
     {
     	$users = User::whereHas('roles', function ($query) use ($type) {
     	    $query->where('name', '=', $type);
     	})->with('userSetting')->get();
+
+        $userArrs = json_decode(json_encode($users), true);
+
+        if (!empty($company_id)) {
+            $filteredUsers = array_filter($userArrs, function ($item) use ($company_id) {
+               if ($item['user_setting']['company_id'] == $company_id) {
+                   return true;
+               }
+               return false;
+            });
+
+            return response()->json($filteredUsers);
+        }
         return response()->json($users);
     }
 
@@ -45,7 +58,7 @@ class UserController extends Controller
         $user_id = '';
         $role = Role::IsRoleExist($data['role']);
         if($role){
-          if ($data['role'] == 'Admin' || $data['role'] == 'Organizer' || $data['role'] == 'Company Admin') {
+          if ($data['role'] == 'Admin' || $data['role'] == 'Organizer' || $data['role'] == 'Company Admin' || $data['role'] == 'Recruiter' || $data['role'] == 'Receptionist') {
             $user = User::create([
               'first_name'=> $data['fname'],
               'last_name' => $data['lname'],
@@ -53,7 +66,6 @@ class UserController extends Controller
               'email'     => $data['email'],
               'password'  => bcrypt($data['password']),
               'plan_password' => $data['password'],
-              'user_image'    => array_key_exists('fileToUpload', $data) ? $data['fileToUpload'] : ''
             ]);
             $user->roles()->attach($role);
             $user_id = $user->id;
@@ -81,15 +93,33 @@ class UserController extends Controller
               ]);
             }
 
+            if ($data['role'] == 'Recruiter') {
+               $user = UserSettings::create([
+                'user_id'               => $user_id,
+                'company_id'            => $data['company_id'],
+                'phone'                 => $data['phone'],
+                'location'              => $data['location'],
+                'user_title'            => empty($data['title']) ? '' : $data['title'],
+                'user_info'             => empty($data['user_info']) ? '': $data['user_info'],
+                'user_image'            => $data['user_image'],
+                'linkedin_profile_link' => empty($data['linkedin_profile_link']) ? '' : $data['linkedin_profile_link'],
+                'match_persantage'      => $data['match_persantage'],
+                'public_email'          => empty($data['public_email']) ? '' : $data['public_email'],
+                'show_email'            => array_key_exists('show_email', $data) ? $data['show_email'] : 0,
+                'job_email'             => array_key_exists('job_email', $data) ? $data['job_email'] : 0,
+                'recruiter_img'         => $data['recruiter_img']
+              ]);
+            }
+
            if ($user) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'User Created Successfully'
+                    'message' => $data['role'].' Created Successfully'
                 ],200); 
            }else{
                 return response()->json([
                    'error' => true,
-                   'message' => 'User Not Created Successfully'
+                   'message' => $data['role'].' Not Created Successfully'
                 ], 401);
             }
             
@@ -139,8 +169,7 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
     	$data = $request->all();
-    	$data  = $data['formData'];
-		  if ($data['role'] == 'Admin' || $data['role'] == 'Organizer' || $data['role'] == 'Company Admin') {
+		  if ($data['role'] == 'Admin' || $data['role'] == 'Organizer' || $data['role'] == 'Company Admin' || $data['role'] == 'Recruiter' || $data['role'] == 'Receptionist' ) {
 		  	$user  = User::findOrFail($id);
 		    $userDataToUpdate = [
 		      'first_name'    => $data['fname'],
@@ -177,15 +206,36 @@ class UserController extends Controller
     	     $setting->update($settingDataToUpdate);
     	    }
 
+           if ($data['role'] == 'Recruiter') {
+               $setting = UserSettings::where('user_id', $id);
+               $settingDataToUpdate = [
+                'company_id'            => $data['company_id'],
+                'phone'                 => $data['phone'],
+                'location'              => $data['location'],
+                'user_title'                 => $data['title'],
+                'user_info'             => $data['user_info'],
+                'user_image'            => $data['user_image'],
+                'linkedin_profile_link' => $data['linkedin_profile_link'],
+                'match_persantage'      => $data['match_persantage'],
+                'public_email'          => $data['public_email'],
+                'show_email'            => array_key_exists('show_email', $data) ? $data['show_email'] : 0,
+                'job_email'             => array_key_exists('job_email', $data) ? $data['job_email'] : 0,
+                'recruiter_img'         => $data['recruiter_img']
+              ];
+
+             $setting->update($settingDataToUpdate);
+            }
+
+
     	   if ($user) {
     	        return response()->json([
     	            'success' => true,
-    	            'message' => 'User Updated Successfully'
+    	            'message' => $data['role'].' Updated Successfully'
     	        ],200); 
     	   }else{
     	        return response()->json([
     	           'error' => true,
-    	           'message' => 'User Not Updated Successfully'
+    	           'message' => $data['role'].' Not Updated Successfully'
     	        ], 401);
     	    }
     	    
@@ -202,16 +252,9 @@ class UserController extends Controller
         $user  = User::findOrFail($id);
         if ($user) {
           $deleteUser = User::destroy($id);
+          $deleteUserSetting = UserSettings::where('user_id',$id)->first()->delete();
           $user->roles()->detach(); 
           return response()->json(['success'=>'User Delete Successfully'], 200); 
-        }
-    }
-    public function getUsersByRole($type){
-        $users = User::whereHas('roles', function ($query) use ($type) {
-            $query->where('name', '=', $type);
-        })->get();
-        if ($users) {
-            return response()->json($users, 200);
         }
     }
 }

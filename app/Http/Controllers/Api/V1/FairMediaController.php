@@ -15,8 +15,8 @@ class FairMediaController extends Controller
      */
     public function index($id)
     {
-        $FairMedias = FairMedia::all()->where('FairMedia_id',$id);
-        return response()->json($FairMedias);
+        $fairMedia = FairMedia::all()->where('fair_id',$id);
+        return response()->json($fairMedia);
     }
 
     /**
@@ -85,7 +85,7 @@ class FairMediaController extends Controller
         $FairMedia->fill($data)->save();
             return response()->json([
                'success' => true,
-               'message' => 'FairMedia Updated Successfully'
+               'message' => 'Fair Media Updated Successfully'
             ], 200);
         
     }
@@ -101,7 +101,7 @@ class FairMediaController extends Controller
         $FairMedia  = FairMedia::findOrFail($id);
         if ($FairMedia) {
           $deleteFairMedia = FairMedia::destroy($id);
-          return response()->json(['success'=>true, 'message'=> 'FairMedia Delete Successfully'], 200); 
+          return response()->json(['success'=>true, 'message'=> 'Fair Media Delete Successfully'], 200); 
         }
     }
 }

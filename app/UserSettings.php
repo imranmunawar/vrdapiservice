@@ -17,7 +17,13 @@ class UserSettings extends Model
       'user_title',
       'phone',
       'location',
-      'linkedin_profile_link'
+      'linkedin_profile_link',
+      'match_persantage',
+      'public_email',
+      'show_email',
+      'job_email',
+      'recruiter_img',
+      'user_image'
     ];
 
 

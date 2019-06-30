@@ -13,6 +13,7 @@ class CreateUserSettingsTable extends Migration
      */
     public function up()
     {
+
         Schema::create('user_settings', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->unsigned()->default(0);
@@ -25,8 +26,14 @@ class CreateUserSettingsTable extends Migration
             $table->longText('user_info')->nullable();
             $table->string('user_title')->nullable();
             $table->string('phone', 100)->nullable();
+             $table->string('public_email')->nullable();
             $table->string('location')->nullable();
             $table->string('linkedin_profile_link')->nullable();
+            $table->string('match_persantage')->nullable();
+            $table->tinyInteger('job_email')->nullable();
+            $table->tinyInteger('show_email')->nullable();
+            $table->string('recruiter_img')->nullable();
+            $table->string('user_image')->nullable();
             $table->timestamps();
         });
     }

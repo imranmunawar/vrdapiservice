@@ -28,9 +28,9 @@ class CreateFairsTable extends Migration
             $table->string('fair_image', 30)->nullable();
             $table->string('fair_video', 30)->nullable();
             $table->string('timezone', 50)->nullable();
-            $table->timestamp('register_time')->nullable();
-            $table->timestamp('start_time')->nullable();
-            $table->timestamp('end_time')->nullable();
+            $table->dateTime('register_time')->nullable();
+            $table->dateTime('start_time')->nullable();
+            $table->dateTime('end_time')->nullable();
             $table->tinyInteger('fair_type')->default(0);
             $table->string('website', 60);
             $table->string('facebook', 60);

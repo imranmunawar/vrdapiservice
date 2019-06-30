@@ -63,7 +63,8 @@ class CompanyController extends Controller
      */
     public function show($id)
     {
-        //
+        $company = Company::find($id);
+        return response()->json($company); 
     }
 
     /**

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateFairMediaTable extends Migration
+class CreateCareerTestsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,17 +13,17 @@ class CreateFairMediaTable extends Migration
      */
     public function up()
     {
-        Schema::create('fair_media', function (Blueprint $table) {
+        Schema::create('career_tests', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('fair_id')->unsigned()->nullable();
             $table->foreign('fair_id')->references('id')->on('fairs');
-            $table->string('fair_media_name');
-            $table->string('fair_media_type');
-            $table->integer('fair_media_description')->nullable();
-            $table->string('fair_media_link')->nullable();
-            $table->string('fair_media_image')->nullable();
-            $table->string('fair_media_video')->nullable();
-            $table->string('fair_media_document')->nullable();
+            $table->string('question');
+            $table->string('short_question');
+            $table->string('backoffice_question')->nullable();
+            $table->string('question_type')->nullable();
+            $table->string('min_selection')->nullable();
+            $table->string('max_selection')->nullable();
+            $table->string('display_order')->nullable();
             $table->timestamps();
         });
     }
@@ -35,6 +35,6 @@ class CreateFairMediaTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('fair_media');
+        Schema::dropIfExists('career_tests');
     }
 }

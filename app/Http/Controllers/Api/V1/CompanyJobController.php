@@ -4,19 +4,19 @@ namespace App\Http\Controllers\Api\V1;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Fair;
+use App\CompanyJob;
 
-class FairController extends Controller
+class CompanyJobController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($company_id = '')
     {
-        $fairs = Fair::with('organizer')->get();
-        return response()->json($fairs);
+        $jobs = !empty($company_id) ? CompanyJob::all()->where('company_id', $company_id) :  CompanyJob::all();;
+        return response()->json($jobs);
     }
 
     /**
@@ -37,13 +37,20 @@ class FairController extends Controller
      */
     public function store(Request $request)
     {
-        // Create a new Fair in the database...
-        $fair = Fair::create($request->all());
-        if (!$fair) {
-            return response()->json(['success' => false,'message' => 'Fair Media Not Created Successfully'],200); 
+        // Create a new company in the database...
+         $job = CompanyJOb::create($request->all());
+        if (!$job) {
+            return response()->json(
+                [ 
+                    'success' => false,
+                    'message' => 'Job Not Created Successfully'
+                ],200); 
         }
 
-        return response()->json(['success' => true,'message' => 'Fair Media Created Successfully' ],200);
+        return response()->json(
+            [ 
+                'success' => true, 
+                'message' => 'Job Created Successfully' ],200);
 
 
     }
@@ -67,8 +74,8 @@ class FairController extends Controller
      */
     public function edit($id)
     {
-        $fair = Fair::find($id);
-        return response()->json($fair); 
+        $company = CompanyJOb::find($id);
+        return response()->json($company); 
     }
 
     /**
@@ -81,11 +88,11 @@ class FairController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->all(); 
-        $fair  = Fair::findOrFail($id);
-        $fair->fill($data)->save();
+        $job = CompanyJOb::findOrFail($id);
+        $job->fill($data)->save();
             return response()->json([
                'success' => true,
-               'message' => 'Fair Updated Successfully'
+               'message' => 'Job Updated Successfully'
             ], 200);
         
     }
@@ -98,10 +105,10 @@ class FairController extends Controller
      */
     public function destroy($id)
     {
-        $fair  = Fair::findOrFail($id);
-        if ($fair) {
-          $deleteFair = Fair::destroy($id);
-          return response()->json(['success'=>true, 'message'=> 'Fair Delete Successfully'], 200); 
+        $job  = CompanyJob::findOrFail($id);
+        if ($job) {
+          $deleteJob = CompanyJob::destroy($id);
+          return response()->json(['success'=>true, 'message'=> 'Job Deleted Successfully'], 200); 
         }
     }
 }

@@ -4,19 +4,23 @@ namespace App\Http\Controllers\Api\V1;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Fair;
+use App\CareerTest;
+use App\JobQuestionnaire;
 
-class FairController extends Controller
+class JobQuestionnaireController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index( $fair_id = '', $job_id = '')
     {
-        $fairs = Fair::with('organizer')->get();
-        return response()->json($fairs);
+        $CareerTestWithAnswers = CareerTest::with(['answers' => function ($query)  {
+            $query->where('fair_id', $fiar_id);
+        }])->get();
+
+        
     }
 
     /**
@@ -37,13 +41,13 @@ class FairController extends Controller
      */
     public function store(Request $request)
     {
-        // Create a new Fair in the database...
-        $fair = Fair::create($request->all());
-        if (!$fair) {
-            return response()->json(['success' => false,'message' => 'Fair Media Not Created Successfully'],200); 
+        // Create a new CareerTestAnswer in the database...
+         $CareerTestAnswer = CareerTestAnswer::create($request->all());
+        if (!$CareerTestAnswer) {
+            return response()->json(['success' => false,'message' => 'Career Test Answer Not Created Successfully'],200); 
         }
-
-        return response()->json(['success' => true,'message' => 'Fair Media Created Successfully' ],200);
+        
+        return response()->json(['success' => true,'message' => 'Career Test Answer Created Successfully' ],200);
 
 
     }
@@ -67,8 +71,8 @@ class FairController extends Controller
      */
     public function edit($id)
     {
-        $fair = Fair::find($id);
-        return response()->json($fair); 
+        $CareerTestAnswer = CareerTestAnswer::find($id);
+        return response()->json($CareerTestAnswer); 
     }
 
     /**
@@ -81,11 +85,11 @@ class FairController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->all(); 
-        $fair  = Fair::findOrFail($id);
-        $fair->fill($data)->save();
+        $CareerTestAnswer  = CareerTestAnswer::findOrFail($id);
+        $CareerTestAnswer->fill($data)->save();
             return response()->json([
                'success' => true,
-               'message' => 'Fair Updated Successfully'
+               'message' => 'Career Test Answer Updated Successfully'
             ], 200);
         
     }
@@ -98,10 +102,10 @@ class FairController extends Controller
      */
     public function destroy($id)
     {
-        $fair  = Fair::findOrFail($id);
-        if ($fair) {
-          $deleteFair = Fair::destroy($id);
-          return response()->json(['success'=>true, 'message'=> 'Fair Delete Successfully'], 200); 
+        $CareerTestAnswer  = CareerTestAnswer::findOrFail($id);
+        if ($CareerTestAnswer) {
+          $deleteCareerTestAnswer = CareerTestAnswer::destroy($id);
+          return response()->json(['success'=>true, 'message'=> 'Career Test Answer Delete Successfully'], 200); 
         }
     }
 }

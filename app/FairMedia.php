@@ -12,7 +12,7 @@ class FairMedia extends Model
        'fair_media_type',
        'fair_media_description',
        'fair_media_link',
-       'fair_media_source',
+       'fair_media_image',
        'fair_media_video',
        'fair_media_document'
      ];
