@@ -7,6 +7,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Passport\HasApiTokens;
 use Lab404\Impersonate\Models\Impersonate;
+use DB;
 
 class User extends Authenticatable
 {
@@ -66,4 +67,14 @@ class User extends Authenticatable
     {
        return $this->hasOne('App\UserSettings', 'user_id');
     }
+
+    public function IsEmailExist($email,$id){
+        $query = DB::table('users');
+        if (!empty($id)) {
+            $result = $query->where('id','!=', $id);
+        }
+        $query->where('email',$email);
+        
+        return $query->count();
+    }   
 }

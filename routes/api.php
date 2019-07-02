@@ -15,6 +15,9 @@ Route::group(['namespace' => 'Auth','prefix' => 'password'], function () {
     Route::post('reset', 'ResetPasswordController@reset');
 });
 Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
+
+    // Check if user email is already exist
+    Route::post('/check-user-email', 'UserController@checkUserEmail')->name('IsUserEmailExist');
     
     /* Users Crud Routes */
     Route::get('users/show/{id}',      ['uses' => 'UserController@show',   'as'  => 'showUser']);
