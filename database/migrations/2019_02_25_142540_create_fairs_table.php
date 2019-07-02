@@ -27,14 +27,15 @@ class CreateFairsTable extends Migration
             $table->dateTime('register_time')->nullable();
             $table->dateTime('start_time')->nullable();
             $table->dateTime('end_time')->nullable();
-            $table->tinyInteger('fair_type')->default(0);
+            $table->string('fair_type');
             $table->string('website');
             $table->string('facebook');
             $table->string('youtube');
             $table->string('twitter');
             $table->string('linkedin');
             $table->string('instagram');
-            $table->tinyInteger('status')->default(0);
+            $table->string('fair_status');
+            $table->string('chat_status');
 
             $table->timestamps();
         });

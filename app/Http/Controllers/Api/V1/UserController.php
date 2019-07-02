@@ -7,14 +7,17 @@ use App\Role;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Traits\IsExist;
 
 class UserController extends Controller
 {
+    use IsExist;
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
+
     public function index($type, $company_id = '')
     {
     	$users = User::whereHas('roles', function ($query) use ($type) {
