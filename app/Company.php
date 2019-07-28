@@ -25,4 +25,9 @@ class Company extends Model
         'company_logo',
         'company_stand_image',
     ];
+
+    public function stand()
+    {
+        return $this->hasOne('App\CompanyStand');
+    }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\CareerTest;
+use App\CareerTestAnswer;
 
 class CareerTestController extends Controller
 {
@@ -38,14 +39,19 @@ class CareerTestController extends Controller
     public function store(Request $request)
     {
         // Create a new CareerTest in the database...
-         $CareerTest = CareerTest::create($request->all());
-        if (!$CareerTest) {
-            return response()->json(['success' => false,'message' => 'Career Test Not Created Successfully'],200); 
+        if ($request->question_type == 'Yes No') {
+            $CareerTest = CareerTest::create($request->all());
+            if (!$this->createAnswer($CareerTest->id)){
+                return response()->json(['success' => false,'message' => 'Career Test Not Created Successfully'],200); 
+            }
+        }else{
+            $CareerTestAnswer = CareerTestAnswer::create($request->all());
+            if (!$CareerTest) {
+                return response()->json(['success' => false,'message' => 'Career Test Not Created Successfully'],200); 
+            }
         }
-        
+
         return response()->json(['success' => true,'message' => 'Career Test Created Successfully' ],200);
-
-
     }
 
     /**
@@ -103,5 +109,25 @@ class CareerTestController extends Controller
           $deleteCareerTest = CareerTest::destroy($id);
           return response()->json(['success'=>true, 'message'=> 'Fair Media Delete Successfully'], 200); 
         }
+    }
+
+    public function createAnswer($test_id){
+        $answersArr = [ 
+            [
+                'test_id' => $test_id,
+                'answer'  => 'Yes'
+            ],
+            [
+                'test_id' => $test_id,
+                'answer'  => 'No'
+            ] 
+        ];
+
+        foreach ($answersArr as $value) {
+            $CareerTestAnswer = CareerTestAnswer::create($value);
+        }
+
+        return true;
+
     }
 }

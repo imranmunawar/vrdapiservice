@@ -35,6 +35,14 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
     Route::patch('company/update/{id}',    ['uses' => 'CompanyController@update', 'as'  => 'updateCompany']);
     Route::delete('company/delete/{id}',   ['uses' => 'CompanyController@destroy','as'  => 'deleteCompany']);
 
+      /* Fair Media Crud Routes */
+    Route::get('company/media/show/{id}',      ['uses' => 'CompanyMediaController@show',    'as'  => 'showCompanyMedia']);
+    Route::get('company/media/list/{fair_id}', ['uses' => 'CompanyMediaController@index',   'as'  => 'listCompanyMedia']);
+    Route::post('company/media',               ['uses' => 'CompanyMediaController@store',   'as'  => 'createCompanyMedia']);
+    Route::get('company/media/{id}',           ['uses' => 'CompanyMediaController@edit',    'as'  => 'editCompanyMedia']);
+    Route::patch('company/media/update/{id}',  ['uses' => 'CompanyMediaController@update',  'as'  => 'updateCompanyMedia']);
+
+
     /* Company Jobs Crud Routes */
     Route::get('job/show/{id}',        ['uses' => 'CompanyJobController@show',   'as'  => 'showJob']);
     Route::get('jobs/list/{company_id?}/{fair_id?}',['uses' => 'CompanyJobController@index',  'as'  => 'listJobs']);
@@ -54,11 +62,22 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
     Route::delete('fair/delete/{id}', ['uses' => 'FairController@destroy','as'  => 'deleteFair']);
      /* Fair Media Crud Routes */
     Route::get('fair/media/show/{id}',      ['uses' => 'FairMediaController@show',    'as'  => 'showFair']);
-    Route::get('fair/media/list/{fair_id}',           ['uses' => 'FairMediaController@index',   'as'  => 'listFairs']);
+    Route::get('fair/media/list/{fair_id}', ['uses' => 'FairMediaController@index',   'as'  => 'listFairs']);
     Route::post('fair/media',               ['uses' => 'FairMediaController@store',   'as'  => 'createFair']);
     Route::get('fair/media/{id}',           ['uses' => 'FairMediaController@edit',    'as'  => 'editFair']);
     Route::patch('fair/media/update/{id}',  ['uses' => 'FairMediaController@update',  'as'  => 'updateFair']);
     Route::delete('fair/media/delete/{id}', ['uses' => 'FairMediaController@destroy', 'as'  => 'deleteFair']);
+
+
+    Route::get('fair/marketing/channel/list/{fair_id}',      ['uses'    => 'MarketingChannelController@index',  'as'  => 'marketingChannel']);
+    Route::post('fair/marketing/channel',          ['uses'    => 'MarketingChannelController@store',  'as'  => 'createMarketingChannel']);
+    Route::get('fair/marketing/channel/{id}',      ['uses'    => 'MarketingChannelController@edit',   'as'  => 'editMarketingChannel']);
+    Route::patch('fair/marketing/channel/{id}',    ['uses'    => 'MarketingChannelController@update', 'as'  => 'updateMarketingChannel']);
+    Route::delete('fair/marketing/channel/{id}',   ['uses'    => 'MarketingChannelController@destroy','as'  => 'deleteMarketingChannel']);
+
+    Route::post('fair/main/hall/save',          ['uses'    => 'FairMainHallController@store',  'as'  => 'createMainHall']);
+    Route::post('fair/company/stand/{company_id}',          ['uses'    => 'FairMainHallController@companyStand',  'as'  => 'companyStand']);
+
 
     Route::get('fair/career/test/list/{fair_id}',      ['uses'    => 'CareerTestController@index',  'as'  => 'careerTest']);
     Route::post('fair/career/test',          ['uses'    => 'CareerTestController@store',  'as'  => 'createCareerTest']);
@@ -73,6 +92,7 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
     Route::delete('career/test/answer/{id}',   ['uses'    => 'CareerTestAnswerController@destroy','as'  => 'deleteTestAnswer']);
 
      Route::get('job/questionnaire/criteria/{fair_id}/{job_id}', ['uses' => 'JobQuestionnaireController@index','as'  => 'JobQuestionnaire']);
+      Route::post('job/questionnaire/criteria/set/{job_id}', ['uses' => 'JobQuestionnaireController@store','as'  => 'JobQuestionnaire']);
 
 
     Route::get('admin/stats', ['uses' => 'StatsController@index', 'as'  => 'adminStats']);

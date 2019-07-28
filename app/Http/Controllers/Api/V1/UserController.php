@@ -81,7 +81,8 @@ class UserController extends Controller
                 'credits'          => $data['credits'],
                 'reg_notification' => array_key_exists('reg_notification', $data) ? $data['reg_notification'] : 0,
                 'enable_exhibitor' => array_key_exists('enable_exhibitor', $data) ? $data['enable_exhibitor'] : 0,
-                'user_info'        => $data['user_info']
+                'user_info'        => empty($data['user_info']) ? '': $data['user_info'],
+                'user_image'        => empty($data['user_img']) ? '': $data['user_img']
              ]);
            }
 
@@ -89,10 +90,11 @@ class UserController extends Controller
                $user = UserSettings::create([
                 'user_id'               => $user_id,
                 'company_id'            => $data['company_id'],
+                'company_name'          => $data['company_name'],
                 'phone'                 => $data['phone'],
                 'location'              => $data['location'],
-                'user_title'            => $data['title'],
-                'user_info'             => $data['user_info'],
+                'user_title'            => empty($data['title']) ? '' : $data['title'],
+                'user_info'             => empty($data['user_info']) ? '': $data['user_info'],
               ]);
             }
 
@@ -110,7 +112,7 @@ class UserController extends Controller
                 'public_email'          => empty($data['public_email']) ? '' : $data['public_email'],
                 'show_email'            => array_key_exists('show_email', $data) ? $data['show_email'] : 0,
                 'job_email'             => array_key_exists('job_email', $data) ? $data['job_email'] : 0,
-                'recruiter_img'         => $data['recruiter_img']
+                'recruiter_img'         => empty($data['recruiter_img']) ? '' : $data['recruiter_img']
               ]);
             }
 
@@ -192,6 +194,7 @@ class UserController extends Controller
 		        'reg_notification' => array_key_exists('reg_notification', $data) ? $data['reg_notification'] : 0,
                 'enable_exhibitor' => array_key_exists('enable_exhibitor', $data) ? $data['enable_exhibitor'] : 0,
 		        'user_info'        => $data['user_info'],
+                'user_image'       => $data['user_image']
 		    ];
 		    $setting->update($settingDataToUpdate);
     	   }
@@ -203,7 +206,6 @@ class UserController extends Controller
                 'phone'      => $data['phone'],
                 'location'   => $data['location'],
                 'user_title' => empty($data['title']) ? '' : $data['title'],
-                'user_info'  => empty($data['user_info']) ? '' : $data['user_info'],
     	      ];
 
     	     $setting->update($settingDataToUpdate);
@@ -255,8 +257,10 @@ class UserController extends Controller
         $user  = User::findOrFail($id);
         if ($user) {
           $deleteUser = User::destroy($id);
-          $deleteUserSetting = UserSettings::where('user_id',$id)->first()->delete();
-          $user->roles()->detach(); 
+          $user->roles()->detach();
+          if (UserSettings::where('user_id',$id)->exists()) {
+              UserSettings::where('user_id',$id)->first()->delete();
+           } 
           return response()->json(['success'=>'User Delete Successfully'], 200); 
         }
     }

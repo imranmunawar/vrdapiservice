@@ -19,7 +19,7 @@ class CreateFairMediaTable extends Migration
             $table->foreign('fair_id')->references('id')->on('fairs');
             $table->string('fair_media_name');
             $table->string('fair_media_type');
-            $table->integer('fair_media_description')->nullable();
+            $table->string('fair_media_description')->nullable();
             $table->string('fair_media_link')->nullable();
             $table->string('fair_media_image')->nullable();
             $table->string('fair_media_video')->nullable();

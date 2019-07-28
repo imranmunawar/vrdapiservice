@@ -23,6 +23,7 @@ class CreateFairsTable extends Migration
             $table->string('phone', 15);
             $table->string('fair_image')->nullable();
             $table->string('fair_video')->nullable();
+            $table->string('fair_mobile_image')->nullable();
             $table->string('timezone')->nullable();
             $table->dateTime('register_time')->nullable();
             $table->dateTime('start_time')->nullable();

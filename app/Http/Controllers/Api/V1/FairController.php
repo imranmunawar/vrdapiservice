@@ -56,7 +56,8 @@ class FairController extends Controller
      */
     public function show($id)
     {
-        //
+        $fair = Fair::find($id);
+        return response()->json($fair); 
     }
 
     /**

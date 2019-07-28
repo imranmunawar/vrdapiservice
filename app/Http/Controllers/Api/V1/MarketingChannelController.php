@@ -4,19 +4,19 @@ namespace App\Http\Controllers\Api\V1;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Company;
+use App\MarketingChannel;
 
-class CompanyController extends Controller
+class MarketingChannelController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($fair_id = '')
+    public function index($id)
     {
-        $companies = !empty($fair_id) ? Company::all()->where('fair_id', $fair_id) :  Company::all();
-        return response()->json($companies);
+        $MarketingChannel = MarketingChannel::all()->where('fair_id',$id);
+        return response()->json($MarketingChannel);
     }
 
     /**
@@ -37,20 +37,13 @@ class CompanyController extends Controller
      */
     public function store(Request $request)
     {
-        // Create a new company in the database...
-         $company = Company::create($request->all());
-        if (!$company) {
-            return response()->json(
-                [ 
-                    'success' => false,
-                    'message' => 'Company Not Created Successfully'
-                ],200); 
+        // Create a new MarketingChannel in the database...
+         $MarketingChannel = MarketingChannel::create($request->all());
+        if (!$MarketingChannel) {
+            return response()->json(['success' => false,'message' => 'Marketing Channel Not Created Successfully'],200); 
         }
-
-        return response()->json(
-            [ 
-                'success' => true, 
-                'message' => 'Company Created Successfully' ],200);
+        
+        return response()->json(['success' => true,'message' => 'Marketing Channel Created Successfully' ],200);
 
 
     }
@@ -63,8 +56,7 @@ class CompanyController extends Controller
      */
     public function show($id)
     {
-        $company = Company::find($id);
-        return response()->json($company); 
+        //
     }
 
     /**
@@ -75,8 +67,8 @@ class CompanyController extends Controller
      */
     public function edit($id)
     {
-        $company = Company::find($id);
-        return response()->json($company); 
+        $MarketingChannel = MarketingChannel::find($id);
+        return response()->json($MarketingChannel); 
     }
 
     /**
@@ -89,11 +81,11 @@ class CompanyController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->all(); 
-        $company  = Company::findOrFail($id);
-        $company->fill($data)->save();
+        $MarketingChannel  = MarketingChannel::findOrFail($id);
+        $MarketingChannel->fill($data)->save();
             return response()->json([
                'success' => true,
-               'message' => 'Company Updated Successfully'
+               'message' => 'Fair Media Updated Successfully'
             ], 200);
         
     }
@@ -106,10 +98,10 @@ class CompanyController extends Controller
      */
     public function destroy($id)
     {
-        $company  = Company::findOrFail($id);
-        if ($company) {
-          $deleteUser = Company::destroy($id);
-          return response()->json(['success'=>true, 'message'=> 'Company Delete Successfully'], 200); 
+        $MarketingChannel  = MarketingChannel::findOrFail($id);
+        if ($MarketingChannel) {
+          $deleteMarketingChannel = MarketingChannel::destroy($id);
+          return response()->json(['success'=>true, 'message'=> 'Marketing Channel Delete Successfully'], 200); 
         }
     }
 }

@@ -15,7 +15,7 @@ class CompanyMediaController extends Controller
      */
     public function index($id)
     {
-        $CompanyMedia = CompanyMedia::all()->where('fair_id',$id);
+        $CompanyMedia = CompanyMedia::all()->where('company_id',$id);
         return response()->json($CompanyMedia);
     }
 
@@ -40,10 +40,10 @@ class CompanyMediaController extends Controller
         // Create a new CompanyMedia in the database...
          $CompanyMedia = CompanyMedia::create($request->all());
         if (!$CompanyMedia) {
-            return response()->json(['success' => false,'message' => 'CompanyMedia Media Not Created Successfully'],200); 
+            return response()->json(['success' => false,'message' => 'Company Media Not Created Successfully'],200); 
         }
         
-        return response()->json(['success' => true,'message' => 'CompanyMedia Created Successfully' ],200);
+        return response()->json(['success' => true,'message' => 'Company Media Created Successfully' ],200);
 
 
     }
@@ -85,7 +85,7 @@ class CompanyMediaController extends Controller
         $CompanyMedia->fill($data)->save();
             return response()->json([
                'success' => true,
-               'message' => 'Fair Media Updated Successfully'
+               'message' => 'Company Media Updated Successfully'
             ], 200);
         
     }
@@ -101,7 +101,7 @@ class CompanyMediaController extends Controller
         $CompanyMedia  = CompanyMedia::findOrFail($id);
         if ($CompanyMedia) {
           $deleteCompanyMedia = CompanyMedia::destroy($id);
-          return response()->json(['success'=>true, 'message'=> 'Fair Media Delete Successfully'], 200); 
+          return response()->json(['success'=>true, 'message'=> 'Company Media Delete Successfully'], 200); 
         }
     }
 }

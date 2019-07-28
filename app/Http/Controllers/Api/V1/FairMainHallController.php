@@ -4,32 +4,24 @@ namespace App\Http\Controllers\Api\V1;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\CareerTest;
-use App\JobQuestionnaire;
+use App\CompanyStand;
 
-class JobQuestionnaireController extends Controller
+class FairMainHallController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index( $fair_id = '', $job_id = '')
+    public function index()
     {
-        $dataObj = [];
-        if (JobQuestionnaire::where('job_id','=',$job_id)->exists()) {
-            $dataObj = [
-                'JobQuestionnaire'      => JobQuestionnaire::where('job_id','=', $job_id)->get(),
-                'careerTestWithAnswers' => CareerTest::with('answers')->where('fair_id', $fair_id)->get()      
-            ];
-        }else{
-             $dataObj = [
-                'careerTestWithAnswers' => CareerTest::with('answers')->where('fair_id', $fair_id)->get()      
-            ];
-        }
-        
-        return response()->json($dataObj);
+       
+    }
 
+    public function companyStand($company_id = '')
+    {
+        $companyStand = CompanyStand::find($company_id)
+        return response()->json($companyStand);
     }
 
     /**
@@ -50,24 +42,22 @@ class JobQuestionnaireController extends Controller
      */
     public function store(Request $request)
     {
-        $destory = JobQuestionnaire::where('job_id', $request->job_id)->delete();
-        $questions = CareerTest::all();  
-        foreach($questions as $question){
-            $id = $question->id;
-            $answers = $request->input("options$id");
-            if($answers){
-                foreach($answers as $answer){
-                    $score = $request->input("score$answer");
-                    JobQuestionnaire::create(array(
-                        'job_id' => $request->job_id,
-                        'test_id' => $id,
-                        'answer' => $answer,
-                        'score' => $score
-                    ));
-                }
+        // Create a new CareerTestAnswer in the database...
+        if (CompanyStand::where('company_id' , '=', $request->company_id)->exists()) {
+            $updateStand = CompanyStand::where('company_id', $request->company_id)->update(['stand_top' => $request->stand_top,
+                'stand_left' => $request->stand_left]);
+             if ($updateStand) {
+
+                return response()->json(['success' => false,'message' => 'Stand Demision Update Successfully'],200); 
+            }
+        }else{
+            $companyStand = CompanyStand::create($request->all()); 
+            if (!$companyStand) {
+                return response()->json(['success' => false,'message' => 'Stand Demision Not Set Successfully'],200); 
             }
         }
-        return response()->json(['success' => true,'message' => 'Job Questionnaire Set Successfully' ],200);
+    
+        return response()->json(['success' => true,'message' => 'Stand Demision Set Successfully' ],200);
 
 
     }
@@ -91,7 +81,7 @@ class JobQuestionnaireController extends Controller
      */
     public function edit($id)
     {
-        $CareerTestAnswer = CareerTestAnswer::find($id);
+        $CareerTestAnswer = companyStand::find($id);
         return response()->json($CareerTestAnswer); 
     }
 
@@ -105,7 +95,7 @@ class JobQuestionnaireController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->all(); 
-        $CareerTestAnswer  = CareerTestAnswer::findOrFail($id);
+        $CareerTestAnswer  = companyStand::findOrFail($id);
         $CareerTestAnswer->fill($data)->save();
             return response()->json([
                'success' => true,
@@ -122,9 +112,9 @@ class JobQuestionnaireController extends Controller
      */
     public function destroy($id)
     {
-        $CareerTestAnswer  = CareerTestAnswer::findOrFail($id);
+        $CareerTestAnswer  = companyStand::findOrFail($id);
         if ($CareerTestAnswer) {
-          $deleteCareerTestAnswer = CareerTestAnswer::destroy($id);
+          $deleteCareerTestAnswer = companyStand::destroy($id);
           return response()->json(['success'=>true, 'message'=> 'Career Test Answer Delete Successfully'], 200); 
         }
     }

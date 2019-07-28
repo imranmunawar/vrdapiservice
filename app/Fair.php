@@ -29,6 +29,7 @@ class Fair extends Model
         'organiser_id',
         'fair_image',
         'fair_video',
+        'fair_mobile_image',
         'fair_type',
         'fair_status',
         'chat_status'

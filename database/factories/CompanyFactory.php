@@ -15,7 +15,6 @@ use Faker\Generator as Faker;
 
 $factory->define(App\Company::class, function (Faker $faker) {
     return [
-        'admin_id' => $faker->randomDigit,
         'fair_id' => $faker->randomDigit,
         'company_name' => 'Gold',
         'company_stand_type' => $faker->name,
