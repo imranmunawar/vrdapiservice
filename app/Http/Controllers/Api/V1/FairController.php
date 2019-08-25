@@ -59,6 +59,20 @@ class FairController extends Controller
         $fair = Fair::find($id);
         return response()->json($fair); 
     }
+    
+    public function showFairByShortname(Request $request)
+    {
+        $fair = Fair::where('short_name',$request->short_name)->first();
+        if ($fair) {
+            return response()->json($fair);
+        }else{
+            return response()->json([
+               'error' => true,
+               'message' => 'Fair Not Found'
+            ], 404);
+        }
+         
+    }
 
     /**
      * Show the form for editing the specified resource.

@@ -2,23 +2,35 @@
 use Illuminate\Http\Request;
 Route::group(['prefix' => 'auth','namespace' => 'Api\V1'], function () {
     Route::post('login', 'AuthController@login');
+    //Check if user email is already exist
+    Route::post('/check-user-email', 'UserController@checkUserEmail')->name('IsUserEmailExist');
     Route::post('signup', 'AuthController@signup');
   
     Route::group(['middleware' => 'auth:api'], function() {
         Route::get('logout', 'AuthController@logout');
         Route::get('user', 'AuthController@user');
     });
+
+    /* Candidates Routes */
+    Route::get('candidate/show/{id}',       ['uses' => 'CandidateController@show',   'as'  => 'showCandidate']);
+    Route::get('candidates/list/{fair_id}', ['uses' => 'CandidateController@index',  'as'  => 'listCandidates']);
+    Route::post('candidates',               ['uses' => 'CandidateController@store',  'as'  => 'createCandidate']);
+    Route::get('candidates/edit/{user}',    ['uses' => 'CandidateController@edit',   'as'  => 'editCandidate']);
+    Route::patch('candidates/update/{id}',  ['uses' => 'CandidateController@update', 'as'  => 'updateCandidate']);
+    Route::delete('candidates/delete/{id}', ['uses' => 'CandidateController@destroy','as'  => 'deleteCandidate']);
+
+    /* Show Fair Info Using Short Name */
+     Route::post('fair/show-by-shortname/',      ['uses' => 'FairController@showFairByShortname',   'as'  => 'showFairByShortname']);
+
 });
 Route::group(['namespace' => 'Auth','prefix' => 'password'], function () {    
     Route::post('create', 'ResetPasswordController@create');
     Route::get('find/{token}', 'ResetPasswordController@find');
     Route::post('reset', 'ResetPasswordController@reset');
 });
+
 Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
 
-    // Check if user email is already exist
-    Route::post('/check-user-email', 'UserController@checkUserEmail')->name('IsUserEmailExist');
-    
     /* Users Crud Routes */
     Route::get('users/show/{id}',      ['uses' => 'UserController@show',   'as'  => 'showUser']);
     Route::get('users/list/{type}/{company_id?}',    ['uses' => 'UserController@index',  'as'  => 'listUsers']);
@@ -97,4 +109,9 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
 
     Route::get('admin/stats', ['uses' => 'StatsController@index', 'as'  => 'adminStats']);
 
+    /*-------------------- Candidates Front Routes ----------------------*/
+    Route::get('career-test/{fair_id}',  ['uses' =>'CandidateController@getCareerTestList', 'as'  => 'getCareerTestList']);
+    Route::post('save/candidate/career-test',  ['uses' =>'CandidateController@storeCareerTest', 'as'  => 'storeCareerTest']);
+    Route::get('candidate/show/{id}',  ['uses' =>'CandidateController@show', 'as'  => 'storeCareerTest']);
+    // Route::get('candidate/career-test/{fair_id}/{candidate_id}',  ['uses' =>'CandidateController@show']);
 });
