@@ -37,7 +37,9 @@ class CreateFairsTable extends Migration
             $table->string('instagram');
             $table->string('fair_status');
             $table->string('chat_status');
-
+            $table->string('layout');
+            $table->string('presenter');
+            $table->string('stand_receptionist');
             $table->timestamps();
         });
     }

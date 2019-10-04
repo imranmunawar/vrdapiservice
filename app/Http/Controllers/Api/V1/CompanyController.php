@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Api\V1;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Company;
+use App\MatchJob;
+use App\CandidateJob;
+use App\MatchRecruiter;
 
 class CompanyController extends Controller
 {
@@ -15,7 +18,8 @@ class CompanyController extends Controller
      */
     public function index($fair_id = '')
     {
-        $companies = !empty($fair_id) ? Company::all()->where('fair_id', $fair_id) :  Company::all();
+        
+        $companies = !empty($fair_id) ? Company::where('fair_id',$fair_id)->where('fair_id',$fair_id)->with('stand')->get() :  Company::all();
         return response()->json($companies);
     }
 
@@ -112,4 +116,71 @@ class CompanyController extends Controller
           return response()->json(['success'=>true, 'message'=> 'Company Delete Successfully'], 200); 
         }
     }
+
+    public function candidateCompanyJobs(Request $request){
+        $fair_id      = $request->fair_id;
+        $candidate_id = $request->candidate_id;
+        $company_id   = $request->company_id;
+        $jobs = MatchJob::where('candidate_id',$candidate_id)
+                        ->where('fair_id',$fair_id)
+                        ->where('company_id',$company_id)
+                        ->with('jobDetail','companyDetail')
+                        ->orderBy('percentage', 'Desc')
+                        ->get();
+        $candidateAppliedJobs = CandidateJob::all()
+                                ->where('candidate_id',$candidate_id)
+                                ->where('fair_id',$fair_id);
+
+        return response()->json(['jobs'=>$jobs,'appliedJobs'=>$candidateAppliedJobs]);
+    }
+
+    public function candidateCompanyRecruiters(Request $request)
+    {  
+        $recruitersArr = [];
+        $fair_id       = $request->fair_id;
+        $candidate_id  = $request->candidate_id;
+        $company_id    = $request->company_id;
+        $recruiters = MatchRecruiter::where('candidate_id',$candidate_id)
+                        ->where('fair_id',$fair_id)
+                        ->where('company_id',$company_id)
+                        ->with('recruiter','companyDetail','recruiterSetting')
+                        ->orderBy('percentage', 'Desc')
+                        ->get();
+        foreach ($recruiters as $row) {
+            $recruitersArr[] = [
+                "id"         => $row->recruiter_id,
+                "company_id" => $row->company_id,
+                "fair_id"    => $row->fair_id,
+                "percentage" => $row->percentage,
+                'name'       => $row->recruiter->name,
+                'company_name'   => $row->companyDetail->company_name,
+                'title'          => $row->recruiterSetting->user_title,
+                'public_email'   => $row->recruiterSetting->public_email,
+                'linkedin'       => $row->recruiterSetting->linkedin_profile_link,
+                'recruiter_img'  => $row->recruiterSetting->recruiter_img,
+                'location'       => $row->recruiterSetting->location,
+            ];
+        }
+        return response()->json(['recruiters'=>$recruitersArr]);
+    }
+
+
+    public function companyDetail(Request $request)
+    {  
+        $company_id = $request->company_id;
+        $company = Company::where('id',$company_id)->with('media')->first();
+        if ($company) {
+            return response()->json($company);
+        }
+
+        return response()->json(['error'=>true,'message'=>'company not found'],401);
+    }
+
+
+    public function fairCompanies(Request $request){
+        $fairCompanies = Company::where('fair_id',$request->fair_id)->with('stand')->get();
+    }
+
+    
+
 }

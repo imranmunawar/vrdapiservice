@@ -30,4 +30,10 @@ class Company extends Model
     {
         return $this->hasOne('App\CompanyStand');
     }
+
+    public function media(){
+        return $this->hasMany('App\CompanyMedia');
+    }
+
+
 }

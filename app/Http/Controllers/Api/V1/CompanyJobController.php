@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\CompanyJob;
+use App\CandidateJob;
 
 class CompanyJobController extends Controller
 {
@@ -13,9 +14,15 @@ class CompanyJobController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($company_id = '')
+    public function index($company_id = '', $recruiter_id = '')
     {
-        $jobs = !empty($company_id) ? CompanyJob::all()->where('company_id', $company_id) :  CompanyJob::all();;
+        $jobs = '';
+        if (empty($recruiter_id) && !empty($company_id)) {
+            $jobs = CompanyJob::all()->where('company_id', $company_id);
+        }elseif (!empty($recruiter_id) && !empty($recruiter_id)) {
+           $jobs = CompanyJob::with('applicationsCount')->where('recruiter_id', $recruiter_id)->where('company_id', $company_id)->get(); 
+        }
+    
         return response()->json($jobs);
     }
 
@@ -38,7 +45,7 @@ class CompanyJobController extends Controller
     public function store(Request $request)
     {
         // Create a new company in the database...
-         $job = CompanyJOb::create($request->all());
+         $job = CompanyJob::create($request->all());
         if (!$job) {
             return response()->json(
                 [ 
@@ -74,7 +81,7 @@ class CompanyJobController extends Controller
      */
     public function edit($id)
     {
-        $company = CompanyJOb::find($id);
+        $company = CompanyJob::find($id);
         return response()->json($company); 
     }
 
@@ -88,7 +95,7 @@ class CompanyJobController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->all(); 
-        $job = CompanyJOb::findOrFail($id);
+        $job = CompanyJob::findOrFail($id);
         $job->fill($data)->save();
             return response()->json([
                'success' => true,
@@ -110,5 +117,32 @@ class CompanyJobController extends Controller
           $deleteJob = CompanyJob::destroy($id);
           return response()->json(['success'=>true, 'message'=> 'Job Deleted Successfully'], 200); 
         }
+    }
+
+
+    public function jobApplications($job_id){
+        $applications = [];
+        $candidates = CandidateJob::where('job_id',$job_id)->get();
+        if ($candidates->count() > 0) {
+            foreach ($candidates as $row) {
+                $applications [] = [
+                    "job_id"       => $row->job_id,
+                    "candidate_id" => $row->candidate_id,
+                    "company_id"   => $row->company_id,
+                    "fair_id"      => $row->fair_id,
+                    "name"         => $row->candidate->name,
+                    "email"        => $row->candidate->email,
+                    "user_country" => $row->candidateInfo->user_country,
+                    "user_city"    => $row->candidateInfo->user_country,
+                    'cv'           => $row->candidateInfo->user_cv,
+                    "match"        => $row->match->percentage,
+                ];
+            }
+            return response()->json(['success' => true, 'applicant'=> $applications], 200);
+        }
+
+        return response()->json(['success' => false,'message' => 'Job Candidate Not Found'
+                ],404); 
+        
     }
 }

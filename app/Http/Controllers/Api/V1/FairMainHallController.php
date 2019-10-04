@@ -20,7 +20,7 @@ class FairMainHallController extends Controller
 
     public function companyStand($company_id = '')
     {
-        $companyStand = CompanyStand::find($company_id)
+        $companyStand = CompanyStand::find($company_id);
         return response()->json($companyStand);
     }
 
@@ -43,23 +43,23 @@ class FairMainHallController extends Controller
     public function store(Request $request)
     {
         // Create a new CareerTestAnswer in the database...
-        if (CompanyStand::where('company_id' , '=', $request->company_id)->exists()) {
-            $updateStand = CompanyStand::where('company_id', $request->company_id)->update(['stand_top' => $request->stand_top,
+        if (CompanyStand::where('company_id',$request->id)->exists()) {
+            $updateStand = CompanyStand::where('company_id', $request->id)->update(['stand_top' => $request->stand_top,
                 'stand_left' => $request->stand_left]);
-             if ($updateStand) {
-
                 return response()->json(['success' => false,'message' => 'Stand Demision Update Successfully'],200); 
-            }
         }else{
-            $companyStand = CompanyStand::create($request->all()); 
+            $arr = [
+              'company_id' => $request->id,
+              'stand_top'  => $request->stand_top,
+              'stand_left' => $request->stand_left
+            ];
+            $companyStand = CompanyStand::create($arr); 
             if (!$companyStand) {
                 return response()->json(['success' => false,'message' => 'Stand Demision Not Set Successfully'],200); 
             }
         }
     
         return response()->json(['success' => true,'message' => 'Stand Demision Set Successfully' ],200);
-
-
     }
 
     /**

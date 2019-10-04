@@ -32,11 +32,23 @@ class Fair extends Model
         'fair_mobile_image',
         'fair_type',
         'fair_status',
-        'chat_status'
+        'chat_status',
+        'layout',
+        'presenter',
+        'stand_receptionist'
     ];
 
     public function organizer()
     {
         return $this->belongsTo('App\User', 'organiser_id','id');
+    }
+
+    public function setting()
+    {
+        return $this->hasOne('App\FairSetting','fair_id','id');
+    }
+
+    public static function fairByShortname($shortName){
+        return $this::where('short_name',$short_name)->with('organizer')->first();
     }
 }

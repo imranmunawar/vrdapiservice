@@ -5,6 +5,10 @@ namespace App\Http\Controllers\Api\V1;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Fair;
+use App\Company;
+use App\CompanyJob;
+use App\FairSetting;
+use App\UserSettings;
 
 class FairController extends Controller
 {
@@ -42,10 +46,7 @@ class FairController extends Controller
         if (!$fair) {
             return response()->json(['success' => false,'message' => 'Fair Media Not Created Successfully'],200); 
         }
-
         return response()->json(['success' => true,'message' => 'Fair Media Created Successfully' ],200);
-
-
     }
 
     /**
@@ -60,19 +61,6 @@ class FairController extends Controller
         return response()->json($fair); 
     }
     
-    public function showFairByShortname(Request $request)
-    {
-        $fair = Fair::where('short_name',$request->short_name)->first();
-        if ($fair) {
-            return response()->json($fair);
-        }else{
-            return response()->json([
-               'error' => true,
-               'message' => 'Fair Not Found'
-            ], 404);
-        }
-         
-    }
 
     /**
      * Show the form for editing the specified resource.
@@ -98,10 +86,10 @@ class FairController extends Controller
         $data = $request->all(); 
         $fair  = Fair::findOrFail($id);
         $fair->fill($data)->save();
-            return response()->json([
-               'success' => true,
-               'message' => 'Fair Updated Successfully'
-            ], 200);
+        return response()->json([
+           'success' => true,
+           'message' => 'Fair Updated Successfully'
+        ], 200);
         
     }
 
@@ -119,4 +107,84 @@ class FairController extends Controller
           return response()->json(['success'=>true, 'message'=> 'Fair Delete Successfully'], 200); 
         }
     }
+
+    public function showFairByShortname(Request $request)
+    {
+        $short_name = $request->short_name;
+        $fair = Fair::where('short_name',$short_name)->first();
+        if ($fair) {
+            return response()->json($fair);
+        }else{
+            return response()->json([
+               'error'   => true,
+               'message' => 'Fair Not Found'
+            ], 404);
+        }     
+    }
+
+    public function terms($fair_id)
+    {
+        $terms = FairSetting::select('terms_conditions')->where('fair_id',$fair_id)->first();
+        if ($terms) {
+            return response()->json($terms);
+        }else{
+            return response()->json([
+               'error'   => true,
+               'message' => 'Terms And Condition Not Found'
+            ], 404);
+        }     
+    }
+
+    public function privacy($fair_id)
+    {
+        $privacy = FairSetting::select('privacy_policy')->where('fair_id',$fair_id)->first();
+        if ($privacy) {
+            return response()->json($privacy);
+        }else{
+            return response()->json([
+               'error'   => true,
+               'message' => 'Privacy Policy Not Found'
+            ], 404);
+        }     
+    }
+
+    public function aboutFair($organizer_id)
+    {
+        $organizer = UserSettings::where('user_id',$organizer_id)->first();
+        if ($organizer) {
+            return response()->json(['info'=>$organizer->user_info],200);
+        }else{
+            return response()->json([
+               'error' => true,
+               'message' => 'Fair Not Found'
+            ], 404);
+        }    
+    }
+
+    public function exhibitors($fair_id)
+    {
+        $companies = Company::select('company_logo','company_name')->where('fair_id',$fair_id)->get();
+        if ($companies) {
+            return response()->json(['companies'=>$companies],200);
+        }else{
+            return response()->json([
+               'error' => true,
+               'message' => 'Exhibitors Not Found'
+            ], 404);
+        }    
+    }
+
+    public function jobs($fair_id)
+    {
+        $jobs = CompanyJob::where('fair_id',$fair_id)->with('company')->get();
+        if ($jobs) {
+            return response()->json(['jobs'=>$jobs],200);
+        }else{
+            return response()->json([
+               'error' => true,
+               'message' => 'Jobs Not Found'
+            ], 404);
+        }    
+    }
+
 }

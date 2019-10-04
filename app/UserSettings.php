@@ -23,7 +23,12 @@ class UserSettings extends Model
       'show_email',
       'job_email',
       'recruiter_img',
-      'user_image'
+      'user_image',
+      'user_cv',
+      'fair_id',
+      'user_country',     
+      'user_city',
+      'user_postal_code',
     ];
 
 

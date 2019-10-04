@@ -45,7 +45,7 @@ class CareerTestController extends Controller
                 return response()->json(['success' => false,'message' => 'Career Test Not Created Successfully'],200); 
             }
         }else{
-            $CareerTestAnswer = CareerTestAnswer::create($request->all());
+            $CareerTest = CareerTest::create($request->all());
             if (!$CareerTest) {
                 return response()->json(['success' => false,'message' => 'Career Test Not Created Successfully'],200); 
             }
@@ -60,9 +60,40 @@ class CareerTestController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
-        //
+    public function show($fair_id){
+        $careerTest = CareerTest::all()->where('fair_id',$fair_id);
+        $questionsArr = [];
+        foreach ($careerTest as $key => $value){
+            $questionsArr[]=[
+                "id"                 =>$value->id,
+                "fair_id"            =>$value->fair_id,
+                "question"           =>$value->question,
+                "short_question"     =>$value->short_question,
+                "backoffice_question"=>$value->backoffice_question,
+                "question_type"      =>$value->question_type,
+                "min_selection"      =>$value->min_selection,
+                "max_selection"      =>$value->max_selection,
+                "display_order"      =>$value->display_order,
+                "answers"            => $this->answers($value->id)
+            ];
+        }
+
+        return response()->json($questionsArr);
+    }
+
+    private function answers($test_id){
+        $answers = CareerTestAnswer::all()->where('test_id',$test_id);
+        $answersArr = [];
+        foreach ($answers as $key => $value){
+            $answersArr[] = [
+                "id"      => $value->id,
+                "test_id" => $value->test_id,
+                "answer"  => $value->answer,
+                "is_checked"=>false
+            ];
+        }
+
+        return $answersArr;
     }
 
     /**

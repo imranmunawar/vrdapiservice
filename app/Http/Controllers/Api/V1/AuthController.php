@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\User;
+use DB;
 class AuthController extends Controller
 {
     /**
@@ -44,35 +45,125 @@ class AuthController extends Controller
      * @return [string] token_type
      * @return [string] expires_at
      */
-    public function login(Request $request)
+    public function backendLogin(Request $request)
     {
-        $request->validate([
+        if ($this->validateRole($request->email)) {
+           $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
             'remember_me' => 'boolean'
-        ]);
-        $credentials = request(['email', 'password']);
-        if(!Auth::attempt($credentials))
+           ]);
+            $credentials = request(['email', 'password']);
+            if(!Auth::attempt($credentials))
+                return response()->json([
+                    "code"   => 401,
+                    "status" => "Unauthorized",
+                ], 401);
+            $user = $request->user();
+            $tokenResult = $user->createToken('Personal Access Token');
+            $token = $tokenResult->token;
+            if ($request->remember_me)
+                $token->expires_at = Carbon::now()->addWeeks(1);
+            $token->save();
+            return response()->json([
+                "code"   => 200,
+                "status" => "success",
+                'access_token' => $tokenResult->accessToken,
+                'token_type' => 'Bearer',
+                'user'=>$user,
+                'expires_at' => Carbon::parse(
+                    $tokenResult->token->expires_at
+                )->toDateTimeString()
+            ], 200);  
+        }else{
             return response()->json([
                 "code"   => 401,
                 "status" => "Unauthorized",
             ], 401);
-        $user = $request->user();
-        $tokenResult = $user->createToken('Personal Access Token');
-        $token = $tokenResult->token;
-        if ($request->remember_me)
-            $token->expires_at = Carbon::now()->addWeeks(1);
-        $token->save();
-        return response()->json([
-            "code"   => 200,
-            "status" => "success",
-            'access_token' => $tokenResult->accessToken,
-            'token_type' => 'Bearer',
-            'user'=>$user,
-            'expires_at' => Carbon::parse(
-                $tokenResult->token->expires_at
-            )->toDateTimeString()
-        ], 200);
+        }
+        
+    }
+
+    public function frontLogin(Request $request)
+    {
+        if($this->isRoleUser($request->email)){
+            $request->validate([
+                'email'       => 'required|string|email',
+                'password'    => 'required|string',
+                'remember_me' => 'boolean'
+            ]);
+            $credentials = request(['email', 'password']);
+            if(!Auth::attempt($credentials))
+                return response()->json([
+                    "code"   => 401,
+                    "status" => "Unauthorized",
+                ], 401);
+            $user = $request->user();
+           $userObject = (object) [
+                'id'        => $user->id,
+                'name'      => $user->name,
+                'first_name'=> $user->first_name,
+                'last_name' => $user->last_name,
+                'email'     => $user->email,
+                'fair_id'   => $user->userSetting['fair_id'],
+                'country_name' => $user->userSetting['user_country'],
+                'city_name'    => $user->userSetting['user_city'],
+                'postal_code'  => $user->userSetting['user_postal_code'],
+                'cv'           => $user->userSetting['user_cv'],
+                'profile_image'=> $user->userSetting['user_image']
+
+            ];
+            $tokenResult = $user->createToken('Personal Access Token');
+            $token = $tokenResult->token;
+            if ($request->remember_me)
+                $token->expires_at = Carbon::now()->addWeeks(1);
+            $token->save();
+            return response()->json([
+                "code"         => 200,
+                "status"       => "success",
+                'access_token' => $tokenResult->accessToken,
+                'token_type'   => 'Bearer',
+                'user'         =>  $userObject,
+                'expires_at'   => Carbon::parse(
+                    $tokenResult->token->expires_at
+                )->toDateTimeString()
+            ], 200);
+        }else{
+            return response()->json([
+                "code"   => 401,    
+                "status" => "Unauthorized",
+            ], 401); 
+        }
+    }
+
+    private function validateRole($email){
+       $user     = User::where('email',$email)->first();
+        if (empty($user)) {
+            return false;
+        }else{
+           $userRole = DB::table('role_user')->where('user_id', '=', $user->id)->first();
+           $roleName = DB::table('roles')->where('id', '=', $userRole->role_id)->first(); 
+           if ($roleName->name == 'Admin' || $roleName->name == 'Organizer' || $roleName->name == 'Receptionist' || $roleName->name ==  'Company Admin' || $roleName->name ==  'Recruiter') {
+               return true;
+           }
+
+           return false;
+        } 
+    }
+
+    private function isRoleUser($email){
+        $user     = User::where('email',$email)->first();
+        if (empty($user)) {
+            return false;
+        }else{
+           $userRole = DB::table('role_user')->where('user_id', '=', $user->id)->first();
+           $roleName = DB::table('roles')->where('id', '=', $userRole->role_id)->first(); 
+           if ($roleName->name == 'User') {
+               return true;
+           }
+
+           return false;
+        }
     }
   
     /**
@@ -100,7 +191,7 @@ class AuthController extends Controller
         return response()->json([
             "code"   => 200,
             "status" => "success",
-            "data"   => $request->user()->load('roles')
+            "data"   => $request->user()->load('roles','userSetting')
          ]);
     }
 }
