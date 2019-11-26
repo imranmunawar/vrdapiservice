@@ -9,10 +9,10 @@ class CandidateJob extends Model {
     // {
     //     return $this->belongsTo('App\User', 'candidate_id', 'id' );
     // }
-    // public function jobs()
-    // {
-    //     return $this->belongsTo('App\FairJobs', 'job_id', 'job_id' );
-    // }
+    public function jobs()
+    {
+        return $this->belongsTo('App\CompanyJob', 'job_id', 'id' );
+    }
     // public function jobdetails()
     // {
     //     return $this->hasOne('App\MatchJobs', 'job_id', 'job_id' );
@@ -28,6 +28,10 @@ class CandidateJob extends Model {
 
     public function candidateInfo(){
       return $this->hasOne('App\UserSettings', 'user_id', 'candidate_id' );
+    }
+
+    public function job(){
+      return $this->hasOne('App\CompanyJob', 'id', 'job_id' );
     }
 
     protected $fillable = array(

@@ -22,6 +22,7 @@ class Company extends Model
         'company_in_url',
         'company_instagram_url',
         'company_stand_type',
+        'description',
         'company_logo',
         'company_stand_image',
     ];

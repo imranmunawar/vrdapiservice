@@ -39,6 +39,20 @@ class WebinarController extends Controller
     {
         // Create a new webinar in the database...
         $webinar = CompanyWebinar::create($request->all());
+        if ($webinar) {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL,"'https://api.cometondemand.net/api/v2/createGroup");
+            curl_setopt($ch, CURLOPT_HTTPHEADER,array(
+              'api-key: 51374xb73fca7c64f3a49d2ffdefbb1f2e8c76'
+            ));
+            curl_setopt($ch, CURLOPT_POST, 1);  
+            curl_setopt($ch, CURLOPT_POSTFIELDS,'GUID='.$webinar->id.'&name='.$request->title.'&type=0');
+            // Receive server response ...
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $apiResponse = curl_exec($ch);
+            $apiResponse = (array)json_decode($apiResponse);
+            curl_close ($ch);
+        }
         if (!$webinar) {
             return response()->json([ 
                 'success' => false,
@@ -88,6 +102,33 @@ class WebinarController extends Controller
     {
         $data = $request->all(); 
         $webinar = CompanyWebinar::findOrFail($id);
+        if ($webinar) {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL,"'https://api.cometondemand.net/api/v2/deleteGroup");
+            curl_setopt($ch, CURLOPT_HTTPHEADER,array(
+              'api-key: 51374xb73fca7c64f3a49d2ffdefbb1f2e8c76'
+            ));
+            curl_setopt($ch, CURLOPT_POST, 1);  
+            curl_setopt($ch, CURLOPT_POSTFIELDS,'GUID='.$id);
+            // Receive server response ...
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $apiResponse = curl_exec($ch);
+            $apiResponse = (array)json_decode($apiResponse);
+            curl_close ($ch);
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL,"'https://api.cometondemand.net/api/v2/createGroup");
+            curl_setopt($ch, CURLOPT_HTTPHEADER,array(
+              'api-key: 51374xb73fca7c64f3a49d2ffdefbb1f2e8c76'
+            ));
+            curl_setopt($ch, CURLOPT_POST, 1);  
+            curl_setopt($ch, CURLOPT_POSTFIELDS,'GUID='.$wid.'&name='.$request->title.'&type=0');
+            // Receive server response ...
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $apiResponse = curl_exec($ch);
+            $apiResponse = (array)json_decode($apiResponse);
+            curl_close ($ch);
+        }
         $webinar->fill($data)->save();
         return response()->json([
            'success' => true,

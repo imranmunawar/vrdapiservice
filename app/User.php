@@ -77,4 +77,37 @@ class User extends Authenticatable
         
         return $query->count();
     }   
+
+    public static function isCandidateTakeTest($fair_id, $candidate_id)
+    {
+        $candidateTest = New CandidateTest;
+        $res = $candidateTest->where('fair_id', $fair_id)->where('candidate_id',$candidate_id)->get();
+        if ($res) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    public static function isCandidateAttendFair($fair_id, $candidate_id)
+    {
+        $candidateTurnout = New CandidateTurnout;
+        $res = $candidateTurnout->where('fair_id', $fair_id)->where('candidate_id',$candidate_id)->first();
+        if ($res) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    public static function isCandidateInMainHall($fair_id, $candidate_id)
+    {
+        $fairCandidates = New FairCandidates;
+        $res = $fairCandidates->where('fair_id', $fair_id)->where('candidate_id',$candidate_id)->where('mainhall',1)->first();
+        if ($res) {
+            return 1;
+        }
+
+        return 0;
+    }
 }

@@ -32,6 +32,7 @@ class CreateCompaniesTable extends Migration
             $table->string('company_in_url')->nullable();
             $table->string('company_instagram_url')->nullable();
             $table->string('company_stand_type')->nullable();
+            $table->longText('description')->nullable();
             $table->string('company_logo', 70)->nullable();
             $table->string('company_stand_image', 70)->nullable();
             $table->timestamps();

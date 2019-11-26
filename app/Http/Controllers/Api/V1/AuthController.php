@@ -106,6 +106,7 @@ class AuthController extends Controller
                 'last_name' => $user->last_name,
                 'email'     => $user->email,
                 'fair_id'   => $user->userSetting['fair_id'],
+                'phone'     => $user->userSetting['phone'],
                 'country_name' => $user->userSetting['user_country'],
                 'city_name'    => $user->userSetting['user_city'],
                 'postal_code'  => $user->userSetting['user_postal_code'],

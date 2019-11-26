@@ -143,6 +143,36 @@ class CompanyJobController extends Controller
 
         return response()->json(['success' => false,'message' => 'Job Candidate Not Found'
                 ],404); 
-        
+    }
+
+
+    public function detail($job_id, $candidate_id = '')
+    {
+        if (empty($candidate_id)) {
+            $jobDetail = CompanyJob::where('id',$job_id)->with('company')->first();
+            if ($jobDetail) {
+                return response()->json(['job'=>$jobDetail],200);
+            }else{
+                return response()->json([
+                   'error'   => true,
+                   'message' => 'Job Details Not Found'
+                ], 404);
+            }
+        }else{
+            $applied   = false;
+            $checkApplied   = CandidateJob::where('candidate_id',$candidate_id)->where('job_id',$job_id)->first();
+            $jobDetail = CompanyJob::where('id',$job_id)->with('company')->first();
+            if ($jobDetail) {
+                if ($checkApplied) {
+                  $applied = true;  
+                }
+                return response()->json(['job'=>$jobDetail,'applied'=>$applied],200);
+            }else{
+                return response()->json([
+                   'error' => true,
+                   'message' => 'Job Details Not Found'
+                ], 404);
+            }
+        }    
     }
 }

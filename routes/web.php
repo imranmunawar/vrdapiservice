@@ -32,5 +32,12 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
+Route::group(['namespace' => 'Api\V1'], function () {    
+   Route::get('/marketing/{fairname}/{channel}',      [
+    'uses'    => 'MarketingChannelController@channelClicks',  
+    'as'      => 'channelClicks'
+   ]); 
+});
+
 
 

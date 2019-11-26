@@ -19,6 +19,9 @@ class CreateMarketingChannelsTable extends Migration
             $table->foreign('fair_id')->references('id')->on('fairs');
             $table->string('channel_name');
             $table->integer('cost');
+            $table->string('url');
+            $table->integer('clicks');
+            $table->longText('notes')->nullable();
             $table->timestamps();
         });
     }

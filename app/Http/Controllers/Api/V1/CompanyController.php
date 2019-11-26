@@ -8,6 +8,7 @@ use App\Company;
 use App\MatchJob;
 use App\CandidateJob;
 use App\MatchRecruiter;
+use App\MatchWebinar;
 
 class CompanyController extends Controller
 {
@@ -127,9 +128,8 @@ class CompanyController extends Controller
                         ->with('jobDetail','companyDetail')
                         ->orderBy('percentage', 'Desc')
                         ->get();
-        $candidateAppliedJobs = CandidateJob::all()
-                                ->where('candidate_id',$candidate_id)
-                                ->where('fair_id',$fair_id);
+        $candidateAppliedJobs = CandidateJob::where('candidate_id',$candidate_id)
+                                ->where('fair_id',$fair_id)->get();
 
         return response()->json(['jobs'=>$jobs,'appliedJobs'=>$candidateAppliedJobs]);
     }
@@ -162,6 +162,21 @@ class CompanyController extends Controller
             ];
         }
         return response()->json(['recruiters'=>$recruitersArr]);
+    }
+
+    public function candidateCompanyWebinars(Request $request)
+    {  
+        $recruitersArr = [];
+        $fair_id       = $request->fair_id;
+        $candidate_id  = $request->candidate_id;
+        $company_id    = $request->company_id;
+        $webinars      = MatchWebinar::where('candidate_id',$candidate_id)
+                            ->where('fair_id',$fair_id)
+                            ->where('company_id',$company_id)
+                            ->with('companyWebinar','companyDetail')
+                            ->orderBy('percentage', 'Desc')
+                            ->get();
+        return response()->json(['webinars'=>$webinars]);
     }
 
 

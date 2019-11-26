@@ -19,6 +19,15 @@ class MatchRecruiter extends Model
         return $this->hasOne('App\UserSettings',  'user_id', 'recruiter_id');
     }
 
+    public function candidate()
+    {
+        return $this->hasOne('App\User', 'id', 'candidate_id');
+    }
+    public function candidateSetting()
+    {
+        return $this->hasOne('App\UserSettings',  'user_id', 'candidate_id');
+    }
+
     protected $fillable = array(
         'recruiter_id',
         'candidate_id',

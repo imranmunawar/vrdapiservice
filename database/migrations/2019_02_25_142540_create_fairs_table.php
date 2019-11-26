@@ -36,6 +36,7 @@ class CreateFairsTable extends Migration
             $table->string('linkedin');
             $table->string('instagram');
             $table->string('fair_status');
+            $table->integer('live');
             $table->string('chat_status');
             $table->string('layout');
             $table->string('presenter');

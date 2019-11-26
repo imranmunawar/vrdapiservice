@@ -1,5 +1,6 @@
 <?php
 use Illuminate\Http\Request;
+
 Route::group(['prefix' => 'auth','namespace' => 'Api\V1'], function () {
     Route::post('front/login', 'AuthController@frontLogin');
     Route::post('backend/login', 'AuthController@backendLogin');
@@ -17,25 +18,40 @@ Route::group(['prefix' => 'auth','namespace' => 'Api\V1'], function () {
         'uses' => 'CandidateController@show',   
         'as'   => 'showCandidate'
     ]);
+    // Candidates List Agints Fair
     Route::get('candidates/list/{fair_id}',[
         'uses' => 'CandidateController@index',  
         'as'   => 'listCandidates'
     ]);
+    // Register New Caniddate
     Route::post('candidates',[
         'uses' => 'CandidateController@store',  
         'as'   => 'createCandidate'
     ]);
+    // Get Candidate
     Route::get('candidates/edit/{user}',[
         'uses' => 'CandidateController@edit',   
         'as'   => 'editCandidate'
     ]);
+    // Update Candidate
     Route::patch('candidates/update/{id}',[
         'uses' => 'CandidateController@update', 
         'as'   => 'updateCandidate'
     ]);
+    // Delete Candiate
     Route::delete('candidates/delete/{id}',[
         'uses' => 'CandidateController@destroy',
         'as'   => 'deleteCandidate'
+    ]);
+    // Fair Candidates
+    Route::get('/fair/candidates/{fair_id}',[
+        'uses' => 'FairController@registeredCandidates',
+        'as'   => 'registeredCandidates'
+    ]);
+    // Candidate Deltail
+    Route::post('/fair/candidate/detail',[
+        'uses' => 'CandidateController@personalAgenda',
+        'as'   => 'candidatePersonalAgenda'
     ]);
 
     /* Show Fair Info Using Short Name */
@@ -73,7 +89,14 @@ Route::group(['prefix' => 'auth','namespace' => 'Api\V1'], function () {
         'as'   => 'fairJobs'
     ]);
 
+     // Get Fair Jobs
+    Route::get('job/detail/{job_id}/{candidate_id?}',[
+        'uses' => 'CompanyJobController@detail', 
+        'as'   => 'jobDetail'
+    ]);
+
 });
+
 Route::group(['namespace' => 'Auth','prefix' => 'password'], function () {    
     Route::post('create', 'ResetPasswordController@create');
     Route::get('find/{token}', 'ResetPasswordController@find');
@@ -87,10 +110,12 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
         'uses' => 'UserController@show',   
         'as'   => 'showUser'
     ]);
+    // List Users
     Route::get('users/list/{type}/{company_id?}',[
         'uses' => 'UserController@index',  
         'as'   => 'listUsers'
     ]);
+    // Create user
     Route::post('users',[
         'uses' => 'UserController@store',  
         'as'   => 'createUser'
@@ -239,6 +264,49 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
         'as'   => 'jobApplications'
     ]);
 
+    Route::get('/fair/candidate/block/{candidate_id}/{fair_id}',[
+      'uses' => 'CandidateController@blockCandidate',
+      'as'   => 'blockCandidate'
+    ]);
+
+    Route::get('/fair/candidate/unblock/{candidate_id}/{fair_id}',[
+      'uses' => 'CandidateController@unBlockCandidate',
+      'as'   => 'unBlockCandidate'
+    ]);
+
+    Route::post('/fair/candidates/bluk/block',[
+      'uses' => 'CandidateController@blukBlockCandidates',
+      'as'   => 'blukBlockCandidates'
+    ]);
+
+    Route::get('/fair/candidate/reset/password/{candidate_id}',[
+      'uses' => 'CandidateController@resetCandidatePassword',
+      'as'   => 'resetCandidatePassword'
+    ]);
+
+    Route::post('/fair/recruiter/candidates', 'CandidateController@recruiterCandidates');
+    Route::post('/recruiter/online/candidates', 'CandidateController@recruiterOnlineCandidates');
+
+    Route::post('/recruiter/candidate/agenda/view',[
+      'uses' => 'CandidateController@postAgendaView',  
+      'as'   => 'postAgendaView'
+    ]);
+
+    Route::post('candidate/recruiter/action',[
+        'uses' => 'CandidateController@recruiterAction',  
+        'as'   => 'recruiterAction'
+    ]);
+
+    Route::post('/fair/chat/transcript',[
+        'uses' => 'CandidateController@userChats',  
+        'as'   => 'userChats'
+    ]);
+
+    Route::get('/fair/chat/transcript-details/{one}/{two}/{userid}',[
+        'uses' => 'CandidateController@chatConversation',  
+        'as'   => 'chatConversation'
+    ]);
+
     /* Fair Settings */
     Route::get('fair/setting/show/{fair_id}',[
         'uses' => 'FairSettingController@show',   
@@ -275,6 +343,12 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
         'as'   => 'deleteFair'
     ]);
 
+
+    Route::get('fair/marketing/channels/stats/{fair_id}',      [
+        'uses'    => 'StatsController@marketingStats',  
+        'as'      => 'marketingStats'
+    ]);
+
     Route::get('fair/marketing/channel/list/{fair_id}',      [
         'uses'    => 'MarketingChannelController@index',  
         'as'      => 'marketingChannel'
@@ -294,6 +368,11 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
     Route::delete('fair/marketing/channel/{id}',[
         'uses'    => 'MarketingChannelController@destroy',
         'as'      => 'deleteMarketingChannel'
+    ]);
+
+    Route::get('/fair/marketing-channels/candidates/{fair_id}/{channel_id}',[
+      'uses' => 'MarketingChannelController@channelRegisteredCandidates',  
+      'as'   => 'channelRegisteredCandidates'
     ]);
 
     Route::post('fair/main/hall/save',[
@@ -379,9 +458,29 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
         'as'   => 'setWebinarQuestionnaire'
     ]);
 
+   
+
+    /* -------------- Dashboard Stats Routes --------------------- */
+
     Route::get('admin/stats',[
         'uses' => 'StatsController@index', 
         'as'   => 'adminStats'
+    ]);
+
+    Route::get('organizer/stats/{id}',[
+        'uses' => 'StatsController@organizerStats', 
+        'as'   => 'organizerStats'
+    ]);
+
+    Route::get('fair/stats/{fair_id}',[
+        'uses' => 'StatsController@fairStats', 
+        'as'   => 'fairStats'
+    ]);
+
+
+    Route::get('recruiter/stats/{recruiter_id}/{fair_id}',[
+        'uses' => 'StatsController@recruiterStats', 
+        'as'   => 'recruiterStats'
     ]);
 
     /*-------------------- VRD Front Routes ----------------------*/
@@ -400,6 +499,11 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
     Route::post('save/candidate/profile-image',[
         'uses' =>'CandidateController@upProfileImage', 
         'as'   => 'upProfileImage'
+    ]);
+     // Save Candidate Resume
+    Route::post('save/candidate/resume',[
+        'uses' =>'CandidateController@updateResume', 
+        'as'   => 'upResume'
     ]);
     // Get Specific Candidate
     Route::get('candidate/show/{id}',[
@@ -423,8 +527,8 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
     ]);
     // Candidate Added Webinar
     Route::post('candidate/add/webinar',[
-        'uses' =>'CandidateController@applyJob', 
-        'as'   => 'candidateApplyJob'
+        'uses' =>'CandidateController@addWebinar', 
+        'as'   => 'candidateaddWebinar'
     ]);
     // Candidate Update Profile
     Route::post('candidate/update',[
@@ -446,10 +550,22 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
         'uses' => 'CompanyController@candidateCompanyRecruiters', 
         'as'   => 'candidateCompanyRecruiters'
     ]);
+
+    // Get Candidate Company Recruiters
+    Route::post('candidate/company/webinars',[
+        'uses' => 'CompanyController@candidateCompanyWebinars', 
+        'as'   => 'candidateCompanyWebinars'
+    ]);
     // Get Company Detail
     Route::post('company/detail',[
         'uses' => 'CompanyController@companyDetail', 
         'as'   => 'companyDetail'
+    ]);
+
+     // Candidate In Main Hall
+    Route::get('/fair/candidate/inhall/{fair_id}/{candidate_id}',[
+        'uses' => 'CandidateController@inHall',
+        'as'   => 'candidateinHall'
     ]);
 
    
