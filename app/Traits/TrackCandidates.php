@@ -49,19 +49,28 @@ trait TrackCandidates
             ));
         }
       }else{
-          // echo "asdasdasdasd";die;
-            Tracking::where('u_id',$fair_id)->where('browser',$request->browser)->where('ip',$request->ip)->update(array(
-              'user_id'    => $request->candidate_id ? $request->candidate_id : '0',
-              'ip'         => $request->ip,
-              'location'   => $request->location,
-              'device'     => $request->platform,
-              'browser'    => $request->browser,
-              'fair_id'    => $fair->id,
-              'u_id'       => $fair_id,
-              'expiry'     => date('Y-m-d H:i:s', strtotime('now +2 minutes')),
-              'referrer'   => 'Test Reffer',
-              'updated_at' => date('Y-m-d H:i:s')
-            ));
+          // echo date('Y-m-d H:i:s'); die;
+            if (Tracking::where('u_id',$fair_id)->where('browser',$request->browser)->where('ip',$request->ip)->exists()) {
+              Tracking::where('u_id',$fair_id)->where('browser',$request->browser)->where('ip',$request->ip)->update(array(
+                'expiry'     => date('Y-m-d H:i:s', strtotime('now +2 minutes')),
+                'referrer'   => 'Test Reffer',
+                'updated_at' => date('Y-m-d H:i:s')
+              ));
+            }else{
+                Tracking::create(array(
+                'user_id'    => $request->candidate_id ? $request->candidate_id : '0',
+                'ip'         => $request->ip,
+                'location'   => $request->location,
+                'device'     => $request->platform,
+                'browser'    => $request->browser,
+                'fair_id'    => $fair->id,
+                'u_id'       => $fair_id,
+                'expiry'     => date('Y-m-d H:i:s', strtotime('now +2 minutes')),
+                'referrer'   => 'Test Reffer',
+                'updated_at' => date('Y-m-d H:i:s')
+              ));
+            }
+            
         }
     }
     

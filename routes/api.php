@@ -274,6 +274,11 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
       'as'   => 'unBlockCandidate'
     ]);
 
+    Route::get('/fair/candidate/delete/{candidate_id}/{fair_id}',[
+      'uses' => 'CandidateController@deleteCandidate',
+      'as'   => 'deleteCandidate'
+    ]);
+
     Route::post('/fair/candidates/bluk/block',[
       'uses' => 'CandidateController@blukBlockCandidates',
       'as'   => 'blukBlockCandidates'
@@ -481,6 +486,12 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
     Route::get('recruiter/stats/{recruiter_id}/{fair_id}',[
         'uses' => 'StatsController@recruiterStats', 
         'as'   => 'recruiterStats'
+    ]);
+
+
+    Route::get('company/stats/{company_id}',[
+        'uses' => 'StatsController@companyStats', 
+        'as'   => 'companyStats'
     ]);
 
     /*-------------------- VRD Front Routes ----------------------*/

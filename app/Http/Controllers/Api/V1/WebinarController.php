@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Api\V1;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Traits\WebinarEmail;
 use App\CompanyWebinar;
 
 class WebinarController extends Controller
 {
+    use WebinarEmail;
     /**
      * Display a listing of the resource.
      *SSS

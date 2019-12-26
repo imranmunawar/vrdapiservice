@@ -6,6 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Fair extends Model
 {
+    public function organizer()
+    {
+        return $this->hasOne('App\User', 'id', 'organiser_id' );
+    }
+
+    public function organizerDetail()
+    {
+        return $this->hasOne('App\UserSettings', 'user_id', 'organiser_id' );
+    }
+
     /**
      * The attributes that are mass assignable.
      *
@@ -37,11 +47,6 @@ class Fair extends Model
         'presenter',
         'stand_receptionist'
     ];
-
-    public function organizer()
-    {
-        return $this->belongsTo('App\User', 'organiser_id','id');
-    }
 
     public function setting()
     {

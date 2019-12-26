@@ -52,6 +52,13 @@ class CompanyController extends Controller
                 ],200); 
         }
 
+        $name  = $request->name;
+        $email = $request->email;
+        Mail::send('emails.company',['name' => $name, 'email' => $email], 
+            function($message) use ($email,$name){
+            $message->to($email, $name)->subject('Welcome! '.$name);
+        });
+
         return response()->json(
             [ 
                 'success' => true, 
@@ -158,6 +165,7 @@ class CompanyController extends Controller
                 'public_email'   => $row->recruiterSetting->public_email,
                 'linkedin'       => $row->recruiterSetting->linkedin_profile_link,
                 'recruiter_img'  => $row->recruiterSetting->recruiter_img,
+                'user_image'     => $row->recruiterSetting->user_image,
                 'location'       => $row->recruiterSetting->location,
             ];
         }

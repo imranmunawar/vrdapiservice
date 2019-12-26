@@ -22,6 +22,8 @@ trait RecruiterCandidates
             $data = $this->shortlistedCandidates($fair_id,$recruiter_id);
         }elseif($filterBy == 'rejected'){
             $data = $this->rejectedCandidates($fair_id,$recruiter_id);
+        }elseif($filterBy == 'recentlyViewed'){
+            $data = $this->recentlyViewedCandidates($fair_id,$recruiter_id);
         }
         return response()->json($data,200);
     }
@@ -42,6 +44,7 @@ trait RecruiterCandidates
               'phone'        => $row->phone,
               'user_country' => $row->user_country,
               'notes'        => $row->notes,
+              'agenda_viewed' => $row->view,
               'is_candidate_take_test'   => User::isCandidateTakeTest($fair_id,$row->candidate_id),
               'is_candidate_attend_fair' => User::isCandidateAttendFair($fair_id,$row->candidate_id),
               'is_candidate_in_hall'     => User::isCandidateInMainHall($fair_id,$row->candidate_id),
@@ -49,6 +52,27 @@ trait RecruiterCandidates
       }
 
       return $resultSet;
+    }
+
+    public function recentlyViewedCandidates($fair_id,$recruiter_id){
+            $data = DB::table('match_recruiters')
+            ->where('match_recruiters.recruiter_id',$recruiter_id)
+            ->where('match_recruiters.fair_id',$fair_id)
+            ->leftJoin('agenda_views', function($join){
+                 $join->on('agenda_views.recruiter_id', '=', 'match_recruiters.recruiter_id');
+                 $join->on('agenda_views.candidate_id', '=', 'match_recruiters.candidate_id');
+            })
+            ->leftJoin('candidate_turnouts', function($join){
+                $join->on('candidate_turnouts.fair_id', '=', 'match_recruiters.fair_id');
+                $join->on('candidate_turnouts.candidate_id', '=', 'match_recruiters.candidate_id');
+            })
+            ->join('users', 'match_recruiters.candidate_id', '=', 'users.id')
+            ->join('user_settings', 'match_recruiters.candidate_id', '=', 'user_settings.user_id')
+            ->orderBy('agenda_views.updated_at', 'desc')
+            ->select('match_recruiters.recruiter_id', 'match_recruiters.candidate_id','match_recruiters.percentage', 'agenda_views.id','agenda_views.view','agenda_views.updated_at', 'agenda_views.shortlisted', 'agenda_views.rejected','agenda_views.notes', 'users.name','users.email', 'user_settings.user_skype', 'user_settings.phone', 'user_settings.user_country', 'candidate_turnouts.id as turnout')
+            ->get();  
+        $data = $this->resultSet($data,$fair_id);
+        return $data;
     }
 
     public function autoEnrolledCandidates($fair_id,$recruiter_id){
@@ -66,7 +90,7 @@ trait RecruiterCandidates
             ->join('users', 'match_recruiters.candidate_id', '=', 'users.id')
             ->join('user_settings', 'match_recruiters.candidate_id', '=', 'user_settings.user_id')
             ->orderBy('match_recruiters.id', 'desc')
-            ->select('match_recruiters.recruiter_id', 'match_recruiters.candidate_id','match_recruiters.percentage', 'agenda_views.id', 'agenda_views.shortlisted', 'agenda_views.rejected','agenda_views.notes', 'users.name','users.email', 'user_settings.user_skype', 'user_settings.phone', 'user_settings.user_country', 'candidate_turnouts.id as turnout')
+            ->select('match_recruiters.recruiter_id', 'match_recruiters.candidate_id','match_recruiters.percentage', 'agenda_views.id', 'agenda_views.view','agenda_views.shortlisted', 'agenda_views.rejected','agenda_views.notes', 'users.name','users.email', 'user_settings.user_skype', 'user_settings.phone', 'user_settings.user_country', 'candidate_turnouts.id as turnout')
             ->get();  
         $data = $this->resultSet($data,$fair_id);
         return $data;
@@ -88,7 +112,7 @@ trait RecruiterCandidates
             ->join('users', 'match_recruiters.candidate_id', '=', 'users.id')
             ->join('user_settings', 'match_recruiters.candidate_id', '=', 'user_settings.user_id')
             ->orderBy('match_recruiters.id', 'desc')
-            ->select('match_recruiters.recruiter_id', 'match_recruiters.candidate_id','match_recruiters.percentage', 'agenda_views.id', 'agenda_views.shortlisted', 'agenda_views.rejected', 'agenda_views.notes','users.name','users.email', 'user_settings.user_skype', 'user_settings.phone', 'user_settings.user_country', 'candidate_turnouts.id as turnout')
+            ->select('match_recruiters.recruiter_id', 'match_recruiters.candidate_id','match_recruiters.percentage', 'agenda_views.id', 'agenda_views.view','agenda_views.shortlisted', 'agenda_views.rejected', 'agenda_views.notes','users.name','users.email', 'user_settings.user_skype', 'user_settings.phone', 'user_settings.user_country', 'candidate_turnouts.id as turnout')
             ->where('agenda_views.shortlisted',1)
             ->get();  
 
@@ -112,7 +136,7 @@ trait RecruiterCandidates
         ->join('users', 'match_recruiters.candidate_id', '=', 'users.id')
         ->join('user_settings', 'match_recruiters.candidate_id', '=', 'user_settings.user_id')
         ->orderBy('match_recruiters.id', 'desc')
-        ->select('match_recruiters.recruiter_id', 'match_recruiters.candidate_id','match_recruiters.percentage', 'agenda_views.id', 'agenda_views.shortlisted', 'agenda_views.rejected', 'users.name','users.email', 'user_settings.user_skype', 'user_settings.phone', 'user_settings.user_country','agenda_views.notes', 'candidate_turnouts.id as turnout')
+        ->select('match_recruiters.recruiter_id', 'match_recruiters.candidate_id','match_recruiters.percentage', 'agenda_views.id', 'agenda_views.view','agenda_views.shortlisted', 'agenda_views.rejected', 'users.name','users.email', 'user_settings.user_skype', 'user_settings.phone', 'user_settings.user_country','agenda_views.notes', 'candidate_turnouts.id as turnout')
         ->where('agenda_views.rejected',1)
             ->get();  
         $data = $this->resultSet($data,$fair_id);

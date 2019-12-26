@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\StoreCandidate;
 use Carbon\Carbon;
 use App\User;
 use App\MatchJob;
@@ -20,15 +21,17 @@ use App\Traits\MatchingJobs;
 use App\Traits\MatchingRecruiters;
 use App\Traits\MatchingWebinars;
 use App\Traits\RecruiterCandidates;
+use App\Traits\CandidateEmail;
 use App\Traits\CandidatePersonalAgenda;
 use App\MarketingChannel;
 use App\MarketingRegistration;
 use App\ChatTranscript;
 use App\FairCandidates;
 use App\CandidateAgenda;
+
 class CandidateController extends Controller
 {
-    use MatchingJobs, MatchingRecruiters, MatchingWebinars, RecruiterCandidates, CandidatePersonalAgenda;
+    use MatchingJobs, MatchingRecruiters, MatchingWebinars, RecruiterCandidates, CandidatePersonalAgenda,CandidateEmail;
     /**
      * Display a listing of the resource.
      *
@@ -80,8 +83,9 @@ class CandidateController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreCandidate $request)
     {  
+        $validated = $request->validated();
         $user_id = '';
         $userObject = '';
         $data = $request->all();
@@ -142,6 +146,8 @@ class CandidateController extends Controller
 
 
            if ($user) {
+              // Generate Email For Candidate
+              $this->generateEmail($request,$user->id);
               $user = User::find($userObject->id);
               $credentials = ['email'=>$user->email, 'password'=>$user->plan_password];
               if(!Auth::attempt($credentials))
@@ -154,8 +160,8 @@ class CandidateController extends Controller
               $tokenResult = $user->createToken('Personal Access Token');
               $token = $tokenResult->token;
               if ($request->remember_me)
-                  $token->expires_at = Carbon::now()->addWeeks(1);
-              $token->save();
+                $token->expires_at = Carbon::now()->addWeeks(1);
+                $token->save();
               return response()->json([
                   "code"         => 200,
                   "status"       => "success",
@@ -274,6 +280,7 @@ class CandidateController extends Controller
                 'public_email'   => $row->recruiterSetting->public_email,
                 'linkedin'       => $row->recruiterSetting->linkedin_profile_link,
                 'recruiter_img'  => $row->recruiterSetting->recruiter_img,
+                'user_image'  => $row->recruiterSetting->user_image,
                 'location'       => $row->recruiterSetting->location,
             ];
         }
@@ -310,6 +317,9 @@ class CandidateController extends Controller
                 'fair_id'      => $fair_id,
                 'company_id'   => $company_id
             ));
+
+            $this->jobApplyEmail($request);
+
         }
         $candidateAppliedJobs = CandidateJob::where('candidate_id',$candidate_id)
                                 ->where('fair_id',$fair_id)->get();
@@ -546,6 +556,7 @@ class CandidateController extends Controller
       if ($candidate) {
         $updateStatus = $candidate->update(['status'=>'Block']);
         if ($updateStatus) {
+          $this->blockCandidateEmail($fair_id, $candidate_id);
           return response()->json([
            'success' => true,
            'message' => 'Candidate Blocked Successfully'
@@ -583,6 +594,7 @@ class CandidateController extends Controller
         $user = FairCandidates::where('candidate_id',$ids[$i])->where('fair_id',$fair_id)->first();
         if ($user) {
           $user->update(['status'=>'Block']);
+          $this->blockCandidateEmail($fair_id, $ids[$i]);
         }
           // $candidate = User::find($ids[$i]);
           // $name = $candidate->firstname;
@@ -633,6 +645,23 @@ class CandidateController extends Controller
   // Update Mailhall value if candidate enter in maill hall
   public function inHall($fair_id,$candidate_id){
     FairCandidates::where('fair_id',$fair_id)->where('candidate_id',$candidate_id)->update(['mainhall' => 1]);
+  }
+
+  public function deleteCandidate($candidate_id,$fair_id){
+    User::find($candidate_id)->delete();
+    UserSettings::find($candidate_id)->delete();
+    $fairCandidateDelete = FairCandidates::where('fair_id',$fair_id)->where('candidate_id',$candidate_id)->delete();
+    if ($fairCandidateDelete) {
+      return response()->json([
+        'success'   => true,
+        'message'   => 'Candidate Deleted Successfully'
+      ], 200);
+    }
+
+    return response()->json([
+     'error'   => true,
+     'message' => 'Candidate Not Deleted'
+    ], 401);
   }
     
 }

@@ -101,6 +101,7 @@ class StatsController extends Controller
 
     public function fairVisitStats($organizer_id){
         $data  = [];
+        $fairArr = array();
         $fairs = Fair::where('organiser_id',$organizer_id)->get();
         foreach ($fairs as $key => $fair) {
             $fairArr[] = $fair->id;
@@ -343,5 +344,37 @@ class StatsController extends Controller
         }
 
         return $data;
+    }
+
+    public function companyStats($company_id){
+        $data = [];
+        $company = Company::find($company_id);
+        $fair_id = $company->fair_id;
+        $data['applications'] = CandidateJob::whereHas('jobs', function($query) use ($company_id){
+            $query->whereCompanyId($company_id);
+        })->count();
+        // $companyStats['applications'] = $applications;
+        $data['jobs']        = CompanyJob::where('company_id',$company_id)->count();
+        $data['shortlisted'] = AgendaView::where('company_id',$company_id)->where('fair_id',$fair_id)->where('shortlisted', '=', '1')->count();
+        $recruiters  = UserSettings::select('user_id')->where('company_id',$company_id)->where('fair_id',$fair_id)->get();
+        if ($recruiters->count() > 0) {
+            foreach ($recruiters  as $key => $recruiter) {
+               $user  = User::select('name')->where('id',$recruiter->user_id)->first(); 
+               $chats = ChatTranscript::where('company_id',$company_id)->where('fair_id',$fair_id)->where('from',$recruiter->user_id)->count();
+                $data['recruiterChats'][] = [
+                   'name'  => $user->name,
+                   'chats' => $chats  
+                ]; 
+            }
+        }else{
+            $data['recruiterChats'] = [];
+        }
+        
+        $data["chats"] = ChatTranscript::where('company_id',$company_id)->where('fair_id',$fair_id)->groupBy('from')->get();
+        $data["chat_count"] = $data["chats"]->count();
+        $data["chat_exchange_count"] = ChatTranscript::where('company_id',$company_id)->where('fair_id',$fair_id)->count();
+
+        return $data;
+
     }
 }

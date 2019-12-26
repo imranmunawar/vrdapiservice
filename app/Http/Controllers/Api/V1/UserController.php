@@ -8,10 +8,11 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Traits\IsExist;
+use App\Traits\UserEmail;
 
 class UserController extends Controller
 {
-    use IsExist;
+    use IsExist,UserEmail;
     /**
      * Display a listing of the resource.
      *
@@ -90,7 +91,7 @@ class UserController extends Controller
                $user = UserSettings::create([
                 'user_id'               => $user_id,
                 'company_id'            => $data['company_id'],
-                'company_name'          => $data['company_name'],
+                // 'company_name'          => $data['company_name'],
                 'phone'                 => $data['phone'],
                 'location'              => $data['location'],
                 'user_title'            => empty($data['title']) ? '' : $data['title'],
@@ -117,20 +118,21 @@ class UserController extends Controller
             }
 
            if ($user) {
+                $this->generateEmail($request);
                 return response()->json([
                     'success' => true,
                     'message' => $data['role'].' Created Successfully'
                 ],200); 
            }else{
                 return response()->json([
-                   'error' => true,
+                   'error'   => true,
                    'message' => $data['role'].' Not Created Successfully'
                 ], 401);
             }
             
         }else{
            return response()->json([
-               'error' => true,
+               'error'   => true,
                'message' => 'User Role Not Find'
             ], 401);
         }
@@ -180,9 +182,7 @@ class UserController extends Controller
 		      'first_name'    => $data['fname'],
 		      'last_name'     => $data['lname'],
 		      'name'          => $data['fname'].' '.$data['lname'],
-		      'email'         => $data['email'],
-		      'password'      => bcrypt($data['password']),
-              'plan_password' => $data['password'],
+		      'email'         => $data['email']
 		    ];
 		    $user->fill($userDataToUpdate)->save();
     	   }
@@ -193,8 +193,8 @@ class UserController extends Controller
 		        'credits'          => $data['credits'],
 		        'reg_notification' => array_key_exists('reg_notification', $data) ? $data['reg_notification'] : 0,
                 'enable_exhibitor' => array_key_exists('enable_exhibitor', $data) ? $data['enable_exhibitor'] : 0,
-		        'user_info'        => $data['user_info'],
-                'user_image'       => $data['user_image']
+		        'user_info'        => $data['user_info'] ? $data['user_info'] : '',
+                'user_image'       => empty($data['user_image']) ? '' : $data['user_image']
 		    ];
 		    $setting->update($settingDataToUpdate);
     	   }
@@ -217,7 +217,7 @@ class UserController extends Controller
                 'company_id'            => $data['company_id'],
                 'phone'                 => $data['phone'],
                 'location'              => $data['location'],
-                'user_title'                 => $data['title'],
+                'user_title'            => empty($data['title']) ? '' : $data['title'],
                 'user_info'             => $data['user_info'],
                 'user_image'            => $data['user_image'],
                 'linkedin_profile_link' => $data['linkedin_profile_link'],

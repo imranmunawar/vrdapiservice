@@ -11,12 +11,14 @@ use App\CompanyJob;
 use App\FairSetting;
 use App\UserSettings;
 use App\Traits\TrackCandidates;
+use App\Traits\FairLiveEmailNotification;
+use App\Traits\FairEndEmailCandidates;
 use App\FairCandidates;
 use DB;
 
 class FairController extends Controller
 {
-    use TrackCandidates;
+    use TrackCandidates,FairLiveEmailNotification,FairEndEmailCandidates;
     /**
      * Display a listing of the resource.
      *
@@ -128,8 +130,8 @@ class FairController extends Controller
     {
         $candidateTest = false;
         $candidate_id  = $request->candidate_id;
-        $short_name = $request->short_name;
-        $timezone   =  $request->timezone;
+        $short_name    = $request->short_name;
+        $timezone      =  $request->timezone;
         $fair = Fair::where('short_name',$short_name)->first();
         if ($fair) {
           $this->vistFairCandidates($fair,$request);
