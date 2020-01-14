@@ -35,5 +35,9 @@ class Company extends Model
     public function media(){
         return $this->hasMany('App\CompanyMedia');
     }
+    public function fair()
+    {
+      return $this->hasOne('App\Fair','id','fair_id')->select('name');
+    }
 
 }

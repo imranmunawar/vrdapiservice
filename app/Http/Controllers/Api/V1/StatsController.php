@@ -27,7 +27,7 @@ class StatsController extends Controller
         $compjobs  = CompanyJob::count();
         $users     = User::count();
         $user24hrs = UserLogs::where('created_at', '>=', Carbon::now()->subDay())->count();
-        $logs      = UserLogs::select('fairs.name as fname','users.name as uname','user_logs.user_ip', 
+        $logs      = UserLogs::select('fairs.name as fname','users.name as uname','user_logs.user_ip',
                                       'user_logs.location','user_logs.device', 'user_logs.browser',
                                       'user_logs.referrer', 'user_logs.u_id', 'user_logs.created_at')
                                ->where('user_logs.created_at', '>=', Carbon::now()->subDay())
@@ -212,7 +212,7 @@ class StatsController extends Controller
                 ];
             }
         }
-       return $count; 
+       return $count;
     }
 
      // Fair Active Vistor
@@ -359,17 +359,17 @@ class StatsController extends Controller
         $recruiters  = UserSettings::select('user_id')->where('company_id',$company_id)->where('fair_id',$fair_id)->get();
         if ($recruiters->count() > 0) {
             foreach ($recruiters  as $key => $recruiter) {
-               $user  = User::select('name')->where('id',$recruiter->user_id)->first(); 
+               $user  = User::select('name')->where('id',$recruiter->user_id)->first();
                $chats = ChatTranscript::where('company_id',$company_id)->where('fair_id',$fair_id)->where('from',$recruiter->user_id)->count();
                 $data['recruiterChats'][] = [
                    'name'  => $user->name,
-                   'chats' => $chats  
-                ]; 
+                   'chats' => $chats
+                ];
             }
         }else{
             $data['recruiterChats'] = [];
         }
-        
+
         $data["chats"] = ChatTranscript::where('company_id',$company_id)->where('fair_id',$fair_id)->groupBy('from')->get();
         $data["chat_count"] = $data["chats"]->count();
         $data["chat_exchange_count"] = ChatTranscript::where('company_id',$company_id)->where('fair_id',$fair_id)->count();
@@ -377,4 +377,24 @@ class StatsController extends Controller
         return $data;
 
     }
+
+    public function companyListing() {
+      $companies = Company::with('fair')->get();
+      return response()->json([
+          "code"   => 200,
+          "status" => "success",
+          "data"   => $companies
+      ]);
+    }
+
+    public function jobListing() {
+      $jobs = CompanyJob::with('fair')->get();
+
+      return response()->json([
+          "code"   => 200,
+          "status" => "success",
+          "data"   => $jobs
+      ]);
+    }
+
 }

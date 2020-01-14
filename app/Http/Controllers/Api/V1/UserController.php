@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\User;
 use App\UserSettings;
 use App\Role;
+use App\FairCandidates;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -40,6 +41,32 @@ class UserController extends Controller
         return response()->json($users);
     }
 
+    public function candidateListing() {
+      $data = array();
+      $type = 'User';
+      $users = User::whereHas('roles', function ($query) use ($type) {
+                $query->where('name', '=', $type);
+              })->orderBy('id', 'asc')->get();
+      foreach ($users as $user) {
+        $fairs = "";
+        $fairCandidates = FairCandidates::where('candidate_id', $user->id)->get();
+        foreach ($fairCandidates as $candidate) {
+          $fairs .= ($fairs == "") ? $candidate->fair->name : ", ".$candidate->fair->name;
+        }
+        $data[] = array(
+          'first_name'  => $user->first_name,
+          'last_name'   => $user->last_name,
+          'email'       => $user->email,
+          'created_at'  => date('d-m-Y', strtotime($user->created_at)),
+          'fairs'       => $fairs
+        );
+      }
+      return response()->json([
+          "code"   => 200,
+          "status" => "success",
+          "data"   => $data
+      ]);
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -57,8 +84,8 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {   
-        $data = $request->all(); 
+    {
+        $data = $request->all();
         $user_id = '';
         $role = Role::IsRoleExist($data['role']);
         if($role){
@@ -74,7 +101,7 @@ class UserController extends Controller
             $user->roles()->attach($role);
             $user_id = $user->id;
           }
-           
+
           if ($data['role'] == 'Organizer') {
               $user = UserSettings::create([
                 'user_id'          => $user_id,
@@ -122,14 +149,14 @@ class UserController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => $data['role'].' Created Successfully'
-                ],200); 
+                ],200);
            }else{
                 return response()->json([
                    'error'   => true,
                    'message' => $data['role'].' Not Created Successfully'
                 ], 401);
             }
-            
+
         }else{
            return response()->json([
                'error'   => true,
@@ -151,7 +178,7 @@ class UserController extends Controller
             "code"   => 200,
             "status" => "success",
             "data"   => $user,
-        ]); 
+        ]);
     }
 
     /**
@@ -163,7 +190,7 @@ class UserController extends Controller
     public function edit($id)
     {
     	$user = User::find($id)->load('userSetting');
-        return response()->json($user); 
+        return response()->json($user);
     }
 
     /**
@@ -236,14 +263,14 @@ class UserController extends Controller
     	        return response()->json([
     	            'success' => true,
     	            'message' => $data['role'].' Updated Successfully'
-    	        ],200); 
+    	        ],200);
     	   }else{
     	        return response()->json([
     	           'error' => true,
     	           'message' => $data['role'].' Not Updated Successfully'
     	        ], 401);
     	    }
-    	    
+
     	}
 
     /**
@@ -260,8 +287,8 @@ class UserController extends Controller
           $user->roles()->detach();
           if (UserSettings::where('user_id',$id)->exists()) {
               UserSettings::where('user_id',$id)->first()->delete();
-           } 
-          return response()->json(['success'=>'User Delete Successfully'], 200); 
+           }
+          return response()->json(['success'=>'User Delete Successfully'], 200);
         }
     }
 }

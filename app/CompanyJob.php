@@ -18,6 +18,11 @@ class CompanyJob extends Model
 
     }
 
+    public function fair()
+    {
+        return $this->hasOne('App\Fair','id','fair_id')->select('name');
+    }
+
     protected $fillable = [
         'fair_id',
         'company_id',

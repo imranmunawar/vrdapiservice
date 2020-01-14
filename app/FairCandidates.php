@@ -25,6 +25,10 @@ class FairCandidates extends Model
     {
         return $this->hasOne('App\CandidateTurnout',  'candidate_id', 'candidate_id')->select('candidate_id');
     }
+    public function fair()
+    {
+      return $this->hasOne('App\Fair','id','fair_id')->select('name');
+    }
 
     protected $fillable = array(
         'candidate_id',
