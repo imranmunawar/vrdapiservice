@@ -258,6 +258,7 @@ class StatsController extends Controller
         $data['fairCompanyJobs']    = $this->fairCompanyJobs($fair_id);
         $data['fairCompanyChats']    = $this->fairCompanyChats($fair_id);
         $data['fairMarketingStats']  = $this->getChannelStats($fair_id);
+        $data['candidatesTournouts']  = FairCandidates::where('fair_id',$fair_id)->where('mainhall',1)->count();
         $data['fairRegisteredCandidates']  = $this->fairRegisteredCandidates($fair_id);
 
         return $data;

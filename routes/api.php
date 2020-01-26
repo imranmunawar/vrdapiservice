@@ -48,6 +48,10 @@ Route::group(['prefix' => 'auth','namespace' => 'Api\V1'], function () {
         'uses' => 'FairController@registeredCandidates',
         'as'   => 'registeredCandidates'
     ]);
+    Route::get('/test/route',[
+        'uses' => 'FairController@testRoute',
+        'as'   => 'testRoute'
+    ]);
     // Candidate Deltail
     Route::post('/fair/candidate/detail',[
         'uses' => 'CandidateController@personalAgenda',

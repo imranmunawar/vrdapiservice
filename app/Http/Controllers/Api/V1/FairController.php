@@ -30,6 +30,10 @@ class FairController extends Controller
         return response()->json($fairs);
     }
 
+    public function testRoute(){
+        echo env('S3_PRIVATE_EP'); die;
+    }
+
     /**
      * Show the form for creating a new resource.
      *
