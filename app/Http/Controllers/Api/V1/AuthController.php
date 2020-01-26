@@ -86,6 +86,7 @@ class AuthController extends Controller
 
     public function frontLogin(Request $request)
     {
+        echo "Test"; die();
         if($this->isRoleUser($request->email)){
             $request->validate([
                 'email'       => 'required|string|email',
