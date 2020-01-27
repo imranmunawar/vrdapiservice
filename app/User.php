@@ -82,7 +82,7 @@ class User extends Authenticatable
     {
         $candidateTest = New CandidateTest;
         $res = $candidateTest->where('fair_id', $fair_id)->where('candidate_id',$candidate_id)->get();
-        if ($res) {
+        if ($res->count() > 0) {
             return 1;
         }
 

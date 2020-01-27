@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Api\V1;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Storage;
+use AWS;
 use App\Http\Requests\StoreCandidate;
 use Carbon\Carbon;
 use App\User;
@@ -101,11 +104,17 @@ class CandidateController extends Controller
             $userCV = '';
             if($request->hasFile('document')){
                   $file = $request->file('document');
-                  $filename = $file->getClientOriginalName();
-                  $path = public_path().'/documents/';
-                  $move = $file->move($path, $filename);
-                  $userCV = $filename;
+                  $filename = rand().'_'.$file->getClientOriginalName();
+                  $path = 'candidate_cv/';
+                  $target_file = $path.$filename;
+                  // echo env('S3_PRIVATE_EP'); die;
+                  // $path = public_path().'/documents/';
+                  // $move = $file->move($path, $filename);
+                  Storage::disk('resumes_s3')->put($target_file, file_get_contents($file), 'private');
+                  // $userCV = $filename;
             }
+             
+           
             $userObject = $user;
             $user_id = $user->id;
             $user = UserSettings::create([
@@ -350,9 +359,13 @@ class CandidateController extends Controller
     public function upProfileImage(Request $request){
         if($request->hasFile('profile_image')){
           $file = $request->file('profile_image');
-          $filename = $file->getClientOriginalName();
-          $path = public_path().'/candidate/images/';
-          $move = $file->move($path, $filename);
+          $filename = rand().'_'.$file->getClientOriginalName();
+          $path = 'assets/candidate_avatars/';
+          $target_file = $path.$filename;
+          // echo env('S3_PRIVATE_EP'); die;
+          // $path = public_path().'/documents/';
+          // $move = $file->move($path, $filename);
+          Storage::disk('s3')->put($target_file, file_get_contents($file), 'public');
           $profileImage = $filename;
           UserSettings::where('user_id',$request->candidate_id)->update(['user_image'=>$profileImage]);
           $user = User::find($request->candidate_id);
@@ -373,9 +386,13 @@ class CandidateController extends Controller
     public function updateResume(Request $request){
         if($request->hasFile('resume')){
           $file = $request->file('resume');
-          $filename = $file->getClientOriginalName();
-          $path = public_path().'/documents';
-          $move = $file->move($path, $filename);
+          $filename = rand().'_'.$file->getClientOriginalName();
+          $path = 'assets/candidate_cv/';
+          $target_file = $path.$filename;
+          // echo env('S3_PRIVATE_EP'); die;
+          // $path = public_path().'/documents/';
+          // $move = $file->move($path, $filename);
+          Storage::disk('s3')->put($target_file, file_get_contents($file), 'public');
           $resume = $filename;
           UserSettings::where('user_id',$request->candidate_id)->update(['user_cv'=>$resume]);
           $user = User::find($request->candidate_id);
