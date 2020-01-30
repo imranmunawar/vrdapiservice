@@ -388,6 +388,10 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
         'uses'    => 'FairMainHallController@store',  
         'as'      => 'createMainHall'
     ]);
+    Route::post('fair/mian/hall/set/width',[
+        'uses' => 'FairMainHallController@createStandWidth',
+        'as'   => 'createStandWidth'
+    ]);
     Route::post('fair/company/stand/{company_id}',[
         'uses' => 'FairMainHallController@companyStand',  
         'as'   => 'companyStand'

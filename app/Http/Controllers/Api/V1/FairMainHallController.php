@@ -62,6 +62,28 @@ class FairMainHallController extends Controller
         return response()->json(['success' => true,'message' => 'Stand Demision Set Successfully' ],200);
     }
 
+    public function createStandWidth(Request $request)
+    {
+        // Create a new CareerTestAnswer in the database...
+        if (CompanyStand::where('company_id',$request->id)->exists()) {
+            $updateStand = CompanyStand::where('company_id', $request->id)->update(['stand_width' => $request->stand_width,
+                'stand_height' => $request->stand_height]);
+                return response()->json(['success' => false,'message' => 'Stand Dimension Update Successfully'],200); 
+        }else{
+            $arr = [
+              'company_id' => $request->id,
+              'stand_width'  => $request->stand_width,
+              'stand_height' => $request->stand_height
+            ];
+            $companyStand = CompanyStand::create($arr); 
+            if (!$companyStand) {
+                return response()->json(['success' => false,'message' => 'Stand Dimension Not Set Successfully'],200); 
+            }
+        }
+    
+        return response()->json(['success' => true,'message' => 'Stand Demision Set Successfully' ],200);
+    }
+
     /**
      * Display the specified resource.
      *
