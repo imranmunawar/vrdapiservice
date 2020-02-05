@@ -34,6 +34,7 @@ class CreateUserSettingsTable extends Migration
             $table->tinyInteger('job_email')->nullable();
             $table->tinyInteger('show_email')->nullable();
             $table->string('recruiter_img')->nullable();
+            $table->string('recruiter_status')->default('online');
             $table->string('user_image')->nullable();
             $table->string('user_skype')->nullable();
             $table->string('user_country')->nullable();

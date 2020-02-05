@@ -1,6 +1,13 @@
 <?php
 use Illuminate\Http\Request;
 
+Route::namespace('Api\V1')->group(function () {
+    Route::get('/candidate/download/cv/{candidate_id}',[
+      'uses' => 'CandidateController@downloadCV',
+      'as'   => 'downloadCandidateCV'
+    ]);
+});
+
 Route::group(['prefix' => 'auth','namespace' => 'Api\V1'], function () {
     Route::post('front/login', 'AuthController@frontLogin');
     Route::post('backend/login', 'AuthController@backendLogin');
@@ -291,6 +298,11 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
     Route::get('/fair/candidate/reset/password/{candidate_id}',[
       'uses' => 'CandidateController@resetCandidatePassword',
       'as'   => 'resetCandidatePassword'
+    ]);
+
+    Route::post('set/recruiter/status',[
+        'uses' => 'UserController@setRecruiterStatus',  
+        'as'   => 'setRecruiterStatus'
     ]);
 
     Route::post('/fair/recruiter/candidates', 'CandidateController@recruiterCandidates');

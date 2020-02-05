@@ -291,4 +291,16 @@ class UserController extends Controller
           return response()->json(['success'=>'User Delete Successfully'], 200);
         }
     }
+
+
+    public function setRecruiterStatus(Request $request){
+      $id     = $request->id;
+      $status = $request->status;
+      $setting = UserSettings::where('user_id', $id);
+      $settingDataToUpdate = [
+        'recruiter_status' => $status,
+      ];
+      $updated = $setting->update($settingDataToUpdate);
+      return response()->json(['success'=>'Status Updated Successfully'], 200);
+    }
 }

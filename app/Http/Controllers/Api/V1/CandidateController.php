@@ -680,5 +680,10 @@ class CandidateController extends Controller
      'message' => 'Candidate Not Deleted'
     ], 401);
   }
+
+  public function downloadCV($candidate_id){
+    $user = User::find($candidate_id)->load('userSetting');
+    return response()->json($user->userSetting->user_cv);
+  }
     
 }
