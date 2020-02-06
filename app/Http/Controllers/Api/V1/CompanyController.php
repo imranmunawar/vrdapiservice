@@ -165,6 +165,7 @@ class CompanyController extends Controller
                 'public_email'   => $row->recruiterSetting->public_email,
                 'linkedin'       => $row->recruiterSetting->linkedin_profile_link,
                 'recruiter_img'  => $row->recruiterSetting->recruiter_img,
+                'recruiter_status'  => $row->recruiterSetting->recruiter_status,
                 'user_image'     => $row->recruiterSetting->user_image,
                 'location'       => $row->recruiterSetting->location,
             ];
