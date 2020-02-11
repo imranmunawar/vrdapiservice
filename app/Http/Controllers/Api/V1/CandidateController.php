@@ -686,5 +686,37 @@ class CandidateController extends Controller
     $user = User::find($candidate_id)->load('userSetting');
     return response()->json($user->userSetting->user_cv);
   }
+
+  public function candidateStatistics($fair_id){
+    $statusArray = [];
+    $questions = CareerTest::where('fair_id',$fair_id)->get();
+    foreach ($questions as $key => $value) {
+      $statusArray[]=[
+        'question'=>$value->backoffice_question,
+        'answersStat'=>$this->getAnswerStatArry($fair_id,$value->id)
+      ];
+      
+    }
+    return $statusArray;
+  }
+
+  public function getAnswerStatArry($fair_id,$test_id){
+    $answersstatArray = [];
+    $answers = CareerTestAnswer::where('test_id',$test_id)->get();
+    foreach ($answers as $key => $row) {
+      $answersstatArray[] = [
+        'answer'=> $row->answer,
+        'stat'  => $this->calcStats($fair_id,$row->test_id,$row->id)
+      ];
+    }
+    return $answersstatArray;
+  }
+
+  public function calcStats($fair_id,$test_id, $answer_id){
+    $total_selected = CandidateTest::where('fair_id',$fair_id)->where('test_id',$test_id)->count();
+    $selected = CandidateTest::where('fair_id',$fair_id)->where('test_id',$test_id)->where('answer_id',$answer_id)->count();
+    $percentage = number_format(($selected/$total_selected)*100);
+    return "( ".$selected." of ".$total_selected." - ".$percentage."% )";
+  }
     
 }

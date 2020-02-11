@@ -20,6 +20,11 @@ Route::group(['prefix' => 'auth','namespace' => 'Api\V1'], function () {
         Route::get('user', 'AuthController@user');
     });
 
+    Route::get('/fair/candidates/statistics/{fair_id}',[
+        'as'   => 'candidateStatistics',
+        'uses' => 'CandidateController@candidateStatistics'
+    ]);
+
     /* Candidates Routes */
     Route::get('candidate/show/{id}',[
         'uses' => 'CandidateController@show',
@@ -54,6 +59,11 @@ Route::group(['prefix' => 'auth','namespace' => 'Api\V1'], function () {
     Route::get('/fair/candidates/{fair_id}',[
         'uses' => 'FairController@registeredCandidates',
         'as'   => 'registeredCandidates'
+    ]);
+    // Fair Filter Candidates
+    Route::post('/fair/filter/candidates',[
+        'uses' => 'FairController@registeredFilterCandidates',
+        'as'   => 'registeredFilterCandidates'
     ]);
     Route::get('/test/route',[
         'uses' => 'FairController@testRoute',

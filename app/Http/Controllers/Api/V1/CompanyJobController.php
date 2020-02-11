@@ -56,10 +56,8 @@ class CompanyJobController extends Controller
 
         return response()->json(
             [ 
-                'success' => true, 
-                'message' => 'Job Created Successfully' ],200);
-
-
+              'success' => true, 
+               'message' => 'Job Created Successfully'],200);
     }
 
     /**
@@ -141,8 +139,7 @@ class CompanyJobController extends Controller
             return response()->json(['success' => true, 'applicant'=> $applications], 200);
         }
 
-        return response()->json(['success' => false,'message' => 'Job Candidate Not Found'
-                ],404); 
+        return response()->json(['success' => false,'message' => 'Job Candidate Not Found'],404); 
     }
 
 

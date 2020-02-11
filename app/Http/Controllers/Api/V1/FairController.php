@@ -9,11 +9,14 @@ use App\Fair;
 use App\Company;
 use App\CompanyJob;
 use App\FairSetting;
+use App\CareerTest;
+use App\CandidateTest;
 use App\UserSettings;
 use App\Traits\TrackCandidates;
 use App\Traits\FairLiveEmailNotification;
 use App\Traits\FairEndEmailCandidates;
 use App\FairCandidates;
+use \Input as Input;
 use DB;
 
 class FairController extends Controller
@@ -274,6 +277,84 @@ class FairController extends Controller
     public function registeredCandidates($fair_id){
         $candidatesArr = [];
         $candidates    = FairCandidates::where('fair_id',$fair_id)->with('candidate','candidateInfo','candidateTest','candidateTurnout')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        if ($candidates) {
+            foreach ($candidates as $key => $value) {
+                $candidatesArr[] = [
+                    'candidate_id' => $value->candidate_id,
+                    'name'         => empty($value->candidate) ? '' : $value->candidate->name,
+                    'email'        => empty($value->candidate) ? '' : $value->candidate->email,
+                    'country'      => empty($value->candidateInfo) ? '' : $value->candidateInfo->user_country,
+                    'city'         => empty($value->candidateInfo) ? '' : $value->candidateInfo->user_city,
+                    'cv'           => empty($value->candidateInfo) ? '' : $value->candidateInfo->user_city,
+                    'phone'        => empty($value->candidateInfo) ? '' : $value->candidateInfo->user_phone,
+                    'marketing_channel' => $value->marketing_channel,
+                    'source'       => $value->source,
+                    'status'       => $value->status,
+                    'created_at'   => date('d-m-Y', strtotime($value->created_at)),
+                    'is_candidate_take_test'   => User::isCandidateTakeTest($fair_id,$value->candidate_id),
+                    'is_candidate_attend_fair' => User::isCandidateAttendFair($fair_id,$value->candidate_id),
+                ];
+            }
+        }
+      
+       return $candidatesArr;
+    }
+
+    public function getTestId($answer_id){
+      $test = CandidateTest::where('answer_id',$answer_id)->first();
+      return $test->test_id;
+    }
+
+    public function answerEx($answer_id){
+      $answer = CandidateTest::where('answer_id',$answer_id)->first();
+      if ($answer) {
+        return true;
+      }
+
+      return false;
+    }
+
+    public function registeredFilterCandidates(Request $request){
+        $candidateIds = [];
+        $fair_id = $request->fair_id;
+        $answers = $request->answers;
+        // return $data; die;
+        $questions = CareerTest::where('fair_id','=', $fair_id)->get();
+        $search = CandidateTest::whereNested(function($query) use ($answers,$fair_id) {
+          foreach($answers as $answer){
+            $query->orWhere('answer_id', '=', $answer);;
+          }
+        })->where('fair_id', '=', $fair_id)->select('candidate_id')->get();
+
+        // return $search; die;
+        //return json_encode($filterOptions);
+        if(!$search->isEmpty()){
+          $candidates = User::whereNested(function($query) use ($search) {
+                      foreach ($search as $key => $value)
+                          {
+                              $query->orWhere('id','=', $value["candidate_id"]);
+                          }
+                  })
+                  ->orderBy('id', 'Desc')->groupBy('id')->get();
+        }else{
+          $candidates = [];
+        }
+        $count = count($candidates);
+        $candidateIds = array();
+        foreach ($candidates as $key => $candidate) {
+          $candidateIds[] = $candidate->id;
+        } 
+        // foreach ($answers as $key => $value) {
+        //     $search = CandidateTest::where('answer_id',$value)->where('fair_id',$fair_id)->select('candidate_id')->distinct('candidate_id')->get();
+        //     array_push($candidateIds,$search);
+        // }
+        // return $candidateIds; die;
+        // $search = CandidateTest::where('fair_id')
+        $candidatesArr = [];
+        $candidates    = FairCandidates::where('fair_id',$fair_id)->whereIn('candidate_id',$candidateIds)->with('candidate','candidateInfo','candidateTest','candidateTurnout')
             ->orderBy('created_at', 'desc')
             ->get();
 
