@@ -269,6 +269,7 @@ trait RecruiterCandidates
               'email'        => $matchRecr->candidate->email,
               'name'         => $matchRecr->candidate->name,
               'country'      => $matchRecr->candidateSetting->user_country,
+              'avatar'       => $matchRecr->candidateSetting->user_image,
               'last_seen'    => \Carbon\Carbon::parse($value->updated_at)->diffForHumans(),
               'is_candidate_take_test'   => User::isCandidateTakeTest($fair_id,$matchRecr->candidate_id),
               'is_candidate_attend_fair' => User::isCandidateAttendFair($fair_id,$matchRecr->candidate_id),

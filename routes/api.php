@@ -6,11 +6,6 @@ Route::namespace('Api\V1')->group(function () {
       'uses' => 'CandidateController@downloadCV',
       'as'   => 'downloadCandidateCV'
     ]);
-      // Get Fair Jobs
-    Route::get('front/job/detail/{job_id}/{candidate_id?}',[
-        'uses' => 'CompanyJobController@detail',
-        'as'   => 'jobDetail'
-    ]);
 });
 
 Route::group(['prefix' => 'auth','namespace' => 'Api\V1'], function () {
