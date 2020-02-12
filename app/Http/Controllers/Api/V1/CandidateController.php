@@ -361,6 +361,7 @@ class CandidateController extends Controller
             ->withHeader('api-key: 51374xb73fca7c64f3a49d2ffdefbb1f2e8c76')
             ->withData('GUID='.$webinar_id.'&UID='.$candidate_id)
                       ->post();
+        }
         $candidateAddedWebinars = CandidateAgenda::where('candidate_id',$candidate_id)
                                 ->where('fair_id',$fair_id)->get();
         return $candidateAddedWebinars;
