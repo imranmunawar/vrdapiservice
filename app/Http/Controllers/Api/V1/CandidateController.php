@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Storage;
+use Ixudra\Curl\Facades\Curl;
 use AWS;
 use App\Http\Requests\StoreCandidate;
 use Carbon\Carbon;
@@ -343,7 +344,11 @@ class CandidateController extends Controller
         $company_id   = $request->company_id;
         $CandidateAgenda = CandidateAgenda::where('candidate_id',$candidate_id)->where('webinar_id',$webinar_id)->first(); 
         if($CandidateAgenda){
-            $CandidateAgenda->delete();
+          Curl::to('https://api.cometondemand.net/api/v2/removeUsersFromGroup')
+          ->withHeader('api-key: 51374xb73fca7c64f3a49d2ffdefbb1f2e8c76')
+          ->withData('GUID='.$webinar_id.'&UID='.$candidate_id)
+          ->post();
+          $CandidateAgenda->delete();
         }else{
             CandidateAgenda::create(array(
                 'candidate_id' => $candidate_id,
@@ -351,7 +356,11 @@ class CandidateController extends Controller
                 'fair_id'      => $fair_id,
                 'webinar_type' => 'Webinar'
             ));
-        }
+
+            Curl::to('https://api.cometondemand.net/api/v2/addUsersToGroup')
+            ->withHeader('api-key: 51374xb73fca7c64f3a49d2ffdefbb1f2e8c76')
+            ->withData('GUID='.$webinar_id.'&UID='.$candidate_id)
+                      ->post();
         $candidateAddedWebinars = CandidateAgenda::where('candidate_id',$candidate_id)
                                 ->where('fair_id',$fair_id)->get();
         return $candidateAddedWebinars;

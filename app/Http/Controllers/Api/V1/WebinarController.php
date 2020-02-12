@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Ixudra\Curl\Facades\Curl;
 use App\Traits\WebinarEmail;
 use App\CompanyWebinar;
 
@@ -124,7 +125,7 @@ class WebinarController extends Controller
               'api-key: 51374xb73fca7c64f3a49d2ffdefbb1f2e8c76'
             ));
             curl_setopt($ch, CURLOPT_POST, 1);  
-            curl_setopt($ch, CURLOPT_POSTFIELDS,'GUID='.$wid.'&name='.$request->title.'&type=0');
+            curl_setopt($ch, CURLOPT_POSTFIELDS,'GUID='.$id.'&name='.$request->title.'&type=0');
             // Receive server response ...
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             $apiResponse = curl_exec($ch);

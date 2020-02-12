@@ -167,6 +167,7 @@ return [
          */
          Lab404\Impersonate\ImpersonateServiceProvider::class,
          Laravel\Passport\PassportServiceProvider::class,
+         Ixudra\Curl\CurlServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -227,6 +228,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'AWS' => Aws\Laravel\AwsFacade::class,
+        'Curl'          => Ixudra\Curl\Facades\Curl::class,
 
     ],
 
