@@ -624,6 +624,13 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
         'as'   => 'candidateinHall'
     ]);
 
+    /* Messages Routes */
+
+    Route::post('messages/list', ['uses' => 'MessageController@index','as'  => 'listMessages']);
+
+    Route::post('candidate/recruiter/chat', ['uses' => 'MessageController@candidateRecruiterChat','as'  => 'candidateRecruiterChat']);
+
+    Route::post('recruiter/send/message', ['uses' => 'MessageController@recruiterSendMessage','as'  => 'recruiterSendMessage']);
 
     // Route::get('candidate/career-test/{fair_id}/{candidate_id}',  ['uses' =>'CandidateController@show']);
 });
