@@ -6,6 +6,10 @@ Route::namespace('Api\V1')->group(function () {
       'uses' => 'CandidateController@downloadCV',
       'as'   => 'downloadCandidateCV'
     ]);
+
+    Route::post('candidate/recruiter/chat', ['uses' => 'MessageController@candidateRecruiterChat','as'  => 'candidateRecruiterChat']);
+
+    Route::post('recruiter/send/message', ['uses' => 'MessageController@recruiterSendMessage','as'  => 'recruiterSendMessage']);
 });
 
 Route::group(['prefix' => 'auth','namespace' => 'Api\V1'], function () {
@@ -628,9 +632,9 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
 
     Route::post('messages/list', ['uses' => 'MessageController@index','as'  => 'listMessages']);
 
-    Route::post('candidate/recruiter/chat', ['uses' => 'MessageController@candidateRecruiterChat','as'  => 'candidateRecruiterChat']);
+    // Route::post('candidate/recruiter/chat', ['uses' => 'MessageController@candidateRecruiterChat','as'  => 'candidateRecruiterChat']);
 
-    Route::post('recruiter/send/message', ['uses' => 'MessageController@recruiterSendMessage','as'  => 'recruiterSendMessage']);
+    // Route::post('recruiter/send/message', ['uses' => 'MessageController@recruiterSendMessage','as'  => 'recruiterSendMessage']);
 
     // Route::get('candidate/career-test/{fair_id}/{candidate_id}',  ['uses' =>'CandidateController@show']);
 });
