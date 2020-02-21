@@ -308,7 +308,7 @@ class CandidateController extends Controller
                       ->with('companyWebinar','companyDetail')
                       ->orderBy('percentage', 'Desc')
                       ->get();
-      $addedWebinars = CandidateJob::where('candidate_id',$candidate_id)
+      $addedWebinars = CandidateAgenda::where('candidate_id',$candidate_id)
                           ->where('fair_id',$fair_id)->get();
       return response()->json(['webinars'=>$webinars,'addedWebinars'=>$addedWebinars]);
     }
