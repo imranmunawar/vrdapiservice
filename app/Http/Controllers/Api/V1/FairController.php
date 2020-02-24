@@ -141,7 +141,7 @@ class FairController extends Controller
                       ->where('fair_id',$fair_id)->get();
       if ($webinars) {
         foreach ($webinars as $key => $row) {
-          array_push($webinarIds, $row->id);
+          array_push($webinarIds, $row->webinar_id);
         }
       }
 
