@@ -16,6 +16,8 @@ use App\Traits\TrackCandidates;
 use App\Traits\FairLiveEmailNotification;
 use App\Traits\FairEndEmailCandidates;
 use App\FairCandidates;
+use App\CandidateAgenda;
+use App\CompanyWebinar;
 use \Input as Input;
 use DB;
 
@@ -133,8 +135,26 @@ class FairController extends Controller
         return $dateTime;
     }
 
+    private function getCandidateAddedWebinars($fair_id,$candidate_id){
+      $webinarIds = [];
+      $webinars = CandidateAgenda::where('candidate_id',$candidate_id)
+                      ->where('fair_id',$fair_id)->get();
+      if ($webinars) {
+        foreach ($webinars as $key => $row) {
+          array_push($webinarIds, $row->id);
+        }
+      }
+
+      $addedWebinars = CompanyWebinar::whereIn('id',$webinarIds)
+                                            ->where('fair_id',$fair_id)
+                                            ->get();
+
+      return $addedWebinars;
+    }
+
     public function showFairByShortname(Request $request)
     {
+        $addedWebinars = [];
         $candidateTest = false;
         $candidate_id  = $request->candidate_id;
         $short_name    = $request->short_name;
@@ -143,6 +163,7 @@ class FairController extends Controller
         if ($fair) {
           $this->vistFairCandidates($fair,$request);
           if (!empty($candidate_id)) {
+            $addedWebinars = $this->getCandidateAddedWebinars($fair->id,$candidate_id);
             $candidate = FairCandidates::where('candidate_id',$candidate_id)->where('fair_id',$fair->id)->first();
             if ($candidate){
                 $candidateTest = $candidate->is_take_test == 1 ? true : false;
@@ -199,7 +220,7 @@ class FairController extends Controller
             'fair_end_time'        => $fairEndTime,
             'date'                 => $date,
         ];
-            return response()->json(['fair'=>$fair,'dateAndTime'=>$dateAndTimeArray,'isTakeTest'=>$candidateTest]);
+            return response()->json(['fair'=>$fair,'dateAndTime'=>$dateAndTimeArray,'isTakeTest'=>$candidateTest,'addedWebinars'=>$addedWebinars]);
 
         }else{
             return response()->json([
