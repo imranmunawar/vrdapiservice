@@ -10,6 +10,8 @@ use App\Company;
 use App\CompanyJob;
 use App\FairSetting;
 use App\CareerTest;
+use App\CareerTestAnswer;
+use App\JobQuestionnaire;
 use App\CandidateTest;
 use App\UserSettings;
 use App\Traits\TrackCandidates;
@@ -29,7 +31,7 @@ class FairController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index() 
+    public function index()
     {
         $fairs = Fair::with('organizer')->get();
         return response()->json($fairs);
@@ -60,7 +62,7 @@ class FairController extends Controller
         // Create a new Fair in the database...
         $fair = Fair::create($request->all());
         if (!$fair) {
-            return response()->json(['success' => false,'message' => 'Fair Media Not Created Successfully'],200); 
+            return response()->json(['success' => false,'message' => 'Fair Media Not Created Successfully'],200);
         }
         return response()->json(['success' => true,'message' => 'Fair Media Created Successfully' ],200);
     }
@@ -74,9 +76,9 @@ class FairController extends Controller
     public function show($id)
     {
         $fair = Fair::find($id);
-        return response()->json($fair); 
+        return response()->json($fair);
     }
-    
+
 
     /**
      * Show the form for editing the specified resource.
@@ -87,7 +89,7 @@ class FairController extends Controller
     public function edit($id)
     {
         $fair = Fair::find($id);
-        return response()->json($fair); 
+        return response()->json($fair);
     }
 
     /**
@@ -99,14 +101,14 @@ class FairController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = $request->all(); 
+        $data = $request->all();
         $fair  = Fair::findOrFail($id);
         $fair->fill($data)->save();
         return response()->json([
            'success' => true,
            'message' => 'Fair Updated Successfully'
         ], 200);
-        
+
     }
 
     /**
@@ -120,7 +122,7 @@ class FairController extends Controller
         $fair  = Fair::findOrFail($id);
         if ($fair) {
           $deleteFair = Fair::destroy($id);
-          return response()->json(['success'=>true, 'message'=> 'Fair Delete Successfully'], 200); 
+          return response()->json(['success'=>true, 'message'=> 'Fair Delete Successfully'], 200);
         }
     }
 
@@ -179,7 +181,7 @@ class FairController extends Controller
           }else{
             $candidateTest = true;
           }
-          
+
           date_default_timezone_set($timezone);
           //start time of fair
           $cur_date = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone($fair->timezone));
@@ -199,7 +201,7 @@ class FairController extends Controller
           $data["end_time"] = $end_date->format('h:ia');
           $data["fair_end"] = $end_date->format('Y-m-d')." ".$end_date->format('H:i:s');
 
-         $fairStartDateFrom = date('D jS F Y', strtotime($data["start_date"])); 
+         $fairStartDateFrom = date('D jS F Y', strtotime($data["start_date"]));
          $fairStartTime = date('g:iA', strtotime($data["start_time"]));
          $fairEndTime = date('g:iA', strtotime($data["end_time"]));
          $date = date('Y-m-d H:i:s');
@@ -227,7 +229,7 @@ class FairController extends Controller
                'error'   => true,
                'message' => 'Fair Not Found'
             ], 404);
-        }     
+        }
     }
 
     public function terms($fair_id)
@@ -240,7 +242,7 @@ class FairController extends Controller
                'error'   => true,
                'message' => 'Terms And Condition Not Found'
             ], 404);
-        }     
+        }
     }
 
     public function privacy($fair_id)
@@ -253,7 +255,7 @@ class FairController extends Controller
                'error'   => true,
                'message' => 'Privacy Policy Not Found'
             ], 404);
-        }     
+        }
     }
 
     public function aboutFair($organizer_id)
@@ -266,7 +268,7 @@ class FairController extends Controller
                'error' => true,
                'message' => 'Fair Not Found'
             ], 404);
-        }    
+        }
     }
 
     public function exhibitors($fair_id)
@@ -279,7 +281,7 @@ class FairController extends Controller
                'error' => true,
                'message' => 'Exhibitors Not Found'
             ], 404);
-        }    
+        }
     }
 
     public function jobs($fair_id)
@@ -292,9 +294,72 @@ class FairController extends Controller
                'error' => true,
                'message' => 'Jobs Not Found'
             ], 404);
-        }    
+        }
     }
-
+    public function jobsMatching($fair_id, $candidate_id, $job_id)
+    {
+  		$questions = CareerTest::where('fair_id', '=', $fair_id)->get();
+  		foreach($questions as $question) {
+  			$score = "question".$question->id;
+				$data["$score"] = 0;
+				$count = "questioncount".$question->id;
+				$data["$count"] = 0;
+  			$answers = CareerTestAnswer::where('test_id', '=', $question->id)->get();
+  			foreach($answers as $answer) {
+  				$index = "question".$question->id."answer".$answer->id;
+  				$index2 = "chquestion".$question->id."chanswer".$answer->id;
+    			$data["$index"] = 0;
+    			$data["$index2"] = 0;
+  			}
+  		}
+  		$job_criteria = JobQuestionnaire::where('job_id', '=', $job_id)->get();
+  		foreach ($job_criteria as $criteria) {
+  			$question_id = $criteria->test_id;
+  			$answer = $criteria->answer;
+  			$index2 = "chquestion".$question_id."chanswer".$answer;
+  			$data["$index2"] = $criteria->score;
+  		}
+  		$candidate = CandidateTest::where('candidate_id', '=', $candidate_id)->where('fair_id','=', $fair_id)->get();
+  		foreach($candidate as $test){
+  			$question_id = $test->test_id;
+  			$answer = $test->answer_id;
+  			$index2 = "chquestion".$question_id."chanswer".$answer;
+  			$score = "question".$question_id;
+	      $data["$score"] = $data["$score"] + $data["$index2"];
+  			$count = "questioncount".$question_id;
+	      $data["$count"] = $data["$count"] + 1;
+  		}
+      $candidate = CandidateTest::where('candidate_id', '=', $candidate_id)->where('fair_id','=', $fair_id)->get();
+  		foreach($candidate as $test){
+  			$question_id = $test->test_id;
+  			$answer = $test->answer_id;
+  			$index2 = "chquestion".$question_id."chanswer".$answer;
+  			if($data["$index2"] == 5){
+    			$score = "question".$question_id;
+				$data["$score"] = 5;
+    			$count = "questioncount".$question_id;
+				$data["$count"] = 1;
+  			}
+  		}
+  		$questions = CareerTest::where('fair_id', '=', $fair_id)->get();
+  		foreach($questions as $question) {
+  			$score = "question".$question->id;
+			  $count = "questioncount".$question->id;
+        $match[] = array(
+                    "question" => $question->question,
+                    "score" => number_format(($data["$score"]/($data["$count"]*5))*100)
+                  );
+      }
+      // $jobs = CompanyJob::where('fair_id',$fair_id)->with('company')->get();
+      if ($match) {
+          return response()->json(['match'=>$match], 200);
+      }else{
+          return response()->json([
+             'error' => true,
+             'message' => 'Invalid Match'
+          ], 404);
+      }
+    }
     public function registeredCandidates($fair_id){
         $candidatesArr = [];
         $candidates    = FairCandidates::where('fair_id',$fair_id)->with('candidate','candidateInfo','candidateTest','candidateTurnout')
@@ -320,7 +385,7 @@ class FairController extends Controller
                 ];
             }
         }
-      
+
        return $candidatesArr;
     }
 
@@ -367,7 +432,7 @@ class FairController extends Controller
         $candidateIds = array();
         foreach ($candidates as $key => $candidate) {
           $candidateIds[] = $candidate->id;
-        } 
+        }
         // foreach ($answers as $key => $value) {
         //     $search = CandidateTest::where('answer_id',$value)->where('fair_id',$fair_id)->select('candidate_id')->distinct('candidate_id')->get();
         //     array_push($candidateIds,$search);
@@ -398,7 +463,7 @@ class FairController extends Controller
                 ];
             }
         }
-      
+
        return $candidatesArr;
     }
 
