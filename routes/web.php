@@ -63,7 +63,6 @@ Route::group(['namespace' => 'Api\V1'], function () {
     'uses'    => 'CandidateController@Unsubscribe',  
     'as'      => 'Unsubscribe'
    ]);   
-
 });
 
 

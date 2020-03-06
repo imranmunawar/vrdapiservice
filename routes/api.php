@@ -637,4 +637,31 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
     // Route::post('recruiter/send/message', ['uses' => 'MessageController@recruiterSendMessage','as'  => 'recruiterSendMessage']);
 
     // Route::get('candidate/career-test/{fair_id}/{candidate_id}',  ['uses' =>'CandidateController@show']);
+
+    /* Scheduling Routes */
+    Route::post('/company/recruiters/scheduling', 'RecruiterSchedulingController@index');
+    // Route::get('/company/recruiters/scheduling/data', 'RecruiterSchedulingController@indexData');
+    Route::post('/company/recruiters/scheduled/interviews', 'RecruiterSchedulingController@scheduledInterviews');
+    Route::get('/company/recruiters/scheduling/add', 'RecruiterSchedulingController@addSchedule');
+    Route::post('/company/recruiters/scheduling/create', 'RecruiterSchedulingController@createSchedule');
+    Route::get('/company/recruiters/scheduling/edit/{id}', 'RecruiterSchedulingController@editSchedule');
+    Route::post('/company/recruiters/scheduling/update', 'RecruiterSchedulingController@updateSchedule');
+    Route::delete('/company/recruiters/scheduling/delete/{id}', 'RecruiterSchedulingController@deleteSchedule');
+    Route::post('/company/recruiters/scheduling/invite', 'RecruiterSchedulingController@inviteCandidate');
+    Route::post('/company/recruiters/interview/approvals', 'RecruiterSchedulingController@interviewApprovals');
+    Route::get('/recruiter/approve/interview/{interview_id}', 'RecruiterSchedulingController@interviewApproved');
+
+});
+
+
+Route::group(['namespace' => 'Api\V1'], function () { 
+    /* Candidate Scheduling Routes*/
+    Route::get('/candidate/interview/fetch/calender', 'RecruiterSchedulingController@candidateFetchCalender');
+    Route::get('/candidate/interview/fetch/schedules', 'RecruiterSchedulingController@candidateFetchSchedules');
+    Route::get('/candidate/interview/book/schedules', 'RecruiterSchedulingController@candidateBookSchedules');
+    Route::get('/candidate/interview/book/schedules', 'RecruiterSchedulingController@candidateBookSchedules');
+    Route::get('/candidate/interview/cancel/{u_id}', 'RecruiterSchedulingController@candidateCancelSchedule');
+    Route::get('/interview/invitation/{u_id}', 'RecruiterSchedulingController@invitationLink');
+    Route::post('/interview/fetch/schedules', 'RecruiterSchedulingController@fetchSchedules');
+    Route::post('/interview/book/schedules', 'RecruiterSchedulingController@bookSchedules');
 });
