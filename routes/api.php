@@ -120,6 +120,11 @@ Route::group(['prefix' => 'auth','namespace' => 'Api\V1'], function () {
         'as'   => 'jobDetail'
     ]);
 
+    // Get Jobs Matching
+    Route::get('fair/jobs/matching/{fair_id}/{candidate_id}/{job_id}',[
+       'uses' => 'FairController@jobsMatching',
+       'as'   => 'fairJobsMatch'
+    ]);
 });
 
 Route::group(['namespace' => 'Auth','prefix' => 'password'], function () {
@@ -315,7 +320,7 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
     ]);
 
     Route::post('set/recruiter/status',[
-        'uses' => 'UserController@setRecruiterStatus',  
+        'uses' => 'UserController@setRecruiterStatus',
         'as'   => 'setRecruiterStatus'
     ]);
 
