@@ -120,10 +120,10 @@ Route::group(['prefix' => 'auth','namespace' => 'Api\V1'], function () {
         'as'   => 'jobDetail'
     ]);
 
-    // Get Jobs Matching
-    Route::get('fair/jobs/matching/{fair_id}/{candidate_id}/{job_id}',[
-       'uses' => 'FairController@jobsMatching',
-       'as'   => 'fairJobsMatch'
+    // Get Matching Detail
+    Route::get('matching/detail/{matching_param}/{fair_id}/{candidate_id}/{where_id}',[
+       'uses' => 'FairController@matchingDetail',
+       'as'   => 'matchingDetail'
     ]);
 });
 

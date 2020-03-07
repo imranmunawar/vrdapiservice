@@ -12,6 +12,8 @@ use App\FairSetting;
 use App\CareerTest;
 use App\CareerTestAnswer;
 use App\JobQuestionnaire;
+use App\RecruiterQuestionnaire;
+use App\WebinarQuestionnaire;
 use App\CandidateTest;
 use App\UserSettings;
 use App\Traits\TrackCandidates;
@@ -296,7 +298,7 @@ class FairController extends Controller
             ], 404);
         }
     }
-    public function jobsMatching($fair_id, $candidate_id, $job_id)
+    public function matchingDetail($matching_param,$fair_id, $candidate_id, $where_id)
     {
   		$questions = CareerTest::where('fair_id', '=', $fair_id)->get();
   		foreach($questions as $question) {
@@ -312,8 +314,15 @@ class FairController extends Controller
     			$data["$index2"] = 0;
   			}
   		}
-  		$job_criteria = JobQuestionnaire::where('job_id', '=', $job_id)->get();
-  		foreach ($job_criteria as $criteria) {
+
+      if ($matching_param == 'job') {
+        $matchingCriteria = JobQuestionnaire::where('job_id', '=', $where_id)->get();
+      }elseif ($matching_param == 'webinar') {
+        $matchingCriteria = WebinarQuestionnaire::where('webinar_id', '=', $where_id)->get();
+      }elseif ($matching_param == 'recruiter'){
+        $matchingCriteria = RecruiterQuestionnaire::where('recruiter_id', '=', $where_id)->get();
+      }
+  		foreach ($matchingCriteria as $criteria) {
   			$question_id = $criteria->test_id;
   			$answer = $criteria->answer;
   			$index2 = "chquestion".$question_id."chanswer".$answer;
@@ -360,6 +369,9 @@ class FairController extends Controller
           ], 404);
       }
     }
+
+
+
     public function registeredCandidates($fair_id){
         $candidatesArr = [];
         $candidates    = FairCandidates::where('fair_id',$fair_id)->with('candidate','candidateInfo','candidateTest','candidateTurnout')

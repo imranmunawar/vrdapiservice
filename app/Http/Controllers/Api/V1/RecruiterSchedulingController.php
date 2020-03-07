@@ -218,30 +218,58 @@ class RecruiterSchedulingController extends Controller {
 	 */
 	public function createSchedule(Request $req)
 	{
-		$selectedDays = explode(" - ", $req->days);
-		$date_from = strtotime($selectedDays[0]); // Convert date to a UNIX timestamp
-		$date_to = strtotime($selectedDays[1]); // Convert date to a UNIX timestamp
-		$days = array();
-		for ($i = $date_from; $i <= $date_to; $i+=86400) {
-		    $days[] = date("Y-m-d", $i);
-		}
-		$create = RecruiterSchedule::create(array(
-			'fair_id'      => $req->fair_id,
-			'company_id'   => $req->company_id,
-			'recruiter_id' => $req->recruiter_id,
-			'start_time'   => $req->start_time,
-			'end_time'     => $req->end_time,
-			'days'         => $req->days,
-			'days_arr'     => json_encode($days),
-			'available'    => '1'
-		));
+		// $intervel     = $req->interval;
+		// $start_time_interval = $request->start_time;
+		// $selectedDays = explode(" - ", $req->days);
+		// $date_from    = strtotime($selectedDays[0]); // Convert date to a UNIX timestamp
+		// $date_to      = strtotime($selectedDays[1]); // Convert date to a UNIX timestamp
+		// $days         = array();
+		// for ($i = $date_from; $i <= $date_to; $i+=86400) {
+		//     $days[] = date("Y-m-d", $i);
+		// }
 
-		if ($create) {
+		$intervel            = $req->interval;
+		$start_time_interval = $req->start_time;
+		$end_time_interval   = $req->start_time;
+		$start_time          = $req->start_time;
+		$end_time            = $req->end_time;
+		$end_interval = $req->interval * 2;
+
+
+		$loopCount = 0;
+		while ($start_time_interval <= $end_time) {
+			if($loopCount > 0){
+				$start_time_interval = date('H:i', strtotime("+$intervel minutes", strtotime($start_time_interval)));
+			}
+			$end_time_interval = date('H:i', strtotime("+$intervel minutes", strtotime($start_time_interval)));
+			$return =  $start_time_interval." - ".$end_time_interval."</br>";
 			return response()->json([ 
+	            'return' => $return
+	        ],200);
+			$create = RecruiterSchedule::create(array(
+				'fair_id'      => $req->fair_id,
+				'company_id'   => $req->company_id,
+				'recruiter_id' => $req->recruiter_id,
+				'start_time'   => $start_time_interval,
+				'end_time'     => $end_time_interval,
+				'days'         => $req->days,
+				'days_arr'     => json_encode($req->days),
+				'available'    => '1'
+			));
+			$loopCount++;
+		}	
+
+		// if ($create) {
+		// 	return response()->json([ 
+  //           'success' => true, 
+  //           'message' => 'Time Slots Added Successfully' 
+  //           ],200);
+		// }
+
+		return response()->json([ 
             'success' => true, 
-            'message' => 'Time Slot Added Successfully' 
-            ],200);
-		}
+            'message' => 'Time Slots Added Successfully' 
+        ],200);
 
 	}
 
