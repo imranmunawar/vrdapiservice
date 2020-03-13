@@ -1,9 +1,9 @@
-<html style="box-sizing: border-box; font-size: 14px; margin: 0;">
+<html style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
 <head>
-<link href="https://fonts.googleapis.com/css?family=Poppins&display=swap" rel="stylesheet">
+
 </head>
 
-<body style="font-family: 'Poppins', sans-serif; box-sizing: border-box; font-size: 14px; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; width: 100% !important; height: 100%; line-height: 1.6em; background-color: #efebe3; margin: 0;" bgcolor="#efebe3">
+<body style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; width: 100% !important; height: 100%; line-height: 1.6em; background-color: #efebe3; margin: 0;" bgcolor="#efebe3">
 
 <div style="width:100%;margin:0px;background-color:#efebe3">
 
@@ -11,7 +11,7 @@
         <tbody>
         <tr>
             <td align="center" valign="top">
-                <table border="0" cellspacing="0" cellpadding="0" width="600" align="center" style="color:#6666666;line-height:20px;font-size:12px;font-family: 'Poppins', sans-serif;;text-align:left">
+                <table border="0" cellspacing="0" cellpadding="0" width="600" align="center" style="color:#6666666;line-height:20px;font-size:12px;font-family:Arial,helvetica,sans-serif;text-align:left">
                     <tbody><tr>
                         <td height="30" valign="top" colspan="3">&nbsp;</td>
                     </tr>
@@ -27,7 +27,7 @@
 
                     <tr class="m_-7922248444950610321up-header-lvl-02">
                         <td bgcolor="#FFFFFF" valign="top" width="600" colspan="3">
-                            <h1 style="color:#5D2DDC;font-family: 'Poppins', sans-serif;;font-size:24px;line-height:35px;font-weight:bold;margin-bottom:20px;margin-top:20px;margin-left:20px;margin-right:20px"> Dear {{ $name }}</h1>
+                            <h1 style="color:#5D2DDC;font-family:Arial,helvetica,sans-serif;font-size:24px;line-height:35px;font-weight:bold;margin-bottom:20px;margin-top:20px;margin-left:20px;margin-right:20px"> Dear {{ $name }}</h1>
                         </td>
                     </tr>
 
@@ -43,34 +43,56 @@
                                 </tr>
                                 <tr>
                                     <td width="20" valign="top">&nbsp;</td>
-                                    <td valign="top" width="560" style="font-family: 'Poppins', sans-serif;;font-weight:normal;font-size:12px;line-height:19px;color:#666666">
-                                        <h2 style="color:#fff;font-family: 'Poppins', sans-serif;background: #333333d4;font-size:15px;line-height:28px;font-weight:bold;margin-bottom:10px">
-                                            Invitation for the Interview on {{ $date }} from {{ $start_time }} to {{ $end_time }} in {{ $fairname }}
+                                    <td valign="top" width="560" style="font-family:Arial,helvetica,sans-serif;font-weight:normal;font-size:12px;line-height:19px;color:#666666">
+                                        <h2 style="color:#fff;font-family: 'Poppins', sans-serif;background: #333333d4;font-size:15px;line-height:28px;font-weight:bold;margin-bottom:10px;padding: 15px;">
+                                            Your interview has successfully schedule at {{ $date }} from {{ $start_time }} to {{ $end_time }} in {{ $fairname }}
                                         </h2>
-                                        <p style="color:#666666;font-family: 'Poppins', sans-serif;;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
-                                            Please click on the accept invitation button and book your interview.
+                                        
+                                        <table class="table table-striped">
+                                           <thead>
+                                             <tr>
+                                               <th><b>Candidate Name</b></th>
+                                               <th><b>Time Zone</b></th>
+                                             </tr>
+                                           </thead>
+                                           <tbody>
+                                             <tr>
+                                               <td><b>{{$candidateName}}</b></td>
+                                               <td><b>{{$timezone}}</b></td>
+                                             </tr>
+                                           </tbody>
+                                         </table>
+                                        <p style="color:#666666;font-family:Arial,helvetica,sans-serif;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
+                                            <p>Thank You for scheduling your interview to the {{ $fairname }}.</p>
                                         </p>
-										<table border="0" cellpadding="0" cellspacing="0" style="background-color:#5D2DDC;border-radius:2px;margin-bottom:20px">
+                                        <h3 style="color:#5D2DDC;font-family:Arial,helvetica,sans-serif;font-size:15px;line-height:28px;font-weight:bold;margin-bottom:10px">
+
+                                        </h3>
+
+                                        <table border="0" cellpadding="0" cellspacing="0" style="margin-bottom:20px">
                                             <tbody>
                                                 <tr>
-                                                    <td align="center" valign="middle" style="color:#ffffff;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:bold;line-height:150%;padding-top:5px;padding-right:10px;padding-bottom:5px;padding-left:10px">
-                                                        <a style="color:#fff;text-decoration:none" href="{{$acceptInvitationLink}}" target="_blank">Accept Invitation</a>
+                                                    <td align="center" valign="middle" style="">
+                                                        <a style="background-color:#5D2DDC;border-radius:2px;color:#ffffff;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:bold;line-height:150%;padding:10px 10px; margin-right: 5px;text-decoration:none;" href="https://calendar.google.com/calendar/r/eventedit?dates={{$calendar_time}}&text={{ $fairname }}&location={{ url('/'.$url) }}&details=&pli=1&sf=true" target="_blank">Add to Calendar</a>
+                                                    </td>
+                                                    <td align="center" valign="middle" style="">
+                                                        <a style="background-color:#5D2DDC;border-radius:2px;color:#ffffff;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:bold;line-height:150%;padding:10px 10px;text-decoration:none;" href="{{ url('/'.$url) }}" target="_blank">Click to Login</a>
                                                     </td>
                                                 </tr>
                                             </tbody>
                                         </table>
 
-                                        <p style="color:#666666;font-family: 'Poppins', sans-serif;;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
-                                            If you want to cancel your interview, please click this link anytime. <a href="{{$cancelUrl}}" style="color:#0083be;text-decoration:none" target="_blank">Cancel Interview</a>.
+                                        <p style="color:#666666;font-family:Arial,helvetica,sans-serif;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
+                                            If you want to cancel your interview, please click this link anytime. <a href="{{ $cancelUrl }}" style="color:#0083be;text-decoration:none" target="_blank">Cancel Interview</a>.
                                         </p>
-                                        <p style="color:#666666;font-family: 'Poppins', sans-serif;;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
+
+                                        <p style="color:#666666;font-family:Arial,helvetica,sans-serif;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
                                             If you have any questions, please contact us at <a href="mailto:info@virtualrecruitmentdays.com" style="color:#0083be;text-decoration:none" target="_blank">info@virtualrecruitmentdays.com</a>.
                                         </p>
-                                        <p style="color:#666666;font-family: 'Poppins', sans-serif;;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
-											<br>
+                                        <p style="color:#666666;font-family:Arial,helvetica,sans-serif;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
                                             Good Luck and See you at the event
-											<br>
-											Best Regards
+                                             <br>
+                                             Best Regards
                                             <br>
                                             Virtual Recruitment Team
                                         </p>
@@ -104,6 +126,7 @@
                                 <small style="font-size:9px">
                                     <a href="{{ url('/emails/unsubscribe/'.$faircandidate_id.'/'.$candidate_id) }}"> Unsubscribe</a>
                                 </small>
+
                                 <br>
                                 <br>
                             </p>

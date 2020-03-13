@@ -44,9 +44,27 @@
                                 <tr>
                                     <td width="20" valign="top">&nbsp;</td>
                                     <td valign="top" width="560" style="font-family:Arial,helvetica,sans-serif;font-weight:normal;font-size:12px;line-height:19px;color:#666666">
-                                        <h2 style="color:#5D2DDC;font-family:Arial,helvetica,sans-serif;font-size:18px;line-height:28px;font-weight:bold;margin-bottom:10px">
+                                        <h2 style="color:#fff;font-family: 'Poppins', sans-serif;background: #333333d4;font-size:15px;line-height:28px;font-weight:bold;margin-bottom:10px;padding: 15px;">
                                             Your interview has successfully schedule at {{ $date }} from {{ $start_time }} to {{ $end_time }} in {{ $fairname }}
                                         </h2>
+                                        
+                                        <table class="table table-striped">
+                                           <thead>
+                                             <tr>
+                                               <th><b>Recruter Name</b></th>
+                                               <th><b>Time Zone</b></th>
+                                             </tr>
+                                           </thead>
+                                           <tbody>
+                                             <tr>
+                                               <td><b>{{$recruiterName}}</b></td>
+                                               <td><b>{{$timezone}}</b></td>
+                                             </tr>
+                                           </tbody>
+                                         </table>
+                                        <span>
+                                            <b>Meeting Room Link : </b> {{$meetingLink}}
+                                        </span>
                                         <p style="color:#666666;font-family:Arial,helvetica,sans-serif;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
                                             <p>Thank You for scheduling your interview to the {{ $fairname }}.</p>
                                         </p>
@@ -68,7 +86,7 @@
                                         </table>
 
                                         <p style="color:#666666;font-family:Arial,helvetica,sans-serif;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
-                                            If you want to cancel your interview, please click this link anytime. <a href="{{ url('/candidate/interview/cancel', $u_id) }}" style="color:#0083be;text-decoration:none" target="_blank">Cancel Interview</a>.
+                                            If you want to cancel your interview, please click this link anytime. <a href="{{ $cancelUrl }}" style="color:#0083be;text-decoration:none" target="_blank">Cancel Interview</a>.
                                         </p>
 
                                         <p style="color:#666666;font-family:Arial,helvetica,sans-serif;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
