@@ -125,6 +125,24 @@ Route::group(['prefix' => 'auth','namespace' => 'Api\V1'], function () {
        'uses' => 'FairController@matchingDetail',
        'as'   => 'matchingDetail'
     ]);
+
+    // Get Zoom Users
+    Route::get('get/zoom/users',[
+       'uses' => 'ZoomController@getUsers',
+       'as'   => 'getZoomUsers'
+    ]);
+
+    // Register Zoom Meeting
+    Route::post('register/zoom/user',[
+       'uses' => 'ZoomController@registerUser',
+       'as'   => 'registerUser'
+    ]);
+
+    // Set Zoom Meeting
+    Route::post('set/zoom/meeting',[
+       'uses' => 'ZoomController@setMeeting',
+       'as'   => 'setZoomMeeting'
+    ]);
 });
 
 Route::group(['namespace' => 'Auth','prefix' => 'password'], function () {
@@ -659,7 +677,7 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
 });
 
 
-Route::group(['namespace' => 'Api\V1'], function () { 
+Route::group(['namespace' => 'Api\V1'], function () {
     /* Candidate Scheduling Routes*/
     Route::get('/candidate/interview/fetch/calender', 'RecruiterSchedulingController@candidateFetchCalender');
     Route::get('/candidate/interview/fetch/schedules', 'RecruiterSchedulingController@candidateFetchSchedules');
