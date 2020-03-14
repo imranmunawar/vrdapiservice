@@ -18,10 +18,20 @@ class RecruiterScheduleInvite extends Model
      {
         return $this->hasOne('App\Fair',  'id', 'fair_id');
      }
-     protected $fillable = array(
+
+    public function SlotInfo()
+    {
+        return $this->hasOne('App\RecruiterSchedule',  'id', 'slot_id');
+    }
+
+
+    protected $fillable = array(
         'u_id',
         'fair_id',
         'recruiter_id',
-        'candidate_id'
+        'candidate_id',
+        'slot_id',
+        'notes',
+        'cancel'
      );
 }
