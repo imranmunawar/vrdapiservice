@@ -24,6 +24,11 @@ class CreateRecruiterScheduleBookedsTable extends Migration
             $table->string('date');
             $table->tinyInteger('attended')->default(0);
             $table->tinyInteger('is_approved')->default(0);
+            $table->string('meeting_id');
+            $table->string('host_id');
+            $table->text('start_url');
+            $table->text('join_url');
+            $table->string('password');
             $table->timestamps();
         });
     }

@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use DB;
@@ -18,9 +18,11 @@ use App\Http\Requests;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use App\Traits\ZoomMeetings;
 
 
 class RecruiterSchedulingController extends Controller {
+	use ZoomMeetings;
 
 	/**
 	 * Display a listing of the resource.
@@ -155,14 +157,14 @@ class RecruiterSchedulingController extends Controller {
 
 			Mail::send('emails.interview-confirm', [
 				'name' => $name,
-				'email' => $email, 
-				'faircandidate_id' => $faircandidate_id, 
-				'candidate_id'     => $candidate_id, 
-				'url' => $url, 
+				'email' => $email,
+				'faircandidate_id' => $faircandidate_id,
+				'candidate_id'     => $candidate_id,
+				'url' => $url,
 				'fairname' => $fairname,
 				'start_time' => $start_time,
 				'end_time' => $end_time,
-				'date' => $date, 
+				'date' => $date,
 				'u_id' => $u_id,
 				'timezone' => $timezone,
 				'calendar_time' => $calendar_time,
@@ -181,14 +183,14 @@ class RecruiterSchedulingController extends Controller {
 
 			Mail::send('emails.interview-confirm', [
 				'name' => $name,
-				'email' => $email, 
-				'faircandidate_id' => $faircandidate_id, 
-				'candidate_id'     => $candidate_id, 
-				'url' => $url, 
+				'email' => $email,
+				'faircandidate_id' => $faircandidate_id,
+				'candidate_id'     => $candidate_id,
+				'url' => $url,
 				'fairname' => $fairname,
 				'start_time' => $start_time,
 				'end_time' => $end_time,
-				'date' => $date, 
+				'date' => $date,
 				'u_id' => $u_id,
 				'timezone' => $timezone,
 				'calendar_time' => $calendar_time,
@@ -198,15 +200,15 @@ class RecruiterSchedulingController extends Controller {
 			{
 			    $message->to($email, $name)->subject('Congratulation! Your interview is successfully scheduled');
 			});
-			return response()->json([  
+			return response()->json([
 	            'success'    => true,
-	            'message' => 'Interview Scheduled With ' .$candidateName. ' Approved Successfully' 
+	            'message' => 'Interview Scheduled With ' .$candidateName. ' Approved Successfully'
 	        ],200);
 		}
 
-		return response()->json([  
+		return response()->json([
             'success'    => fasle,
-            'message' => 'Interview Scheduled Approved Not Successfully' 
+            'message' => 'Interview Scheduled Approved Not Successfully'
         ],200);
 	}
 
@@ -235,8 +237,9 @@ class RecruiterSchedulingController extends Controller {
 		    $days[] = date("Y-m-d", $i);
 		}
 
+
 		foreach ($days as $key => $day) {
-			$intervel = $request->interval;        
+			$intervel = $request->interval;
 			$start_time_interval = $request->start_time;
 			$end_time_interval   = $request->start_time;
 			$start_time = $request->start_time;
@@ -253,11 +256,10 @@ class RecruiterSchedulingController extends Controller {
 				$end_time_interval = date('H:i', strtotime("+$intervel minutes", strtotime($start_time_interval)));
 				$return =  $start_time_interval." - ".$end_time_interval."</br>";
 				$loopCount++;
-
 				// if ($loopCount > 5) {
 				// 	exit();
 				// }
-				// echo $return."<br/>"; 
+				// echo $return."<br/>";
 				$create = RecruiterSchedule::create(array(
 					'fair_id'      => $request->fair_id,
 					'company_id'   => $request->company_id,
@@ -268,19 +270,19 @@ class RecruiterSchedulingController extends Controller {
 					'days_arr'     => json_encode($request->days),
 					'available'    => '1'
 				));
-			}	
+			}
 		}
 
-		// if ($create) {
-		// 	return response()->json([ 
-  //           'success' => true, 
-  //           'message' => 'Time Slots Added Successfully' 
-  //           ],200);
-		// }
+		if ($create) {
+			return response()->json([
+            'success' => true,
+            'message' => 'Time Slots Added Successfully'
+            ],200);
+		}
 
-		return response()->json([ 
-            'success' => true, 
-            'message' => 'Time Slots Added Successfully' 
+		return response()->json([
+            'success' => true,
+            'message' => 'Time Slots Added Successfully'
         ],200);
 
 	}
@@ -328,9 +330,9 @@ class RecruiterSchedulingController extends Controller {
 		));
 
 		if ($update) {
-			return response()->json([ 
-            'success' => true, 
-            'message' => 'Time Slot Updated Successfully' 
+			return response()->json([
+            'success' => true,
+            'message' => 'Time Slot Updated Successfully'
             ],200);
 		}
 
@@ -346,9 +348,9 @@ class RecruiterSchedulingController extends Controller {
  	{
  		$delete = RecruiterSchedule::where('id',$id)->delete();
 		if ($delete) {
-			return response()->json([ 
-            'success' => true, 
-            'message' => 'Time Slot Deleted Successfully' 
+			return response()->json([
+            'success' => true,
+            'message' => 'Time Slot Deleted Successfully'
             ],200);
 		}
  	}
@@ -381,18 +383,18 @@ class RecruiterSchedulingController extends Controller {
 					if( $SQL){
 						$emails = FairCandidates::where('candidate_id',$candidate_id)->where('fair_id',$fair_id)->first();
 						$faircandidate_id = $emails->id;
-						$acceptInvitationLink = env('BACKEND_URL').'interview/invitation/'.$u_id;
+							$acceptInvitationLink = env('BACKEND_URL').'interview/invitation/'.$u_id;
 						$cancelUrl    = env('BACKEND_URL').'cancel/interview/invitation/'.$u_id;
 						$backendLogin = env('BACKEND_URL').'login';
 						$date = Carbon::createFromFormat('Y-m-d',$recruiterSchedule->days)->toFormattedDateString();
 				        $start_time = date('h:i A', strtotime($recruiterSchedule->start_time));
 				        $end_time   = date('h:i A', strtotime($recruiterSchedule->end_time));
 						if($emails->email_notification == 1){
-							Mail::send('emails.scheduling-invitation', 
+							Mail::send('emails.scheduling-invitation',
 								[
-									'name'  => $name, 
+									'name'  => $name,
 									'email' => $email,
-									'u_id'  => $u_id, 
+									'u_id'  => $u_id,
 									'faircandidate_id' => $faircandidate_id,
 									'candidate_id'     => $candidate_id,
 									'fairname'         => $fairname,
@@ -407,20 +409,20 @@ class RecruiterSchedulingController extends Controller {
 								$message->to($email, $name)->subject($recruiter_name.' invited you for the interview on '.$fairname);
 							});
 						}
-						return response()->json([  
+						return response()->json([
 				            'code'    => 'success',
-				            'message' => 'Candidate Invited Successfully' 
+				            'message' => 'Candidate Invited Successfully'
 				        ],200);
 					}else{
-						return response()->json([  
+						return response()->json([
 				            'code'    => 'error',
-				            'message' => 'Candidate Not Invited Successfully' 
+				            'message' => 'Candidate Not Invited Successfully'
 				        ],200);
 					}
 				}
 			}
 		}
-		
+
 	}
 
 	public function getRecruiterAvailableSlots($fair_id,$recruiter_id){
@@ -470,9 +472,9 @@ class RecruiterSchedulingController extends Controller {
 		if(RecruiterScheduleInvite::where('u_id',$u_id)->where('expire',0)->exists()){
 			RecruiterScheduleInvite::where('u_id',$u_id)->update(array('expire' => 1,'notes'=>$notes,'cancel'=>1));
 			RecruiterScheduleBooked::where('u_id', $u_id)->delete();
-			return response()->json([  
+			return response()->json([
 	            'code'    => 'success',
-	            'message' => 'Interview Cancel Successfully' 
+	            'message' => 'Interview Cancel Successfully'
 	        ],200);
 		}
 	}
@@ -483,9 +485,9 @@ class RecruiterSchedulingController extends Controller {
 		if(RecruiterScheduleInvite::where('u_id',$u_id)->where('expire',0)->exists()){
 			RecruiterScheduleInvite::where('u_id',$u_id)->update(array('expire' => 1,'cancel'=>1));
 			RecruiterScheduleBooked::where('u_id', $u_id)->delete();
-			return response()->json([  
+			return response()->json([
 	            'code'    => 'success',
-	            'message' => 'Interview Cancel Successfully' 
+	            'message' => 'Interview Cancel Successfully'
 	        ],200);
 		}
 	}
@@ -518,6 +520,14 @@ class RecruiterSchedulingController extends Controller {
 			$data = RecruiterScheduleInvite::where('u_id',$u_id)->where('expire',0)->first();
 			$slot = RecruiterSchedule::find($data->slot_id);
 			if(!RecruiterScheduleBooked::where('start_time',$slot->start_time)->where('end_time',$slot->end_time)->where('date',$slot->date)->exists()){
+				// Set Zoom Meeting
+				$fair = Fair::find($slot->fair_id);
+				$topic = "Interview Call";
+		    $type = 2;
+		    $duration = 60;
+		    $timzone = "";
+		    $meeting = $this->setZoomMeeting($topic, $slot->start_time, $duration, $timzone);
+				$meeting = json_decode($meeting, true);
 				$booked = RecruiterScheduleBooked::create(array(
 					'u_id'         => $u_id,
 					'fair_id'      => $data->fair_id,
@@ -526,7 +536,12 @@ class RecruiterSchedulingController extends Controller {
 					'start_time'   => $slot->start_time,
 					'end_time'     => $slot->end_time,
 					'date'         => $slot->days,
-					'attended'     => 0
+					'attended'     => 0,
+					'meeting_id'	 => $meeting["id"],
+					'host_id'	 		 => $meeting["host_id"],
+					'start_url'		 => $meeting["start_url"],
+					'join_url'		 => $meeting["join_url"],
+					'password'		 => $meeting["password"]
 				));
 				if($booked){
 					RecruiterScheduleInvite::where('u_id',$u_id)->update(array('expire' => 1));
@@ -554,7 +569,7 @@ class RecruiterSchedulingController extends Controller {
 					$end_time     = date('h:i A', strtotime($end_time));
 					$calendar_time = date('Ymd', strtotime($slot->days))."T".date('His', strtotime($start_time))."/".date('Ymd', strtotime($slot->days))."T".date('His', strtotime($end_time));
 
-					Mail::send('emails.interview-confirm', 
+					Mail::send('emails.interview-confirm',
 						[
 							'name'  => $name,
 							'email' => $email,
@@ -564,7 +579,7 @@ class RecruiterSchedulingController extends Controller {
 							'fairname'   => $fairname,
 							'start_time' => $start_time,
 							'end_time'   => $end_time,
-							'date'       => $date, 
+							'date'       => $date,
 							'u_id'       => $u_id,
 							'timezone'   => $timezone,
 							'calendar_time' => $calendar_time,
@@ -578,7 +593,7 @@ class RecruiterSchedulingController extends Controller {
 
 
 					// Email For Recuiter
-					Mail::send('emails.recruiter-interview-confirm', 
+					Mail::send('emails.recruiter-interview-confirm',
 						[
 							'name'  => $recruiterName,
 							'email' => $recruiterEmail,
@@ -588,7 +603,7 @@ class RecruiterSchedulingController extends Controller {
 							'fairname'   => $fairname,
 							'start_time' => $start_time,
 							'end_time'   => $end_time,
-							'date'       => $date, 
+							'date'       => $date,
 							'u_id'       => $u_id,
 							'timezone'   => $timezone,
 							'calendar_time' => $calendar_time,
@@ -600,26 +615,26 @@ class RecruiterSchedulingController extends Controller {
 					});
 
 
-					return response()->json([  
+					return response()->json([
 			            'code'    => 'success',
-			            'message' => 'Booked' 
+			            'message' => 'Booked'
 			        ],200);
 				}else{
-					return response()->json([  
+					return response()->json([
 			            'code'    => 'error',
-			            'message' => 'Error' 
+			            'message' => 'Error'
 			        ],200);
 				}
 			}else{
-				return response()->json([  
+				return response()->json([
 		            'code'    => 'taken',
-		            'message' => 'Already Taken' 
+		            'message' => 'Already Taken'
 		        ],200);
 			}
 		}else{
-			return response()->json([  
+			return response()->json([
 	            'code'    => 'expire',
-	            'message' => 'Link Expire' 
+	            'message' => 'Link Expire'
 	        ],200);
 		}
 	}
@@ -675,6 +690,7 @@ class RecruiterSchedulingController extends Controller {
 		$fair_id      = $req->fair_id;
 		$u_id         = substr(base_convert(sha1(uniqid(mt_rand())), 16, 36), 0, 8).time().substr(base_convert(sha1(uniqid(mt_rand())), 16, 36), 0, 8);
 
+
 			if(!RecruiterScheduleBooked::where('start_time',$start_time)->where('end_time',$end_time)->where('date',$date)->where('recruiter_id',$recruiter_id)->exists()){
 				$booked = RecruiterScheduleBooked::create(array(
 					'u_id'         => $u_id,
@@ -685,6 +701,7 @@ class RecruiterSchedulingController extends Controller {
 					'end_time'     => $end_time,
 					'date'         => $date,
 					'attended'     => 0
+
 				));
 				if($booked){
 					$candidate = User::find($candidate_id);

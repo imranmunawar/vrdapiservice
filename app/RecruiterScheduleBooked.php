@@ -27,6 +27,11 @@ class RecruiterScheduleBooked extends Model
       'end_time',
       'date',
       'attended',
-      'is_approved'
+      'is_approved',
+      'meeting_id',
+      'host_id',
+      'start_url',
+      'join_url',
+      'password'
   );
 }

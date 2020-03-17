@@ -45,6 +45,8 @@ class ZoomController extends Controller
     $start_time = "";
     $duration = 45;
     $timzone = "Europe/London";
-    return $this->setZoomMeeting($topic, $start_time, $duration, $timzone);
+    $meeting = $this->setZoomMeeting($topic, $start_time, $duration, $timzone);
+    return $meeting = json_decode($meeting, true);
+    return $meeting["id"];
   }
 }

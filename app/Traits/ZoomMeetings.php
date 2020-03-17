@@ -32,7 +32,7 @@ trait ZoomMeetings {
     $apiResponse = curl_exec($ch);
     $apiResponse = (array)json_decode($apiResponse);
     curl_close ($ch);
-    return response()->json($apiResponse);
+    return json_encode($apiResponse, true);
   }
 
   public function registerZoomUser($data){
