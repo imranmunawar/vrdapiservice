@@ -14,6 +14,7 @@ use App\FairCandidates;
 use App\RecruiterSchedule;
 use App\RecruiterScheduleInvite;
 use App\RecruiterScheduleBooked;
+use App\CandidateScheduleNote;
 use App\Http\Requests;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\Request;
@@ -92,11 +93,33 @@ class RecruiterSchedulingController extends Controller {
 	    		"starttime" => $interview->start_time,
 	    		"endtime"   => $interview->end_time,
 	    		"color"     => "#DA4453",
-	    		"url"       => env('BACKEND_URL').'fair/candidate/detail/'.$interview->candidate_id
+	    		"url"       => env('BACKEND_URL').'fair/candidate/detail/'.$interview->candidate_id.'/XHMADWBCLS0GWZVH6M6K'
 			);
 		}
 
 		return $interview_arr;
+	}
+
+
+	public function getCandidateNotes($candidate_id){
+		$notes = [];
+		$candidateNotes = CandidateScheduleNote::where('candidate_id',$candidate_id)->get();
+		if ($candidateNotes) {
+			foreach ($candidateNotes as $key => $row) {
+				// $date = Carbon::createFromFormat('Y-m-d',$row->created_at);
+				// $date = Carbon::create($row->created_at);
+				$date = Carbon::createFromFormat('Y-m-d H:i:s',  $row->created_at)->format('F j, Y g:i:s a');
+				// $date = $date->englishDayOfWeek.', '.$date->toFormattedDateString();
+				$notes[] = [
+					'id'      => $row->id,
+					'slot_id' => $row->slot_id,
+					'date'    => $date,
+					'note'    => $row->notes
+				];
+			}
+		}
+
+		return $notes;
 	}
 
 	public function interviewInvitations(Request $req){
@@ -104,8 +127,18 @@ class RecruiterSchedulingController extends Controller {
 		$fair_id      = $req->fair_id;
 		$recruiter_id = $req->recruiter_id;
 		$company_id   = $req->company_id;
+		$start_date    = $req->start_date;
+		$end_date     = $req->end_date;
 
 		$interviews = RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->orderBy('created_at', 'ASC')->get();
+
+		if (!empty($start_date) && !empty($end_date)) {
+			// echo "asdasdas"; die;
+			$filtered  = $interviews->filter(function ($value, $key) use ($start_date,$end_date) {
+			    return $value->SlotInfo->days == $start_date || $value->SlotInfo->days == $end_date;
+			});
+			$interviews = $filtered->all();
+		}
 
 		// $interview_arr = array();
 		foreach ($interviews as $key => $interview) {
@@ -114,7 +147,8 @@ class RecruiterSchedulingController extends Controller {
 			$interview_arr[] = array(
 				'id'        => $interview->id,
 				"u_id"      => $interview->u_id,
-				'notes'     => $interview->notes,
+				'slot_id'   => $interview->slot_id,
+				'notes'     => $this->getCandidateNotes($interview->candidate_id),
 				'status'    => $interview->cancel,
 				"name"      => $interview->CandidateDetails->name,
 				'email'     => $interview->CandidateDetails->email,
@@ -370,15 +404,23 @@ class RecruiterSchedulingController extends Controller {
 					$fairname = $fair->name;
 					$recruiter_name = $recruiter->name;
 					$u_id = substr(base_convert(sha1(uniqid(mt_rand())), 16, 36), 0, 8).time().substr(base_convert(sha1(uniqid(mt_rand())), 16, 36), 0, 8);
-					$SQL = RecruiterScheduleInvite::create(array(
-						'u_id'         => $u_id,
-						'fair_id'      => $fair_id,
-						'recruiter_id' => $recruiter_id,
-						'candidate_id' => $candidate_id,
-						'slot_id'      => $slot_id
-					));
+					if (RecruiterScheduleInvite::where('fair_id',$fair_id)->where('recruiter_id',$recruiter_id)->where('candidate_id',$candidate_id)->exists()) {
+						$SQL = RecruiterScheduleInvite::where('fair_id',$fair_id)
+						            ->where('recruiter_id',$recruiter_id)
+						            ->where('candidate_id',$candidate_id)
+						            ->update(array('expire' => 0,'cancel'=> 0, 'slot_id'=>$slot_id,'u_id'=>$u_id));
+					}else{
+						$SQL = RecruiterScheduleInvite::create(array(
+							'u_id'         => $u_id,
+							'fair_id'      => $fair_id,
+							'recruiter_id' => $recruiter_id,
+							'candidate_id' => $candidate_id,
+							'slot_id'      => $slot_id
+						));
+					}
+					
 
-					if( $SQL){
+					if($SQL){
 						$emails = FairCandidates::where('candidate_id',$candidate_id)->where('fair_id',$fair_id)->first();
 						$faircandidate_id = $emails->id;
 						$acceptInvitationLink = env('BACKEND_URL').'interview/invitation/'.$u_id;
@@ -467,27 +509,110 @@ class RecruiterSchedulingController extends Controller {
 		$slot_id = $request->slot_id;
 		$u_id    = $request->u_id;
 		$notes   = $request->notes;
-		if(RecruiterScheduleInvite::where('u_id',$u_id)->where('expire',0)->exists()){
-			RecruiterScheduleInvite::where('u_id',$u_id)->update(array('expire' => 1,'notes'=>$notes,'cancel'=>1));
-			RecruiterScheduleBooked::where('u_id', $u_id)->delete();
-			return response()->json([  
-	            'code'    => 'success',
-	            'message' => 'Interview Cancel Successfully' 
-	        ],200);
+		RecruiterScheduleInvite::where('u_id',$u_id)->update(array('expire' => 1,'cancel'=>1));
+		$invite = RecruiterScheduleInvite::where('u_id',$u_id)->first();
+		CandidateScheduleNote::create(array(
+			'slot_id'      => $slot_id,
+			'notes'        => $notes,
+			'candidate_id' => $invite->candidate_id
+        ));
+		RecruiterScheduleBooked::where('u_id', $u_id)->delete();
+
+		// if ($isDeleteSlot) {
+			$this->generateCandidateCancelInterviewEmail($slot_id,$u_id,$notes,'candidate');
+		// }
+
+		return response()->json([  
+            'code'    => 'success',
+            'message' => 'Interview Cancel Successfully' 
+        ],200);
+	}
+
+	public function generateCandidateCancelInterviewEmail($slot_id,$u_id,$notes,$cancelBy){
+		$slot = RecruiterScheduleInvite::where('slot_id',$slot_id)->first();
+		$recruiterSchedule = RecruiterSchedule::where('id',$slot_id)->first();
+		$candidate         = User::find($slot->candidate_id);
+		$recruiter         = User::find($slot->recruiter_id);
+		$fair              = Fair::find($slot->fair_id);
+		$fairCandidate     = FairCandidates::where('fair_id',$slot->fair_id)->where('candidate_id',$slot->candidate_id)->first();
+		$faircandidate_id  = $fairCandidate->id;
+		$candidate_id      = $candidate->id;
+		$fairname          = $fair->name;
+
+		if ($cancelBy == 'candidate') {
+			$name              = $recruiter->name;
+			$email             = $recruiter->email;
+			$candidateName     = $candidate->name;
 		}
+
+		if ($cancelBy == 'recruiter') {
+			$name              = $candidate->name;
+			$email             = $candidate->email;
+			$recruiterName     = $recruiter->name;
+		}
+		// $acceptInvitationLink = env('BACKEND_URL').'interview/invitation/'.$u_id;
+		// $cancelUrl    = env('BACKEND_URL').'cancel/interview/invitation/'.$u_id;
+		// $backendLogin = env('BACKEND_URL').'login';
+		$date = Carbon::createFromFormat('Y-m-d',$recruiterSchedule->days)->toFormattedDateString();
+        $start_time = date('h:i A', strtotime($recruiterSchedule->start_time));
+        $end_time   = date('h:i A', strtotime($recruiterSchedule->end_time));
+
+        if ($cancelBy == 'candidate') {
+        	Mail::send('emails.candidateCancelInterview', 
+				[
+					'name'             => $name, 
+					'email'            => $email,
+					'candidateName'    => $candidateName,
+					'fairname'         => $fairname,
+					'faircandidate_id' => $faircandidate_id,
+					'candidate_id'     => $candidate_id,
+					'start_time'       => $start_time,
+					'end_time'         => $end_time,
+					'notes'            => $notes,
+					'date'             => $date,
+					'cancelBy'         => $cancelBy
+
+				], function($message) use ($email,$name, $fairname,$candidateName)
+			{
+				$message->to($email, $name)->subject($candidateName.' rejected the interview request in '.$fairname);
+			});
+        }
+
+        if ($cancelBy == 'recruiter') {
+        	Mail::send('emails.candidateCancelInterview', 
+				[
+					'name'  => $name, 
+					'email' => $email,
+					'recruiterName' => $recruiterName,
+					'fairname'      => $fairname,
+					'faircandidate_id' => $faircandidate_id,
+					'candidate_id'   => $candidate_id,
+					'start_time'    => $start_time,
+					'end_time'      => $end_time,
+					'date'          => $date,
+					'cancelBy'         => $cancelBy
+
+				], function($message) use ($email,$name, $fairname,$recruiterName)
+			{
+				$message->to($email, $name)->subject($recruiterName.' rejected the interview '.$fairname);
+			});
+        }
+		
+
+		return true;
 	}
 
 	public function recruiterCancelInterview(Request $request){
 		$slot_id = $request->slot_id;
 		$u_id    = $request->u_id;
-		if(RecruiterScheduleInvite::where('u_id',$u_id)->where('expire',0)->exists()){
-			RecruiterScheduleInvite::where('u_id',$u_id)->update(array('expire' => 1,'cancel'=>1));
-			RecruiterScheduleBooked::where('u_id', $u_id)->delete();
-			return response()->json([  
-	            'code'    => 'success',
-	            'message' => 'Interview Cancel Successfully' 
-	        ],200);
-		}
+		$notes   = '';
+		RecruiterScheduleInvite::where('u_id',$u_id)->update(array('expire' => 1,'cancel'=>1));
+		RecruiterScheduleBooked::where('u_id', $u_id)->delete();
+		$this->generateCandidateCancelInterviewEmail($slot_id,$u_id,$notes,'recruiter');
+		return response()->json([  
+            'code'    => 'success',
+            'message' => 'Interview Canceled Successfully' 
+        ],200);
 	}
 
 	public function fetchSchedules(Request $req){
@@ -529,7 +654,7 @@ class RecruiterSchedulingController extends Controller {
 					'attended'     => 0
 				));
 				if($booked){
-					RecruiterScheduleInvite::where('u_id',$u_id)->update(array('expire' => 1));
+					RecruiterScheduleInvite::where('u_id',$u_id)->update(array('expire' => 1,'cancel'=>2));
 					$candidate = User::find($data->candidate_id);
 					$recruiter = User::find($data->recruiter_id);
 					$fair = Fair::find($data->fair_id);

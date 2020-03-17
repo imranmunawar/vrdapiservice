@@ -44,25 +44,17 @@
                                 <tr>
                                     <td width="20" valign="top">&nbsp;</td>
                                     <td valign="top" width="560" style="font-family: 'Poppins', sans-serif;;font-weight:normal;font-size:12px;line-height:19px;color:#666666">
-                                        <h2 style="color:#fff;font-family: 'Poppins', sans-serif;background: #333333d4;font-size:15px;line-height:28px;font-weight:bold;margin-bottom:10px;padding: 10px">
-                                            Invitation for the Interview on {{ $date }} from {{ $start_time }} to {{ $end_time }} in {{ $fairname }}
+                                        <h2 style="color:#404040;font-family: 'Poppins', sans-serif;background: #f1f1f1;font-size:15px;line-height:28px;font-weight:bold;margin-bottom:10px;padding: 10px">
+                                            Interview on {{ $date }} from {{ $start_time }} to {{ $end_time }} in {{ $fairname }} has been Canceled by @if($cancelBy == 'candidate'){{$candidateName}} @else {{$recruiterName}} @endif.
                                         </h2>
-                                        <p style="color:#666666;font-family: 'Poppins', sans-serif;;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
-                                            Please click on the accept invitation button and book your interview.
-                                        </p>
-										<table border="0" cellpadding="0" cellspacing="0" style="background-color:#5D2DDC;border-radius:2px;margin-bottom:20px">
-                                            <tbody>
-                                                <tr>
-                                                    <td align="center" valign="middle" style="color:#ffffff;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:bold;line-height:150%;padding-top:5px;padding-right:10px;padding-bottom:5px;padding-left:10px">
-                                                        <a style="color:#fff;text-decoration:none" href="{{$acceptInvitationLink}}" target="_blank">Accept Invitation</a>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
 
-                                        <p style="color:#666666;font-family: 'Poppins', sans-serif;;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
-                                            If you want to cancel your interview, please click this link anytime. <a href="{{$cancelUrl}}" style="color:#0083be;text-decoration:none" target="_blank">Cancel Interview</a>.
+                                        @if($cancelBy == 'candidate')
+                                        <h3>Candiadate Notes :</h3>
+                                        <p style="color:#404040;font-family: 'Poppins', sans-serif;background: #f1f1f1;font-size:14px;font-weight:normal;margin-bottom:20px;margin-top:0px;padding: 10px">
+                                            {{$notes}}
                                         </p>
+                                        @endif
+									
                                         <p style="color:#666666;font-family: 'Poppins', sans-serif;;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
                                             If you have any questions, please contact us at <a href="mailto:info@virtualrecruitmentdays.com" style="color:#0083be;text-decoration:none" target="_blank">info@virtualrecruitmentdays.com</a>.
                                         </p>
