@@ -689,4 +689,6 @@ Route::group(['namespace' => 'Api\V1'], function () {
     Route::post('/interview/fetch/schedules', 'RecruiterSchedulingController@fetchSchedules');
     Route::get('/interview/book/schedule/{u_id}', 'RecruiterSchedulingController@bookSchedule');
     Route::post('/candidate/cancel/interview', 'RecruiterSchedulingController@candidateCancelInterview');
+    
+    Route::post('/candidate/schedule/detail', 'RecruiterSchedulingController@getCandidateSchedule');
 });
