@@ -419,21 +419,37 @@ class FairController extends Controller
         $candidateIds = [];
         $fair_id = $request->fair_id;
         $answers = $request->answers;
+        // return json_encode($request); die(); exit();
         // return $data; die;
         $questions = CareerTest::where('fair_id','=', $fair_id)->get();
-        $search = CandidateTest::whereNested(function($query) use ($answers,$fair_id) {
-          foreach($answers as $answer){
-            $query->orWhere('answer_id', '=', $answer);;
-          }
-        })->where('fair_id', '=', $fair_id)->select('candidate_id')->get();
+        // $search = CandidateTest::whereNested(function($query) use ($answers,$fair_id) {
+        //   foreach($answers as $answer){
+        //     $query->orWhere('answer_id', '=', $answer);;
+        //   }
+        // })->where('fair_id', '=', $fair_id)->select('candidate_id')->get();
+        $candidates_list = array();
+    		$loop = 0;
+    		foreach($questions as $question){
+    			$id = $question->id;
+  				$loop++;
+  				$c = CandidateTest::where('fair_id', '=', $fair_id)->where('test_id','=', $id)->whereIn('answer_id', $answers)->select('candidate_id')->get();
+  				foreach($c as $candidate){
+  					$candidates_list[$loop][] = $candidate->candidate_id;
+  				}
+    		}
+    		if($loop == 1){
+    			$candidates_list[$loop + 1] = $candidates_list[1];
+    		}
+    		// return $candidates_list;
+    		$search = call_user_func_array('array_intersect', $candidates_list);
 
         // return $search; die;
         //return json_encode($filterOptions);
-        if(!$search->isEmpty()){
+        if($search){
           $candidates = User::whereNested(function($query) use ($search) {
                       foreach ($search as $key => $value)
                           {
-                              $query->orWhere('id','=', $value["candidate_id"]);
+                              $query->orWhere('id','=', $value);
                           }
                   })
                   ->orderBy('id', 'Desc')->groupBy('id')->get();
