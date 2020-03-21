@@ -16,7 +16,10 @@ use App\CandidateJob;
 use App\ChatTranscript;
 use App\MarketingChannel;
 use App\FairCandidates;
-
+use App\RecruiterScheduleInvite;
+use App\RecruiterScheduleBooked;
+use App\CompanyStandCount;
+use DB;
 
 class StatsController extends Controller
 {
@@ -130,14 +133,27 @@ class StatsController extends Controller
         $data["agendaViewsCount"] = AgendaView::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->count();
 
         $data["jobApplicationsCount"] = CandidateJob::where('fair_id',$fair_id)
-                                    ->whereHas('jobs', function($query) use ($recruiter_id){
-                                     $query->where('recruiter_id',$recruiter_id);
-                                })->count();
+                                                      ->whereHas('jobs', function($query) use ($recruiter_id){
+                                                       $query->where('recruiter_id',$recruiter_id);
+                                                      })->count();
 
         $data["shortlistedCount"] = AgendaView::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('shortlisted',1)->where('rejected',0)->count();
 
 
         $data["rejectedCount"]     = AgendaView::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('shortlisted',0)->where('rejected',1)->count();
+
+        $data["booked_interviews"]     = RecruiterScheduleBooked::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where(DB::raw("CONCAT(`date`, ' ', `start_time`)"), '>=', date('Y-m-d H:i'))->count();
+
+        $data["pending_invitations"]     = RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('cancel', 0)
+                                                                    ->whereHas('SlotInfo', function($query) {
+                                                                         $query->where(DB::raw("CONCAT(`days`, ' ', `start_time`)"), '>=', date('Y-m-d H:i'));
+                                                                    })->count();
+
+        $data["cancelled_interviews"]     = RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('cancel', 1)
+                                                                    ->whereHas('SlotInfo', function($query) {
+                                                                         $query->where(DB::raw("CONCAT(`days`, ' ', `start_time`)"), '>=', date('Y-m-d H:i'));
+                                                                    })->count();
+
         return response()->json([
             "code"   => 200,
             "status" => "success",
@@ -260,7 +276,15 @@ class StatsController extends Controller
         $data['fairMarketingStats']  = $this->getChannelStats($fair_id);
         $data['candidatesTournouts']  = FairCandidates::where('fair_id',$fair_id)->where('mainhall',1)->count();
         $data['fairRegisteredCandidates']  = $this->fairRegisteredCandidates($fair_id);
-
+        $standsCount  = CompanyStandCount::where('fair_id', $fair_id)->with('company')->get();
+        foreach ($standsCount as $key => $stand) {
+          $company_name = $stand->company['company_name'];
+          $company_name = strlen($company_name) > 10 ? substr($company_name,0,10)."..." : $company_name;
+          if(!isset($data['standsCount'][$company_name])){
+            $data['standsCount'][$company_name] = 0;
+          }
+          $data['standsCount'][$company_name]++;
+        }
         return $data;
     }
 
@@ -355,6 +379,7 @@ class StatsController extends Controller
             $query->whereCompanyId($company_id);
         })->count();
         // $companyStats['applications'] = $applications;
+        $recruiter_arr = array();
         $data['jobs']        = CompanyJob::where('company_id',$company_id)->count();
         $data['shortlisted'] = AgendaView::where('company_id',$company_id)->where('fair_id',$fair_id)->where('shortlisted', '=', '1')->count();
         $recruiters  = UserSettings::select('user_id')->where('company_id',$company_id)->where('fair_id',$fair_id)->get();
@@ -366,14 +391,28 @@ class StatsController extends Controller
                    'name'  => $user->name,
                    'chats' => $chats
                 ];
+                $recruiter_arr[] = $recruiter->user_id;
             }
         }else{
             $data['recruiterChats'] = [];
         }
 
+
         $data["chats"] = ChatTranscript::where('company_id',$company_id)->where('fair_id',$fair_id)->groupBy('from')->get();
         $data["chat_count"] = $data["chats"]->count();
         $data["chat_exchange_count"] = ChatTranscript::where('company_id',$company_id)->where('fair_id',$fair_id)->count();
+        $data["booked_interviews"] = RecruiterScheduleBooked::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where(DB::raw("CONCAT(`date`, ' ', `start_time`)"), '>=', date('Y-m-d H:i'))->count();
+
+        $data["pending_invitations"] = RecruiterScheduleInvite::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where('cancel', 0)
+                                                                    ->whereHas('SlotInfo', function($query) {
+                                                                         $query->where(DB::raw("CONCAT(`days`, ' ', `start_time`)"), '>=', date('Y-m-d H:i'));
+                                                                    })->count();
+
+        $data["cancelled_interviews"] = RecruiterScheduleInvite::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where('cancel', 1)
+                                                                    ->whereHas('SlotInfo', function($query) {
+                                                                         $query->where(DB::raw("CONCAT(`days`, ' ', `start_time`)"), '>=', date('Y-m-d H:i'));
+                                                                    })->count();
+        $data["standsCount"]  = CompanyStandCount::where('fair_id', $fair_id)->where('company_id',$company_id)->count();
 
         return $data;
 

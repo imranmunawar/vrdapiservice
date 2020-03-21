@@ -9,6 +9,7 @@ use App\MatchJob;
 use App\CandidateJob;
 use App\MatchRecruiter;
 use App\MatchWebinar;
+use App\CompanyStandCount;
 
 class CompanyController extends Controller
 {
@@ -19,7 +20,7 @@ class CompanyController extends Controller
      */
     public function index($fair_id = '')
     {
-        
+
         $companies = !empty($fair_id) ? Company::where('fair_id',$fair_id)->where('fair_id',$fair_id)->with('stand')->get() :  Company::all();
         return response()->json($companies);
     }
@@ -46,22 +47,22 @@ class CompanyController extends Controller
          $company = Company::create($request->all());
         if (!$company) {
             return response()->json(
-                [ 
+                [
                     'success' => false,
                     'message' => 'Company Not Created Successfully'
-                ],200); 
+                ],200);
         }
 
         $name  = $request->name;
         $email = $request->email;
-        Mail::send('emails.company',['name' => $name, 'email' => $email], 
+        Mail::send('emails.company',['name' => $name, 'email' => $email],
             function($message) use ($email,$name){
             $message->to($email, $name)->subject('Welcome! '.$name);
         });
 
         return response()->json(
-            [ 
-                'success' => true, 
+            [
+                'success' => true,
                 'message' => 'Company Created Successfully' ],200);
 
 
@@ -76,7 +77,7 @@ class CompanyController extends Controller
     public function show($id)
     {
         $company = Company::find($id);
-        return response()->json($company); 
+        return response()->json($company);
     }
 
     /**
@@ -88,7 +89,7 @@ class CompanyController extends Controller
     public function edit($id)
     {
         $company = Company::find($id);
-        return response()->json($company); 
+        return response()->json($company);
     }
 
     /**
@@ -100,14 +101,14 @@ class CompanyController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = $request->all(); 
+        $data = $request->all();
         $company  = Company::findOrFail($id);
         $company->fill($data)->save();
             return response()->json([
                'success' => true,
                'message' => 'Company Updated Successfully'
             ], 200);
-        
+
     }
 
     /**
@@ -121,7 +122,7 @@ class CompanyController extends Controller
         $company  = Company::findOrFail($id);
         if ($company) {
           $deleteUser = Company::destroy($id);
-          return response()->json(['success'=>true, 'message'=> 'Company Delete Successfully'], 200); 
+          return response()->json(['success'=>true, 'message'=> 'Company Delete Successfully'], 200);
         }
     }
 
@@ -129,6 +130,15 @@ class CompanyController extends Controller
         $fair_id      = $request->fair_id;
         $candidate_id = $request->candidate_id;
         $company_id   = $request->company_id;
+        if($fair_id > 0 && $candidate_id > 0 && $company_id > 0){
+          if(!CompanyStandCount::where('candidate_id', $candidate_id)->where('company_id', $company_id)->where('fair_id', $fair_id)->exists()){
+            CompanyStandCount::create(array(
+                                  'candidate_id' => $candidate_id,
+                                  'company_id' => $company_id,
+                                  'fair_id' => $fair_id
+                              ));
+          }
+        }
         $jobs = MatchJob::where('candidate_id',$candidate_id)
                         ->where('fair_id',$fair_id)
                         ->where('company_id',$company_id)
@@ -142,7 +152,7 @@ class CompanyController extends Controller
     }
 
     public function candidateCompanyRecruiters(Request $request)
-    {  
+    {
         $recruitersArr = [];
         $fair_id       = $request->fair_id;
         $candidate_id  = $request->candidate_id;
@@ -174,7 +184,7 @@ class CompanyController extends Controller
     }
 
     public function candidateCompanyWebinars(Request $request)
-    {  
+    {
         $recruitersArr = [];
         $fair_id       = $request->fair_id;
         $candidate_id  = $request->candidate_id;
@@ -190,7 +200,7 @@ class CompanyController extends Controller
 
 
     public function companyDetail(Request $request)
-    {  
+    {
         $company_id = $request->company_id;
         $company = Company::where('id',$company_id)->with('media')->first();
         if ($company) {
@@ -205,6 +215,6 @@ class CompanyController extends Controller
         $fairCompanies = Company::where('fair_id',$request->fair_id)->with('stand')->get();
     }
 
-    
+
 
 }
