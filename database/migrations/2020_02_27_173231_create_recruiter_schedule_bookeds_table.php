@@ -15,7 +15,7 @@ class CreateRecruiterScheduleBookedsTable extends Migration
     {
         Schema::create('recruiter_schedule_bookeds', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('u_id');
+            $table->string('u_id');
             $table->integer('fair_id');
             $table->integer('recruiter_id');
             $table->integer('candidate_id');

@@ -10,6 +10,7 @@ use DateTime;
 use DateTimeZone;
 use App\Fair;
 use App\User;
+use App\UserSettings;
 use App\FairCandidates;
 use App\RecruiterSchedule;
 use App\RecruiterScheduleInvite;
@@ -307,12 +308,12 @@ class RecruiterSchedulingController extends Controller {
 			}
 		}
 
-		if ($create) {
-			return response()->json([
-            'success' => true,
-            'message' => 'Time Slots Added Successfully'
-            ],200);
-		}
+		// if ($create) {
+		// 	return response()->json([
+  //           'success' => true,
+  //           'message' => 'Time Slots Added Successfully'
+  //           ],200);
+		// }
 
 		return response()->json([
             'success' => true,
@@ -426,6 +427,7 @@ class RecruiterSchedulingController extends Controller {
 					$email    = $candidate->email;
 					$fairname = $fair->name;
 					$recruiter_name = $recruiter->name;
+					$candidate_timezone = $candidate->userSetting->user_timezone;
 					$u_id = substr(base_convert(sha1(uniqid(mt_rand())), 16, 36), 0, 8).time().substr(base_convert(sha1(uniqid(mt_rand())), 16, 36), 0, 8);
 					if (RecruiterScheduleInvite::where('fair_id',$fair_id)->where('recruiter_id',$recruiter_id)->where('candidate_id',$candidate_id)->exists()) {
 						$SQL = RecruiterScheduleInvite::where('fair_id',$fair_id)
@@ -450,8 +452,11 @@ class RecruiterSchedulingController extends Controller {
 						$cancelUrl    = env('BACKEND_URL').'cancel/interview/invitation/'.$u_id;
 						$backendLogin = env('BACKEND_URL').'login';
 						$date = Carbon::createFromFormat('Y-m-d',$recruiterSchedule->days)->toFormattedDateString();
-				        $start_time = date('h:i A', strtotime($recruiterSchedule->start_time));
-				        $end_time   = date('h:i A', strtotime($recruiterSchedule->end_time));
+				        $start_time = $recruiterSchedule->start_time;
+				        $end_time   = $recruiterSchedule->end_time;
+				        $start_time = AppHelper::startTimeScheduling($start_time, $u_id, $candidate_timezone)->format('h:i A');
+					    $end_time = AppHelper::endTimeScheduling($end_time, $u_id, $candidate_timezone)->format('h:i A');
+
 						if($emails->email_notification == 1){
 							Mail::send('emails.scheduling-invitation',
 								[
@@ -695,24 +700,25 @@ class RecruiterSchedulingController extends Controller {
 					$recruiter = User::find($data->recruiter_id);
 					$fair = Fair::find($data->fair_id);
 					$fairCandidate = FairCandidates::where('fair_id',$data->fair_id)->where('candidate_id',$data->candidate_id)->first();
-					$faircandidate_id = $fairCandidate->id;
-					$candidate_id     = $candidate->id;
-					$name  = $candidate->name;
-					$email = $candidate->email;
-					$url   = $fair->shortname;
-					$fairname      = $fair->name;
-					$timezone      = $fair->timezone;
-					$start_time    = $slot->start_time;
-					$end_time      = $slot->end_time;
-					$date          = $slot->days;
-					$recruiterName = $recruiter->name;
-					$recruiterEmail = $recruiter->email;
+					$faircandidate_id   = $fairCandidate->id;
+					$candidate_id       = $candidate->id;
+					$name               = $candidate->name;
+					$email              = $candidate->email;
+					$candidate_timezone = $candidate->userSetting->user_timezone; 
+					$url                = $fair->shortname;
+					$fairname           = $fair->name;
+					$timezone           = $fair->timezone;
+					$start_time         = $slot->start_time;
+					$end_time           = $slot->end_time;
+					$date               = $slot->days;
+					$recruiterName      = $recruiter->name;
+					$recruiterEmail     = $recruiter->email;
 					$cancelUrl    = env('BACKEND_URL').'cancel/interview/invitation/'.$u_id;
-					$meetingLink  = env('BACKEND_URL').'recruiter/meeting/room/'.$u_id;
+					$meetingLink  = env('FRONT_URL').$fair->short_name.'/recruiter/interview/room/'.$u_id;
 					$date         = Carbon::createFromFormat('Y-m-d',$date);
 					$date         = $date->englishDayOfWeek.', '.$date->toFormattedDateString();
-					$start_time   = date('h:i A', strtotime($start_time));
-					$end_time     = date('h:i A', strtotime($end_time));
+					$start_time = AppHelper::startTimeScheduling($start_time, $u_id, $candidate_timezone)->format('h:i A');
+					$end_time   = AppHelper::endTimeScheduling($end_time, $u_id, $candidate_timezone)->format('h:i A');
 					$calendar_time = date('Ymd', strtotime($slot->days))."T".date('His', strtotime($start_time))."/".date('Ymd', strtotime($slot->days))."T".date('His', strtotime($end_time));
 
 					Mail::send('emails.interview-confirm',
@@ -730,6 +736,7 @@ class RecruiterSchedulingController extends Controller {
 							'timezone'   => $timezone,
 							'calendar_time' => $calendar_time,
 							'recruiterName' => $recruiterName,
+							'withName'      => $recruiterName,
 							'cancelUrl'     => $cancelUrl,
 							'meetingLink'   => $meetingLink
 						], function($message) use ($email,$name)
@@ -754,6 +761,7 @@ class RecruiterSchedulingController extends Controller {
 							'timezone'   => $timezone,
 							'calendar_time' => $calendar_time,
 							'candidateName' => $candidate->name,
+							'withName'      =>$candidate->name,
 							'cancelUrl'     => $cancelUrl
 						], function($message) use ($recruiterEmail,$recruiterName)
 					{
@@ -877,8 +885,128 @@ class RecruiterSchedulingController extends Controller {
 			}
 	}
 	public function candidateCancelSchedule($u_id){
- 			$schedule = RecruiterScheduleBooked::where('u_id', $u_id)->delete();
-			return view('scheduling.delete-confirmation');
-
+		$schedule = RecruiterScheduleBooked::where('u_id', $u_id)->delete();
+	    return view('scheduling.delete-confirmation');
 	}
+
+	public function localStatTime($timezone,$dt,$u_id){
+		date_default_timezone_set($timezone);
+		$data = RecruiterScheduleInvite::where('u_id',$u_id)->first();
+		$fair_timezone = $data->FairDetails->timezone;
+    	$datetime = new DateTime($dt);
+    	$datetime->format('Y-m-d H:i:s');
+		$la_time  = new DateTimeZone($fair_timezone);
+		$datetime->setTimezone($la_time);
+		return $datetime->format('h:i A');
+	}
+
+	public function candidateFrontInterview(Request $request){
+		$data = [];
+		// $candidate_id        = $request->candidate_id;
+		// $fair_short_name     = $request->fair_short_name;
+		$u_id  = $request->u_id;
+		$d  = date('Y-m-d H:i:s', strtotime($request->dateTime));
+		$userCurrentDate  = date('Y-m-d', strtotime($request->dateTime));
+		$userCurrentTime  = date('h:i A', strtotime($request->dateTime));
+		$schedule             = RecruiterScheduleBooked::where('u_id', $u_id)->first();
+		if ($schedule) {
+			$schedule_date       = $schedule->date;
+			$start_time          = $schedule->start_time;
+			$end_time            = $schedule->end_time;
+			$candidate_timezone  = $schedule->userSetting->user_timezone;
+			$userCurrentDate     = AppHelper::dateScheduling($userCurrentDate, $u_id, $candidate_timezone)->format('Y-m-d');
+			$userCurrentTime     = $this->localStatTime($candidate_timezone,$d,$u_id);
+			$schedule_date       = AppHelper::dateScheduling($schedule_date, $u_id, $candidate_timezone)->format('Y-m-d');
+			$start_time          = AppHelper::startTimeScheduling($start_time, $u_id, $candidate_timezone)->format('h:i A');
+		    $end_time            = AppHelper::endTimeScheduling($end_time, $u_id, $candidate_timezone)->format('h:i A');
+
+		    if ($userCurrentDate == $schedule_date) {
+		    	if ($userCurrentTime > $start_time && $userCurrentTime < $end_time){
+		    		$recruiter      = User::find($schedule->recruiter_id);
+	       			$recruiterInfo  = UserSettings::where('user_id',$schedule->recruiter_id)->first();
+	       			$recruiterInfo = [
+	       				'id'         => $recruiter->id,
+	       				'company_id' => $recruiterInfo->company_id,
+	       				'fair_id'    => $recruiterInfo->fair_id,
+	       				'name'       => $recruiter->name,
+	       				'company_name'     => $recruiterInfo->companyDetail->company_name,
+	       				'title'            => $recruiterInfo->user_title,
+	       				'public_email'     => $recruiterInfo->public_email,
+	       				'linkedin'         => $recruiterInfo->linkedin_profile_link,
+	       				'recruiter_img'    => $recruiterInfo->recruiter_img,
+	       				'recruiter_status' => $recruiterInfo->recruiter_status,
+	       				'user_image'       => $recruiterInfo->user_image,
+	       				'location'         => $recruiterInfo->location,
+	       			];
+	       			$data['recruiterData'] = $recruiterInfo;
+	       			$data['slot']          = $schedule;
+
+	       			return $data;
+
+		    	  // return ['userCurrentDateTime'=>$userCurrentDate,'schedule_date'=>$schedule_date,'start_time'=>$start_time,'end_time'=>$end_time,'userCurrentTime'=>$userCurrentTime];
+		    	}else{
+    				return response()->json([
+    		           'error'   => true,
+    		           'message' => 'Interview Date Is Not Available'
+    		        ], 200);
+		    	}
+		    	
+		    	// $recruiter      = User::find($schedule->recruiter_id);
+      	// 		$recruiterInfo  = UserSettings::where('user_id',$schedule->recruiter_id)->first();
+      	// 		$recruiterInfo = [
+      	// 			'id'         => $recruiter->id,
+      	// 			'company_id' => $recruiterInfo->company_id,
+      	// 			'fair_id'    => $recruiterInfo->fair_id,
+      	// 			'name'       => $recruiter->name,
+      	// 			'company_name'     => $recruiterInfo->companyDetail->company_name,
+      	// 			'title'            => $recruiterInfo->user_title,
+      	// 			'public_email'     => $recruiterInfo->public_email,
+      	// 			'linkedin'         => $recruiterInfo->linkedin_profile_link,
+      	// 			'recruiter_img'    => $recruiterInfo->recruiter_img,
+      	// 			'recruiter_status' => $recruiterInfo->recruiter_status,
+      	// 			'user_image'       => $recruiterInfo->user_image,
+      	// 			'location'         => $recruiterInfo->location,
+      	// 		];
+      	// 		$data['recruiterData'] = $recruiterInfo;
+      	// 		$data['slot']          = $schedule;
+		    // }
+
+		    
+		    // if ($date1 > $date2 && $date1 < $date3)
+		    // {
+		    //     $recruiter      = User::find($schedule->recruiter_id);
+      //  			$recruiterInfo  = UserSettings::where('user_id',$schedule->recruiter_id)->first();
+      //  			$recruiterInfo = [
+      //  				'id'         => $recruiter->id,
+      //  				'company_id' => $recruiterInfo->company_id,
+      //  				'fair_id'    => $recruiterInfo->fair_id,
+      //  				'name'       => $recruiter->name,
+      //  				'company_name'     => $recruiterInfo->companyDetail->company_name,
+      //  				'title'            => $recruiterInfo->user_title,
+      //  				'public_email'     => $recruiterInfo->public_email,
+      //  				'linkedin'         => $recruiterInfo->linkedin_profile_link,
+      //  				'recruiter_img'    => $recruiterInfo->recruiter_img,
+      //  				'recruiter_status' => $recruiterInfo->recruiter_status,
+      //  				'user_image'       => $recruiterInfo->user_image,
+      //  				'location'         => $recruiterInfo->location,
+      //  			];
+      //  			$data['recruiterData'] = $recruiterInfo;
+      //  			$data['slot']          = $schedule;
+		    // }else{
+		    	// return ['date1'=>$date1,'date2'=>$date2,'date3'=>$date3];
+		    // }
+		}else{
+				return response()->json([
+		           'error'   => true,
+		           'message' => 'Interview Date Is Not Available'
+		        ], 200);
+		}	
+	}else{
+		return response()->json([
+           'error'   => true,
+           'message' => 'Interview Schedule Not Found'
+        ], 200);
+	}
+
+  }
 }

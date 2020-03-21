@@ -68,6 +68,7 @@ class User extends Authenticatable
        return $this->hasOne('App\UserSettings', 'user_id');
     }
 
+   
     public function IsEmailExist($email,$id){
         $query = DB::table('users');
         if (!empty($id)) {

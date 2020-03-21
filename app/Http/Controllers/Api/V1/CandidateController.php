@@ -119,13 +119,14 @@ class CandidateController extends Controller
             $userObject = $user;
             $user_id = $user->id;
             $user = UserSettings::create([
-                'user_id'          => $user_id,
-                'fair_id'          => $data['fair_id'],
-                'user_country'     => $data['user_country'],
-                'phone'            => $data['phone'],
-                'user_city'        => $data['user_city'],
-                'user_postal_code' => $data['user_postal_code'],
-                'user_cv'          => $userCV,
+              'user_id'          => $user_id,
+              'fair_id'          => $data['fair_id'],
+              'user_country'     => $data['user_country'],
+              'phone'            => $data['phone'],
+              'user_city'        => $data['user_city'],
+              'user_postal_code' => $data['user_postal_code'],
+              'user_cv'          => $userCV,
+              'user_timezone'    => $data['timezone']
              ]);
 
             if (!empty($data['channel'])) {

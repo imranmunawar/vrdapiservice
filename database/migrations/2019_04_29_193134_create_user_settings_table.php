@@ -41,6 +41,7 @@ class CreateUserSettingsTable extends Migration
             $table->string('user_city')->nullable();
             $table->string('user_postal_code')->nullable();
             $table->string('user_cv')->nullable();
+            $table->string('user_timezone')->nullable();
             $table->timestamps();
         });
     }

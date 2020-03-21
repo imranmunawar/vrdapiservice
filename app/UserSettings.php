@@ -6,7 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class UserSettings extends Model
 {
-      
+
+    public function companyDetail()
+    {
+      return $this->hasOne('App\Company',  'id', 'company_id');
+    }
+         
     protected $fillable = [
       'user_id',
       'company_name',
