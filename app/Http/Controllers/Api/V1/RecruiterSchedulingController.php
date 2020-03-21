@@ -920,36 +920,58 @@ class RecruiterSchedulingController extends Controller {
 			$start_time          = AppHelper::startTimeScheduling($start_time, $u_id, $candidate_timezone)->format('h:i A');
 		    $end_time            = AppHelper::endTimeScheduling($end_time, $u_id, $candidate_timezone)->format('h:i A');
 
-		    if ($userCurrentDate == $schedule_date) {
-		    	if ($userCurrentTime > $start_time && $userCurrentTime < $end_time){
-		    		$recruiter      = User::find($schedule->recruiter_id);
-	       			$recruiterInfo  = UserSettings::where('user_id',$schedule->recruiter_id)->first();
-	       			$recruiterInfo = [
-	       				'id'         => $recruiter->id,
-	       				'company_id' => $recruiterInfo->company_id,
-	       				'fair_id'    => $recruiterInfo->fair_id,
-	       				'name'       => $recruiter->name,
-	       				'company_name'     => $recruiterInfo->companyDetail->company_name,
-	       				'title'            => $recruiterInfo->user_title,
-	       				'public_email'     => $recruiterInfo->public_email,
-	       				'linkedin'         => $recruiterInfo->linkedin_profile_link,
-	       				'recruiter_img'    => $recruiterInfo->recruiter_img,
-	       				'recruiter_status' => $recruiterInfo->recruiter_status,
-	       				'user_image'       => $recruiterInfo->user_image,
-	       				'location'         => $recruiterInfo->location,
-	       			];
-	       			$data['recruiterData'] = $recruiterInfo;
-	       			$data['slot']          = $schedule;
 
-	       			return $data;
+		    $recruiter      = User::find($schedule->recruiter_id);
+   			$recruiterInfo  = UserSettings::where('user_id',$schedule->recruiter_id)->first();
+   			$recruiterInfo = [
+   				'id'         => $recruiter->id,
+   				'company_id' => $recruiterInfo->company_id,
+   				'fair_id'    => $recruiterInfo->fair_id,
+   				'name'       => $recruiter->name,
+   				'company_name'     => $recruiterInfo->companyDetail->company_name,
+   				'title'            => $recruiterInfo->user_title,
+   				'public_email'     => $recruiterInfo->public_email,
+   				'linkedin'         => $recruiterInfo->linkedin_profile_link,
+   				'recruiter_img'    => $recruiterInfo->recruiter_img,
+   				'recruiter_status' => $recruiterInfo->recruiter_status,
+   				'user_image'       => $recruiterInfo->user_image,
+   				'location'         => $recruiterInfo->location,
+   			];
+   			$data['recruiterData'] = $recruiterInfo;
+   			$data['slot']          = $schedule;
 
-		    	  // return ['userCurrentDateTime'=>$userCurrentDate,'schedule_date'=>$schedule_date,'start_time'=>$start_time,'end_time'=>$end_time,'userCurrentTime'=>$userCurrentTime];
-		    	}else{
-    				return response()->json([
-    		           'error'   => true,
-    		           'message' => 'Interview Date Is Not Available'
-    		        ], 200);
-		    	}
+   			return $data;
+
+		    // if ($userCurrentDate == $schedule_date) {
+		    // 	if ($userCurrentTime > $start_time && $userCurrentTime < $end_time){
+		    // 		$recruiter      = User::find($schedule->recruiter_id);
+	     //   			$recruiterInfo  = UserSettings::where('user_id',$schedule->recruiter_id)->first();
+	     //   			$recruiterInfo = [
+	     //   				'id'         => $recruiter->id,
+	     //   				'company_id' => $recruiterInfo->company_id,
+	     //   				'fair_id'    => $recruiterInfo->fair_id,
+	     //   				'name'       => $recruiter->name,
+	     //   				'company_name'     => $recruiterInfo->companyDetail->company_name,
+	     //   				'title'            => $recruiterInfo->user_title,
+	     //   				'public_email'     => $recruiterInfo->public_email,
+	     //   				'linkedin'         => $recruiterInfo->linkedin_profile_link,
+	     //   				'recruiter_img'    => $recruiterInfo->recruiter_img,
+	     //   				'recruiter_status' => $recruiterInfo->recruiter_status,
+	     //   				'user_image'       => $recruiterInfo->user_image,
+	     //   				'location'         => $recruiterInfo->location,
+	     //   			];
+	     //   			$data['recruiterData'] = $recruiterInfo;
+	     //   			$data['slot']          = $schedule;
+
+	     //   			return $data;
+
+		    // 	  // return ['userCurrentDateTime'=>$userCurrentDate,'schedule_date'=>$schedule_date,'start_time'=>$start_time,'end_time'=>$end_time,'userCurrentTime'=>$userCurrentTime];
+		    // 	}else{
+    		// 		return response()->json([
+    		//            'error'   => true,
+    		//            'message' => 'Interview Date Is Not Available'
+    		//         ], 200);
+		    // 	}
 		    	
 		    	// $recruiter      = User::find($schedule->recruiter_id);
       	// 		$recruiterInfo  = UserSettings::where('user_id',$schedule->recruiter_id)->first();
@@ -995,12 +1017,12 @@ class RecruiterSchedulingController extends Controller {
 		    // }else{
 		    	// return ['date1'=>$date1,'date2'=>$date2,'date3'=>$date3];
 		    // }
-		}else{
-				return response()->json([
-		           'error'   => true,
-		           'message' => 'Interview Date Is Not Available'
-		        ], 200);
-		}	
+		// }else{
+		// 		return response()->json([
+		//            'error'   => true,
+		//            'message' => 'Interview Date Is Not Available'
+		//         ], 200);
+		// }	
 	}else{
 		return response()->json([
            'error'   => true,
