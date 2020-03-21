@@ -512,12 +512,12 @@ class RecruiterSchedulingController extends Controller {
 					$currentDateTime = new DateTime("now",new DateTimeZone($fair->timezone));
                     $slotDateTime    = new DateTime($row->days.$row->start_time);
 
-                    if ($slotDateTime->format('Y-m-d H:i:s') > $currentDateTime->format('Y-m-d H:i:s')) {
+                    // if ($slotDateTime->format('Y-m-d H:i:s') > $currentDateTime->format('Y-m-d H:i:s')) {
                     	$slots[$date->englishDayOfWeek.', '.$date->toFormattedDateString()][] = [
 							'id'   => $row->id,
 							'slot' => date('h:i A', strtotime($row->start_time)).' - '.date('h:i A', strtotime($row->end_time)),
 						];
-                    }
+                    // }
 				}
 		    }
 		}
