@@ -351,7 +351,7 @@ class RecruiterSchedulingController extends Controller {
 				'join_url' 		=> $schedule->join_url,
 				'password' 		=> $schedule->password,
 				'name' 				=> $user->name,
-				'email' 			=> $user->email
+				'email' 			=> $user->email,
 			);
 			return response()->json($data, 200);
 		}else{
@@ -908,7 +908,10 @@ class RecruiterSchedulingController extends Controller {
 		$d  = date('Y-m-d H:i:s', strtotime($request->dateTime));
 		$userCurrentDate  = date('Y-m-d', strtotime($request->dateTime));
 		$userCurrentTime  = date('h:i A', strtotime($request->dateTime));
-		$schedule             = RecruiterScheduleBooked::where('u_id', $u_id)->first();
+		$schedule         = RecruiterScheduleBooked::where('u_id', $u_id)->first();
+		
+		return $schedule;
+
 		if ($schedule) {
 			$schedule_date       = $schedule->date;
 			$start_time          = $schedule->start_time;
