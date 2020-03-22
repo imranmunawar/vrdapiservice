@@ -64,7 +64,7 @@
                                             <tbody>
                                                 <tr>
                                                     <td align="center" valign="middle" style="color:#ffffff;font-family:Helvetica,Arial,sans-serif;font-size:14px;font-weight:bold;line-height:150%;padding-top:5px;padding-right:10px;padding-bottom:5px;padding-left:10px">
-                                                        <a style="color:#fff;text-decoration:none" href="{{{ $loginUrl }}" target="_blank">Click to Login</a>
+                                                        <a style="color:#fff;text-decoration:none" href="{{ $loginUrl }}" target="_blank">Click to Login</a>
                                                     </td>
                                                 </tr>
                                             </tbody>
