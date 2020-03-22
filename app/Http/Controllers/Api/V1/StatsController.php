@@ -383,6 +383,7 @@ class StatsController extends Controller
         $recruiter_arr = array();
         $data['jobs']        = CompanyJob::where('company_id',$company_id)->count();
         $data['shortlisted'] = AgendaView::where('company_id',$company_id)->where('fair_id',$fair_id)->where('shortlisted', '=', '1')->count();
+        $data['fair_id'] = $fair_id;
         $recruiters  = UserSettings::select('user_id')->where('company_id',$company_id)->where('fair_id',$fair_id)->get();
         if ($recruiters->count() > 0) {
             foreach ($recruiters  as $key => $recruiter) {

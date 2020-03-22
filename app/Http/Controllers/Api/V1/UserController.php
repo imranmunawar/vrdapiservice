@@ -129,6 +129,7 @@ class UserController extends Controller
             if ($data['role'] == 'Recruiter') {
                $user = UserSettings::create([
                 'user_id'               => $user_id,
+                'fair_id'               => $data['fair_id'],
                 'company_id'            => $data['company_id'],
                 'phone'                 => $data['phone'],
                 'location'              => $data['location'],
