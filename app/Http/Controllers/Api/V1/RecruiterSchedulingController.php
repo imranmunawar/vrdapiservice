@@ -908,11 +908,10 @@ class RecruiterSchedulingController extends Controller {
 		$d  = date('Y-m-d H:i:s', strtotime($request->dateTime));
 		$userCurrentDate  = date('Y-m-d', strtotime($request->dateTime));
 		$userCurrentTime  = date('h:i A', strtotime($request->dateTime));
-		$schedule         = RecruiterScheduleBooked::where('u_id', $u_id)->first();
-		
-		return $schedule;
+		// $schedule         = RecruiterScheduleBooked::where('u_id', $u_id)->exists();
 
-		if ($schedule) {
+		if (RecruiterScheduleBooked::where('u_id', $u_id)->exists()) {
+			$schedule            = RecruiterScheduleBooked::where('u_id', $u_id)->first();
 			$schedule_date       = $schedule->date;
 			$start_time          = $schedule->start_time;
 			$end_time            = $schedule->end_time;
@@ -926,7 +925,7 @@ class RecruiterSchedulingController extends Controller {
 
 		    $recruiter      = User::find($schedule->recruiter_id);
    			$recruiterInfo  = UserSettings::where('user_id',$schedule->recruiter_id)->first();
-   			$recruiterInfo = [
+   			$recruiterInfo  = [
    				'id'         => $recruiter->id,
    				'company_id' => $recruiterInfo->company_id,
    				'fair_id'    => $recruiterInfo->fair_id,
