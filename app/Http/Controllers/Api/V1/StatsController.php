@@ -264,6 +264,7 @@ class StatsController extends Controller
 
     public function fairStats($fair_id){
         $data = [];
+        $data['standsCount'] = array();
         $data['totalRegistration'] = UserSettings::where('fair_id',$fair_id)->get()->count();
         $data['jobsApplications']  = CandidateJob::where('fair_id',$fair_id)->get()->count();
         $data['totalJobs']         = CompanyJob::where('fair_id',$fair_id)->get()->count();
