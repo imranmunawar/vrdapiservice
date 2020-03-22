@@ -14,6 +14,12 @@ class RecruiterScheduleBooked extends Model
   {
     return $this->hasOne('App\User',  'id', 'candidate_id');
   }
+
+  public function userSetting()
+  {
+    return $this->hasOne('App\UserSettings',  'user_id', 'candidate_id');
+  }
+
   public function FairDetails()
   {
     return $this->hasOne('App\Fair',  'id', 'fair_id');

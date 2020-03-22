@@ -110,7 +110,7 @@ class UserController extends Controller
                 'reg_notification' => array_key_exists('reg_notification', $data) ? $data['reg_notification'] : 0,
                 'enable_exhibitor' => array_key_exists('enable_exhibitor', $data) ? $data['enable_exhibitor'] : 0,
                 'user_info'        => empty($data['user_info']) ? '': $data['user_info'],
-                'user_image'        => empty($data['user_img']) ? '': $data['user_img']
+                'user_image'       => empty($data['user_img']) ? '': $data['user_img']
              ]);
            }
 
