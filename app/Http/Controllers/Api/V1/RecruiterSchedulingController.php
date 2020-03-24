@@ -361,6 +361,43 @@ class RecruiterSchedulingController extends Controller {
 				], 404);
 		}
 	}
+	public function startInterview($u_id, $login_id)
+	{
+		$api_key = env('ZOOM_API_KEY');
+    $api_sercet = env('ZOOM_API_SECRET');
+
+		$user = User::find($login_id);
+		$schedule = RecruiterScheduleBooked::where('u_id', '=', $u_id)->first();
+		if($user && $schedule){
+			$data = array(
+				'meeting_id' 	=> $schedule->meeting_id,
+				'start_url' 	=> $schedule->start_url,
+				'join_url' 		=> $schedule->join_url,
+				'password' 		=> $schedule->password,
+				'name' 				=> $user->name,
+				'email' 			=> $user->email,
+			);
+
+			$meeting_number = $data["meeting_id"];
+	    $name = $data["name"];
+	    $password = $data["password"];
+	    $email = $data["email"];
+
+	    $role = 1;
+	    $time = time() * 1000; //time in milliseconds (or close enough)
+	  	$data = base64_encode($api_key . $meeting_number . $time . $role);
+	  	$hash = hash_hmac('sha256', $data, $api_sercet, true);
+	  	$_sig = $api_key . "." . $meeting_number . "." . $time . "." . $role . "." . base64_encode($hash);
+	    $_sig = rtrim(strtr(base64_encode($_sig), '+/', '-_'), '=');
+	    return view('zoom.index',['interview_id'=> $meeting_number, 'name'=> $name, 'sig' => $_sig, 'password' => $password, 'email' => $email]);
+
+		}else{
+				return response()->json([
+					 'error' => true,
+					 'message' => 'Invalid Data'
+				], 404);
+		}
+	}
 
 	/**
 	 * Update the specified resource in storage.
@@ -704,7 +741,7 @@ class RecruiterSchedulingController extends Controller {
 					$candidate_id       = $candidate->id;
 					$name               = $candidate->name;
 					$email              = $candidate->email;
-					$candidate_timezone = $candidate->userSetting->user_timezone; 
+					$candidate_timezone = $candidate->userSetting->user_timezone;
 					$url                = $fair->shortname;
 					$fairname           = $fair->name;
 					$timezone           = $fair->timezone;
@@ -974,7 +1011,7 @@ class RecruiterSchedulingController extends Controller {
     		//            'message' => 'Interview Date Is Not Available'
     		//         ], 200);
 		    // 	}
-		    	
+
 		    	// $recruiter      = User::find($schedule->recruiter_id);
       	// 		$recruiterInfo  = UserSettings::where('user_id',$schedule->recruiter_id)->first();
       	// 		$recruiterInfo = [
@@ -995,7 +1032,7 @@ class RecruiterSchedulingController extends Controller {
       	// 		$data['slot']          = $schedule;
 		    // }
 
-		    
+
 		    // if ($date1 > $date2 && $date1 < $date3)
 		    // {
 		    //     $recruiter      = User::find($schedule->recruiter_id);
@@ -1024,7 +1061,7 @@ class RecruiterSchedulingController extends Controller {
 		//            'error'   => true,
 		//            'message' => 'Interview Date Is Not Available'
 		//         ], 200);
-		// }	
+		// }
 	}else{
 		return response()->json([
            'error'   => true,
