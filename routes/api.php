@@ -697,4 +697,5 @@ Route::group(['namespace' => 'Api\V1'], function () {
     ]);
 
     Route::get('/start/interview/{u_id}/{login_id}', 'RecruiterSchedulingController@startInterview');
+    Route::get('/interview/recording/{u_id}', 'RecruiterSchedulingController@getInterviewRecording');
 });

@@ -361,6 +361,19 @@ class RecruiterSchedulingController extends Controller {
 				], 404);
 		}
 	}
+	public function getInterviewRecording(Request $request)
+	{
+		$schedule = RecruiterScheduleBooked::where('u_id', '=', $request->u_id)->first();
+		if($schedule){
+			$response = $this->getMeetingRecording($schedule->meeting_id);
+			return response()->json($response, 200);
+		}else{
+				return response()->json([
+					 'error' => true,
+					 'message' => 'Invalid Data'
+				], 404);
+		}
+	}
 	public function startInterview($u_id, $login_id)
 	{
 		$api_key = env('ZOOM_API_KEY');
