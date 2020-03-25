@@ -352,7 +352,7 @@ class RecruiterSchedulingController extends Controller {
 				'password' 		=> $schedule->password,
 				'name' 		    => $user->name,
 				'email' 		=> $user->email,
-				'role'          => $user->roles->first()->name == 'Recruiter' ? 1 : 0; 
+				'role'          => $user->roles->first()->name == 'Recruiter' ? 1 : 0
 			);
 			return response()->json($data, 200);
 		}else{
