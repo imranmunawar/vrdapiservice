@@ -16,6 +16,9 @@ use App\RecruiterQuestionnaire;
 use App\WebinarQuestionnaire;
 use App\CandidateTest;
 use App\UserSettings;
+use App\Traits\MatchingJobs;
+use App\Traits\MatchingRecruiters;
+use App\Traits\MatchingWebinars;
 use App\Traits\TrackCandidates;
 use App\Traits\FairLiveEmailNotification;
 use App\Traits\FairEndEmailCandidates;
@@ -27,7 +30,7 @@ use DB;
 
 class FairController extends Controller
 {
-    use TrackCandidates,FairLiveEmailNotification,FairEndEmailCandidates;
+    use MatchingJobs, MatchingRecruiters, MatchingWebinars, TrackCandidates,FairLiveEmailNotification,FairEndEmailCandidates;
     /**
      * Display a listing of the resource.
      *
@@ -495,4 +498,34 @@ class FairController extends Controller
        return $candidatesArr;
     }
 
+  // Regenerate Candidate Matching Jobs, Recruiters, And Webinars
+  public function cacheClear($fair_id){
+    $candidates = FairCandidates::where('fair_id',$fair_id)->orderBy('id', 'desc')->get();
+    // return $candidates; die;
+    if ($candidates) {
+       foreach ($candidates as $candidate) {
+          if ($candidate->is_take_test == 1) {
+            $Test = CandidateTest::where('candidate_id',$candidate->candidate_id)->where('fair_id',$fair_id)->get();
+             if ($Test->count() > 0) {
+              // echo "ID ".$candidate->candidate_id."<br/>";
+              $this->generateMatchingJobs($candidate->candidate_id,$fair_id);
+              $this->generateMatchingRecruiters($candidate->candidate_id,$fair_id);
+              $this->generateMatchingWebinars($candidate->candidate_id,$fair_id); 
+             }
+          }
+      }
+
+      return response()->json([
+        'success' => true,
+        'message' => 'Fair Cache Regenerated Successfully'
+      ], 200); 
+    }else{
+      return response()->json([
+        'error' => true,
+        'message' => 'Fair Candidates Not Found'
+      ], 404); 
+    }
+  }
+
+  
 }

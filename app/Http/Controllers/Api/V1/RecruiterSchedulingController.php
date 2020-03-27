@@ -738,9 +738,9 @@ class RecruiterSchedulingController extends Controller {
 					'start_time'   => $slot->start_time,
 					'end_time'     => $slot->end_time,
 					'date'         => $slot->days,
-					'attended'     => 0,
+					'attended'       => 0,
 					'meeting_id'	 => $meeting["id"],
-					'host_id'	 		 => $meeting["host_id"],
+					'host_id'	     => $meeting["host_id"],
 					'start_url'		 => $meeting["start_url"],
 					'join_url'		 => $meeting["join_url"],
 					'password'		 => $meeting["password"]
