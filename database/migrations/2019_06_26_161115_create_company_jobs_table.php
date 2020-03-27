@@ -29,7 +29,7 @@ class CreateCompanyJobsTable extends Migration
             $table->string('location')->nullable();
             $table->string('contact_name')->nullable();
             $table->string('phone')->nullable();
-            $table->string('email')->unique();
+            $table->string('email');
             $table->string('url')->nullable();
             $table->string('salary')->nullable();
             $table->integer('match')->nullable();
