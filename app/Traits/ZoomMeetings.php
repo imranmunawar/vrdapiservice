@@ -9,7 +9,7 @@ trait ZoomMeetings {
   public function setZoomMeeting($topic, $start_time, $duration, $timzone){
     $data = array(
       "topic" => $topic,
-      "type" => 1,
+      "type" => 2,
       "start_time" => $start_time,
       "duration" => $duration,
       "timezone" => $timzone,
