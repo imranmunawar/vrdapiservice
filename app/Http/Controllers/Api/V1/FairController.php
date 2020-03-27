@@ -44,18 +44,18 @@ class FairController extends Controller
       if ($fairs) {
         foreach ($fairs as $key => $fair) {
           $fairsArr[]=[
-            'id'             => $fair->id,
-            'name'           => $fair->name,
-            'short_name'     => $fair->short_name,
-            'email'          => $fair->email,
-            'fair_image'     => $fair->fair_image,
-            'register_time'  => Carbon::createFromFormat('Y-m-d H:i:s',  $fair->register_time)->format('F j, Y g:i A'),
-            'start_time'     => Carbon::createFromFormat('Y-m-d H:i:s',  $fair->start_time)->format('F j, Y g:i A'),
-            'end_time'       => Carbon::createFromFormat('Y-m-d H:i:s',  $fair->end_time)->format('F j, Y g:i A'),
-            'fair_type'      => $fair->fair_type,
-            'organiser_name' => $fair->organizer->name,
-            'organiser_id'   => $fair->organizer->id,
-            'fair_status'    => $fair->fair_status,
+            'id'             => $fair['id'],
+            'name'           => $fair['name'],
+            'short_name'     => $fair['short_name'],
+            'email'          => $fair['email'],
+            'fair_image'     => $fair['fair_image'],
+            'register_time'  => Carbon::createFromFormat('Y-m-d H:i:s',  $fair['register_time'])->format('F j, Y g:i A'),
+            'start_time'     => Carbon::createFromFormat('Y-m-d H:i:s',  $fair['start_time'])->format('F j, Y g:i A'),
+            'end_time'       => Carbon::createFromFormat('Y-m-d H:i:s',  $fair['end_time'])->format('F j, Y g:i A'),
+            'fair_type'      => $fair['fair_type'],
+            'organiser_name' => $fair['organizer']['name'],
+            'organiser_id'   => $fair['organizer']['id'],
+            'fair_status'    => $fair['fair_status'],
           ];
         }
       }
