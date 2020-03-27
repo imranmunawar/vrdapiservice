@@ -16,6 +16,11 @@ class Fair extends Model
         return $this->hasOne('App\UserSettings', 'user_id', 'organiser_id' );
     }
 
+    public function fairSetting()
+    {
+        return $this->hasOne('App\FairSetting', 'fair_id', 'id');
+    }
+
     /**
      * The attributes that are mass assignable.
      *

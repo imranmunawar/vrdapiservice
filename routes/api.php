@@ -85,7 +85,7 @@ Route::group(['prefix' => 'auth','namespace' => 'Api\V1'], function () {
         'as'   => 'showFairByShortname'
     ]);
      /* About Fair */
-    Route::get('about/fair/{organizer_id}',[
+    Route::get('about/fair/{fair_id}',[
         'uses' => 'FairController@aboutFair',
         'as'   => 'aboutFair'
     ]);
