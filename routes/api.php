@@ -85,7 +85,7 @@ Route::group(['prefix' => 'auth','namespace' => 'Api\V1'], function () {
         'as'   => 'showFairByShortname'
     ]);
      /* About Fair */
-    Route::get('about/fair/{organizer_id}',[
+    Route::get('about/fair/{fair_id}',[
         'uses' => 'FairController@aboutFair',
         'as'   => 'aboutFair'
     ]);
@@ -307,6 +307,12 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
         'as'   => 'deleteFair'
     ]);
 
+    /* Fair Cache Clear */
+    Route::get('fair/clear/cache/{id}',[
+        'uses' => 'FairController@cacheClear',
+        'as'   => 'cacheClear'
+    ]);
+
     Route::get('fair/job/applications/{job_id}',[
         'uses' => 'CompanyJobController@jobApplications',
         'as'   => 'jobApplications'
@@ -374,6 +380,7 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
         'uses' => 'FairSettingController@store',
         'as'   => 'createFairSetting'
     ]);
+
 
      /* Fair Media Crud Routes */
     Route::get('fair/media/show/{id}',[

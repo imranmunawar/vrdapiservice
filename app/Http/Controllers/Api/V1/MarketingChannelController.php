@@ -23,9 +23,9 @@ class MarketingChannelController extends Controller
         $marketingChannel = MarketingChannel::all()->where('fair_id',$id);
         if ($marketingChannel->count() > 0) {
             foreach ($marketingChannel as $marketing) {
-            $cost_click = 0;
-            $cost_con = 0;
-            $match50  = '';
+            $cost_click   = 0;
+            $cost_con     = 0;
+            $match50      = '';
             $registration = 0;
             if($marketing->clicks == 0){
                 $cost_click = $marketing->cost;
@@ -124,8 +124,8 @@ class MarketingChannelController extends Controller
     {
 
         $fair = Fair::find($request->fair_id);
-        $fairname = $fair->short_name;
-        $channelUrl = url("/marketing/".$fairname."/".$request->channel_name); 
+        $fairname   = $fair->short_name;
+        $channelUrl = env('FRONT_APP_URL').'marketing/'.$fairname."/".$request->channel_name); 
         // Create a new MarketingChannel in the database...
          $MarketingChannel = MarketingChannel::create([
             'fair_id'      => $request->fair_id,

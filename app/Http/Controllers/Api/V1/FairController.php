@@ -16,6 +16,9 @@ use App\RecruiterQuestionnaire;
 use App\WebinarQuestionnaire;
 use App\CandidateTest;
 use App\UserSettings;
+use App\Traits\MatchingJobs;
+use App\Traits\MatchingRecruiters;
+use App\Traits\MatchingWebinars;
 use App\Traits\TrackCandidates;
 use App\Traits\FairLiveEmailNotification;
 use App\Traits\FairEndEmailCandidates;
@@ -24,10 +27,11 @@ use App\CandidateAgenda;
 use App\CompanyWebinar;
 use \Input as Input;
 use DB;
+use Carbon\Carbon;
 
 class FairController extends Controller
 {
-    use TrackCandidates,FairLiveEmailNotification,FairEndEmailCandidates;
+    use MatchingJobs, MatchingRecruiters, MatchingWebinars, TrackCandidates,FairLiveEmailNotification,FairEndEmailCandidates;
     /**
      * Display a listing of the resource.
      *
@@ -35,8 +39,27 @@ class FairController extends Controller
      */
     public function index()
     {
-        $fairs = Fair::with('organizer')->get();
-        return response()->json($fairs);
+      $fairsArr = [];
+      $fairs = Fair::all();
+      if ($fairs) {
+        foreach ($fairs as $key => $fair) {
+          $fairsArr[]=[
+            'id'             => $fair['id'],
+            'name'           => $fair['name'],
+            'short_name'     => $fair['short_name'],
+            'email'          => $fair['email'],
+            'fair_image'     => $fair['fair_image'],
+            'register_time'  => Carbon::createFromFormat('Y-m-d H:i:s',  $fair['register_time'])->format('F j, Y g:i A'),
+            'start_time'     => Carbon::createFromFormat('Y-m-d H:i:s',  $fair['start_time'])->format('F j, Y g:i A'),
+            'end_time'       => Carbon::createFromFormat('Y-m-d H:i:s',  $fair['end_time'])->format('F j, Y g:i A'),
+            'fair_type'      => $fair['fair_type'],
+            'organiser_name' => $fair['organizer']['name'],
+            'organiser_id'   => $fair['organizer']['id'],
+            'fair_status'    => $fair['fair_status'],
+          ];
+        }
+      }
+      return response()->json($fairsArr);
     }
 
     public function testRoute(){
@@ -260,11 +283,11 @@ class FairController extends Controller
         }
     }
 
-    public function aboutFair($organizer_id)
+    public function aboutFair($fair_id)
     {
-        $organizer = UserSettings::where('user_id',$organizer_id)->first();
-        if ($organizer) {
-            return response()->json(['info'=>$organizer->user_info],200);
+        $fair = FairSetting::where('fair_id',$fair_id)->first();
+        if ($fair) {
+            return response()->json(['info'=>$fair->fair_news,'terms'=>$fair->address],200);
         }else{
             return response()->json([
                'error' => true,
@@ -495,4 +518,34 @@ class FairController extends Controller
        return $candidatesArr;
     }
 
+  // Regenerate Candidate Matching Jobs, Recruiters, And Webinars
+  public function cacheClear($fair_id){
+    $candidates = FairCandidates::where('fair_id',$fair_id)->orderBy('id', 'desc')->get();
+    // return $candidates; die;
+    if ($candidates) {
+       foreach ($candidates as $candidate) {
+          if ($candidate->is_take_test == 1) {
+            $Test = CandidateTest::where('candidate_id',$candidate->candidate_id)->where('fair_id',$fair_id)->get();
+             if ($Test->count() > 0) {
+              // echo "ID ".$candidate->candidate_id."<br/>";
+              $this->generateMatchingJobs($candidate->candidate_id,$fair_id);
+              $this->generateMatchingRecruiters($candidate->candidate_id,$fair_id);
+              $this->generateMatchingWebinars($candidate->candidate_id,$fair_id); 
+             }
+          }
+      }
+
+      return response()->json([
+        'success' => true,
+        'message' => 'Fair Cache Regenerated Successfully'
+      ], 200); 
+    }else{
+      return response()->json([
+        'error' => true,
+        'message' => 'Fair Candidates Not Found'
+      ], 404); 
+    }
+  }
+
+  
 }
