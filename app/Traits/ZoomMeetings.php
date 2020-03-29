@@ -6,13 +6,14 @@ use Illuminate\Http\Request;
 
 trait ZoomMeetings {
 
-  public function setZoomMeeting($topic, $start_time, $duration, $timzone){
+  public function setZoomMeeting($topic, $start_time, $duration, $timzone, $password){
     $data = array(
       "topic" => $topic,
       "type" => 2,
       "start_time" => $start_time,
       "duration" => $duration,
       "timezone" => $timzone,
+      "password" => $password,
       "settings" => array(
         "host_video" => true,
         "participant_video" => true,

@@ -727,8 +727,9 @@ class RecruiterSchedulingController extends Controller {
 				$topic = "Interview Call";
 		    $type = 2;
 		    $duration = 60;
-		    $timzone = "";
-		    $meeting = $this->setZoomMeeting($topic, $slot->start_time, $duration, $timzone);
+		    $timzone = $fair->timezone;
+				$password = rand();
+		    $meeting = $this->setZoomMeeting($topic, $slot->start_time, $duration, $timzone, $password);
 				$meeting = json_decode($meeting, true);
 				$booked = RecruiterScheduleBooked::create(array(
 					'u_id'         => $u_id,
@@ -743,7 +744,7 @@ class RecruiterSchedulingController extends Controller {
 					'host_id'	     => $meeting["host_id"],
 					'start_url'		 => $meeting["start_url"],
 					'join_url'		 => $meeting["join_url"],
-					'password'		 => $meeting["password"]
+					'password'		 => $password
 				));
 				if($booked){
 					RecruiterScheduleInvite::where('u_id',$u_id)->update(array('expire' => 1,'cancel'=>2));
