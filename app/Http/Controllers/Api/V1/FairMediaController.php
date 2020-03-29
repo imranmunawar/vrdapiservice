@@ -15,7 +15,7 @@ class FairMediaController extends Controller
      */
     public function index($id)
     {
-        $fairMedia = FairMedia::all()->where('fair_id',$id);
+        $fairMedia = FairMedia::where('fair_id',$id)->get();
         return response()->json($fairMedia);
     }
 
@@ -38,7 +38,8 @@ class FairMediaController extends Controller
     public function store(Request $request)
     {
         // Create a new FairMedia in the database...
-         $FairMedia = FairMedia::create($request->all());
+
+        $FairMedia = FairMedia::create($request->all());
         if (!$FairMedia) {
             return response()->json(['success' => false,'message' => 'FairMedia Media Not Created Successfully'],200); 
         }
