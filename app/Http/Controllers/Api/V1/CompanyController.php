@@ -201,10 +201,22 @@ class CompanyController extends Controller
 
     public function companyDetail(Request $request)
     {
-        $company_id = $request->company_id;
+        $nextCompany   = '';
+        $preCompany    = '';
+        $company_id    = $request->company_id;
+        $nextCompanyId = $company_id + 1;
+        $preCompanyId  = $company_id - 1;
         $company = Company::where('id',$company_id)->with('media')->first();
         if ($company) {
-            return response()->json($company);
+            $checkNextCompanyId = Company::where('id',$nextCompanyId)->where('fair_id',$request->fair_id)->first();
+            $checkPreCompanyId  = Company::where('id',$preCompanyId)->where('fair_id',$request->fair_id)->first();
+            if ($checkNextCompanyId) {
+               $nextCompany = $checkNextCompanyId->id;
+            }
+            if ($checkPreCompanyId) {
+               $preCompany = $checkPreCompanyId->id;
+            }
+            return response()->json(['company'=>$company,'preCompany'=>$preCompany,'nextCompany'=>$nextCompany]);
         }
 
         return response()->json(['error'=>true,'message'=>'company not found'],401);
