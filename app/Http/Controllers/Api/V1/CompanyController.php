@@ -170,14 +170,14 @@ class CompanyController extends Controller
                 "fair_id"    => $row->fair_id,
                 "percentage" => $row->percentage,
                 'name'       => $row->recruiter->name,
-                'company_name'   => $row->companyDetail->company_name,
-                'title'          => $row->recruiterSetting->user_title,
-                'public_email'   => $row->recruiterSetting->public_email,
-                'linkedin'       => $row->recruiterSetting->linkedin_profile_link,
-                'recruiter_img'  => $row->recruiterSetting->recruiter_img,
+                'company_name'      => $row->companyDetail->company_name,
+                'title'             => $row->recruiterSetting->user_title,
+                'public_email'      => $row->recruiterSetting->public_email,
+                'linkedin'          => $row->recruiterSetting->linkedin_profile_link,
+                'recruiter_img'     => $row->recruiterSetting->recruiter_img,
                 'recruiter_status'  => $row->recruiterSetting->recruiter_status,
-                'user_image'     => $row->recruiterSetting->user_image,
-                'location'       => $row->recruiterSetting->location,
+                'user_image'        => $row->recruiterSetting->user_image,
+                'location'          => $row->recruiterSetting->location,
             ];
         }
         return response()->json(['recruiters'=>$recruitersArr]);
@@ -201,10 +201,22 @@ class CompanyController extends Controller
 
     public function companyDetail(Request $request)
     {
-        $company_id = $request->company_id;
+        $nextCompany   = '';
+        $preCompany    = '';
+        $company_id    = $request->company_id;
+        $nextCompanyId = $company_id + 1;
+        $preCompanyId  = $company_id - 1;
         $company = Company::where('id',$company_id)->with('media')->first();
         if ($company) {
-            return response()->json($company);
+            $checkNextCompanyId = Company::where('id',$nextCompanyId)->where('fair_id',$request->fair_id)->first();
+            $checkPreCompanyId  = Company::where('id',$preCompanyId)->where('fair_id',$request->fair_id)->first();
+            if ($checkNextCompanyId) {
+               $nextCompany = $checkNextCompanyId->id;
+            }
+            if ($checkPreCompanyId) {
+               $preCompany = $checkPreCompanyId->id;
+            }
+            return response()->json(['company'=>$company,'preCompany'=>$preCompany,'nextCompany'=>$nextCompany]);
         }
 
         return response()->json(['error'=>true,'message'=>'company not found'],401);

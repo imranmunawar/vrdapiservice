@@ -229,6 +229,8 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
         'as'   => 'updateCompanyMedia'
     ]);
 
+    Route::delete('company/media/delete/{id}',   ['uses'    => 'CompanyMediaController@destroy','as'  => 'deleteCompanyMedia']);
+
 
     /* Company Jobs Crud Routes */
     Route::get('job/show/{id}',[
