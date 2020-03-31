@@ -111,4 +111,20 @@ class User extends Authenticatable
 
         return 0;
     }
+
+     public static function isCandidateOnline($fair_id, $candidate_id)
+    {
+        $fairTracking = New Tracking;
+        $candidate = $fairTracking->where('fair_id', $fair_id)->where('user_id',$candidate_id)->orderBy('updated_at', 'DESC')->first();
+        $interval = strtotime(date('Y-m-d H:i:s')) - strtotime($candidate['updated_at']); 
+        $interval = $interval/60;
+        // echo $interval; die;
+        if ($interval < 5) {
+          // echo "asdasdas"; die;
+          return 1;
+        }
+
+        return 0;
+    }
+
 }
