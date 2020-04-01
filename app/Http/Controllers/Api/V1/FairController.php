@@ -408,6 +408,7 @@ class FairController extends Controller
                     'name'         => empty($value->candidate) ? '' : $value->candidate->name,
                     'email'        => empty($value->candidate) ? '' : $value->candidate->email,
                     'country'      => empty($value->candidateInfo) ? '' : $value->candidateInfo->user_country,
+                    'user_image'   => empty($value->candidateInfo) ? '' : $value->candidateInfo->user_image,
                     'city'         => empty($value->candidateInfo) ? '' : $value->candidateInfo->user_city,
                     'cv'           => empty($value->candidateInfo) ? '' : $value->candidateInfo->user_city,
                     'phone'        => empty($value->candidateInfo) ? '' : $value->candidateInfo->user_phone,
@@ -417,6 +418,7 @@ class FairController extends Controller
                     'created_at'   => date('d-m-Y', strtotime($value->created_at)),
                     'is_candidate_take_test'   => User::isCandidateTakeTest($fair_id,$value->candidate_id),
                     'is_candidate_attend_fair' => User::isCandidateAttendFair($fair_id,$value->candidate_id),
+                    'is_candidate_online'      => User::isCandidateOnline($fair_id,$value->candidate_id)
                 ];
             }
         }
