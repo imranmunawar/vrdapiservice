@@ -122,7 +122,7 @@ class CareerTestController extends Controller
         $CareerTest->fill($data)->save();
             return response()->json([
                'success' => true,
-               'message' => 'Fair Media Updated Successfully'
+               'message' => 'Career Test Updated Successfully'
             ], 200);
         
     }
