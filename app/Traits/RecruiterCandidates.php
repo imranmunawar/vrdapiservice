@@ -270,6 +270,7 @@ trait RecruiterCandidates
               'name'         => $matchRecr->candidate->name,
               'email'        => $matchRecr->candidate->email,
               'name'         => $matchRecr->candidate->name,
+              'user_image'   => $matchRecr->candidateSetting->user_image,
               'country'      => $matchRecr->candidateSetting->user_country,
               'avatar'       => $matchRecr->candidateSetting->user_image,
               'last_seen'    => \Carbon\Carbon::parse($value->updated_at)->diffForHumans(),
