@@ -13,7 +13,7 @@ class FairCandidates extends Model
 
     public function candidateInfo()
     {
-        return $this->hasOne('App\UserSettings',  'user_id', 'candidate_id')->select('user_id','phone','user_cv','user_country','user_city','user_cv');
+        return $this->hasOne('App\UserSettings',  'user_id', 'candidate_id')->select('user_id','phone','user_cv','user_country','user_city','user_cv','user_image');
     }
 
     public function candidateTest()
