@@ -301,7 +301,7 @@ trait RecruiterCandidates
           'candidate_id' => $candidate_id,
           'fair_id'      => $fair_id,
           'company_id'   => $company_id,
-          'percentage'   => $percentage,
+          'percentage'   => '',
           'shortlisted'  => 0,
           'rejected' => 0,
           'view'     => 1
