@@ -677,8 +677,8 @@ class CandidateController extends Controller
   }
 
   public function deleteCandidate($candidate_id,$fair_id){
-    User::find($candidate_id)->delete();
-    UserSettings::find($candidate_id)->delete();
+    User::destroy($candidate_id);
+    UserSettings::where('user_id',$candidate_id)->delete();
     $fairCandidateDelete = FairCandidates::where('fair_id',$fair_id)->where('candidate_id',$candidate_id)->delete();
     if ($fairCandidateDelete) {
       return response()->json([
