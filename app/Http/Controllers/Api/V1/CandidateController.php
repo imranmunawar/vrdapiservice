@@ -729,5 +729,19 @@ class CandidateController extends Controller
     $percentage = number_format(($selected/$total_selected)*100);
     return "( ".$selected." of ".$total_selected." - ".$percentage."% )";
   }
+
+  public function getFairCandidateCvs($fair_id){
+    $cvsArr = [];
+    $fairCandidates = FairCandidates::where('fair_id',$fair_id)->get();
+    if ($fairCandidates) {
+      foreach ($fairCandidates as $key => $row) {
+        if (!empty($row->candidateInfo->user_cv)) {
+          array_push($cvsArr, $row->candidateInfo->user_cv);
+        }
+      }
+    }
+
+    return $cvsArr;
+  }
     
 }

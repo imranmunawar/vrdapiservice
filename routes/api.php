@@ -7,6 +7,11 @@ Route::namespace('Api\V1')->group(function () {
       'as'   => 'downloadCandidateCV'
     ]);
 
+    Route::get('/fair/candidates/cvs/{fair_id}',[
+      'uses' => 'CandidateController@getFairCandidateCvs',
+      'as'   => 'getFairCandidateCvs'
+    ]);
+
     Route::post('candidate/recruiter/chat', ['uses' => 'MessageController@candidateRecruiterChat','as'  => 'candidateRecruiterChat']);
 
     Route::post('recruiter/send/message', ['uses' => 'MessageController@recruiterSendMessage','as'  => 'recruiterSendMessage']);
