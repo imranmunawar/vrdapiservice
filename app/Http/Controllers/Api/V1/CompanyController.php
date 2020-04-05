@@ -204,7 +204,7 @@ class CompanyController extends Controller
     {
         $nextCompany     = '';
         $preCompany      = '';
-        $standBackground = '';
+        $standBackground = 'r1.jpg';
         $company_id      = $request->company_id;
         $nextCompanyId   = $company_id + 1;
         $preCompanyId    = $company_id - 1;
