@@ -39,6 +39,12 @@ Route::group(['namespace' => 'Api\V1'], function () {
         'as'   => 'jobDetail'
     ]); 
 
+     // Get Exibitor Detail
+    Route::get('front/exibitor/detail/{company_id}',[
+        'uses' => 'CompanyController@exibitorDetail',
+        'as'   => 'exibitorDetail'
+    ]);
+
    Route::get('/marketing/{fairname}/{channel}',      [
     'uses'    => 'MarketingChannelController@channelClicks',  
     'as'      => 'channelClicks'

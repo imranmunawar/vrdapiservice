@@ -307,7 +307,7 @@ class FairController extends Controller
 
     public function exhibitors($fair_id)
     {
-        $companies = Company::select('company_logo','company_name')->where('fair_id',$fair_id)->get();
+        $companies = Company::select('id','company_logo','company_name')->where('fair_id',$fair_id)->get();
         if ($companies) {
             return response()->json(['companies'=>$companies],200);
         }else{

@@ -228,6 +228,16 @@ class CompanyController extends Controller
         return response()->json(['error'=>true,'message'=>'company not found'],401);
     }
 
+    public function exibitorDetail($company_id)
+    {
+        $company = Company::select('company_name','company_logo','description','company_web_url')->where('id',$company_id)->first();
+        if ($company) {
+          return response()->json($company);
+        }
+
+        return response()->json(['error'=>true,'message'=>'company not found'],401);
+    }
+
 
     public function fairCompanies(Request $request){
         $fairCompanies = Company::where('fair_id',$request->fair_id)->with('stand')->get();
