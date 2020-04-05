@@ -220,9 +220,9 @@ class UserController extends Controller
 		        'company_name'     => $data['company_name'],
 		        'credits'          => $data['credits'],
 		        'reg_notification' => array_key_exists('reg_notification', $data) ? $data['reg_notification'] : 0,
-                'enable_exhibitor' => array_key_exists('enable_exhibitor', $data) ? $data['enable_exhibitor'] : 0,
+            'enable_exhibitor' => array_key_exists('enable_exhibitor', $data) ? $data['enable_exhibitor'] : 0,
 		        'user_info'        => $data['user_info'] ? $data['user_info'] : '',
-                'user_image'       => empty($data['user_image']) ? '' : $data['user_image']
+            'user_image'       => empty($data['user_image']) ? '' : $data['user_image']
 		    ];
 		    $setting->update($settingDataToUpdate);
     	   }
@@ -231,9 +231,9 @@ class UserController extends Controller
     	       $setting = UserSettings::where('user_id', $id);
     	       $settingDataToUpdate = [
     	        'company_id' => $data['company_id'],
-                'phone'      => $data['phone'],
-                'location'   => $data['location'],
-                'user_title' => empty($data['title']) ? '' : $data['title'],
+              'phone'      => $data['phone'],
+              'location'   => $data['location'],
+              'user_title' => empty($data['title']) ? '' : $data['title'],
     	      ];
 
     	     $setting->update($settingDataToUpdate);
@@ -246,11 +246,11 @@ class UserController extends Controller
                 'phone'                 => $data['phone'],
                 'location'              => $data['location'],
                 'user_title'            => empty($data['title']) ? '' : $data['title'],
-                'user_info'             => $data['user_info'],
+                'user_info'             => empty($data['user_info']) ? '': $data['user_info'],
                 'user_image'            => $data['user_image'],
-                'linkedin_profile_link' => $data['linkedin_profile_link'],
+                'linkedin_profile_link' => empty($data['linkedin_profile_link']) ? '' : $data['linkedin_profile_link'],
                 'match_persantage'      => $data['match_persantage'],
-                'public_email'          => $data['public_email'],
+                'public_email'          => empty($data['public_email']) ? '' : $data['public_email'],
                 'show_email'            => array_key_exists('show_email', $data) ? $data['show_email'] : 0,
                 'job_email'             => array_key_exists('job_email', $data) ? $data['job_email'] : 0,
                 'recruiter_img'         => $data['recruiter_img']
