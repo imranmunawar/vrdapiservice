@@ -9,6 +9,7 @@ class Company extends Model
     protected $fillable = [
         'admin_id',
         'fair_id',
+        'recruiter_id',
         'company_name',
         'company_email',
         'company_post_code',

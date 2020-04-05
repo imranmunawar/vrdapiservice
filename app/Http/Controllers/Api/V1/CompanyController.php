@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\UserSettings;
 use App\Company;
 use App\MatchJob;
 use App\CandidateJob;
@@ -201,11 +202,12 @@ class CompanyController extends Controller
 
     public function companyDetail(Request $request)
     {
-        $nextCompany   = '';
-        $preCompany    = '';
-        $company_id    = $request->company_id;
-        $nextCompanyId = $company_id + 1;
-        $preCompanyId  = $company_id - 1;
+        $nextCompany     = '';
+        $preCompany      = '';
+        $standBackground = '';
+        $company_id      = $request->company_id;
+        $nextCompanyId   = $company_id + 1;
+        $preCompanyId    = $company_id - 1;
         $company = Company::where('id',$company_id)->with('media')->first();
         if ($company) {
             $checkNextCompanyId = Company::where('id',$nextCompanyId)->where('fair_id',$request->fair_id)->first();
@@ -216,7 +218,11 @@ class CompanyController extends Controller
             if ($checkPreCompanyId) {
                $preCompany = $checkPreCompanyId->id;
             }
-            return response()->json(['company'=>$company,'preCompany'=>$preCompany,'nextCompany'=>$nextCompany]);
+            if (!empty($company->recruiter_id)) {
+                $user = UserSettings::select('recruiter_img')->where('user_id',$company->recruiter_id)->first();
+                $standBackground = $user->recruiter_img; 
+            }
+            return response()->json(['company'=>$company,'preCompany'=>$preCompany,'nextCompany'=>$nextCompany,'standBackground'=>$standBackground]);
         }
 
         return response()->json(['error'=>true,'message'=>'company not found'],401);

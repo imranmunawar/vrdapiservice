@@ -19,6 +19,7 @@ class CreateCompaniesTable extends Migration
             $table->foreign('admin_id')->references('id')->on('users');
             $table->integer('fair_id')->unsigned()->nullable();
             $table->foreign('fair_id')->references('id')->on('fairs');
+            $table->integer('recruiter_id')->nullable();
             $table->string('company_name');
             $table->string('company_email')->unique();
             $table->integer('company_post_code')->nullable();

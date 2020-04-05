@@ -247,8 +247,17 @@ class FairController extends Controller
             'fair_end_time'        => $fairEndTime,
             'date'                 => $date,
         ];
-            return response()->json(['fair'=>$fair,'dateAndTime'=>$dateAndTimeArray,'isTakeTest'=>$candidateTest,'addedWebinars'=>$addedWebinars]);
 
+          if($dateAndTimeArray['date'] > $dateAndTimeArray['fair_end']){
+            return response()->json([
+               'error'    => true,
+               'fairName' => $fair->name,
+               'message'  => 'Fair Close'
+            ], 200);
+          }else{
+            return response()->json(['fair'=>$fair,'dateAndTime'=>$dateAndTimeArray,'isTakeTest'=>$candidateTest,'addedWebinars'=>$addedWebinars]);
+          }
+           
         }else{
             return response()->json([
                'error'   => true,
