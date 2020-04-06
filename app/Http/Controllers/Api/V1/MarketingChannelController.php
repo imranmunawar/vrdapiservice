@@ -128,13 +128,13 @@ class MarketingChannelController extends Controller
 
         $fair = Fair::find($request->fair_id);
         $fairname   = $fair->short_name;
-        // $channelUrl = env('FRONT_APP_URL').'marketing/'.$fairname."/".$request->channel_name; 
+        $channelUrl = env('FRONT_APP_URL').'marketing/'.$fairname."/".$request->channel_name; 
         // Create a new MarketingChannel in the database...
          $MarketingChannel = MarketingChannel::create([
             'fair_id'      => $request->fair_id,
             'channel_name' => $request->channel_name,
             'cost'         => $request->cost,
-            'url'          => $request->channel_name,
+            'url'          => $channelUrl,
             'clicks'       => '0'
          ]);
         if (!$MarketingChannel) {
