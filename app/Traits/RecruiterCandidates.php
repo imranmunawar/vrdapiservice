@@ -282,7 +282,8 @@ trait RecruiterCandidates
             array_push($matched,$arr);
           }else{
             if ($agenda->shortlisted == 0 || $agenda->rejected == 0) {
-                'candidate_id' => $matchRecr->candidate_id,
+              $arr = [
+              'candidate_id' => $matchRecr->candidate_id,
               'recruiter_id' => $matchRecr->recruiter_id,
               'company_id'   => $matchRecr->company_id,
               'fair_id'      => $matchRecr->fair_id,
