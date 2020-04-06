@@ -508,7 +508,7 @@ class RecruiterSchedulingController extends Controller {
 				        $start_time = AppHelper::startTimeScheduling($start_time, $u_id, $candidate_timezone)->format('h:i A');
 					    $end_time = AppHelper::endTimeScheduling($end_time, $u_id, $candidate_timezone)->format('h:i A');
 
-						if($emails->email_notification == 1){
+						// if($emails->email_notification == 1){
 							Mail::send('emails.scheduling-invitation',
 								[
 									'name'  => $name,
@@ -527,7 +527,7 @@ class RecruiterSchedulingController extends Controller {
 							{
 								$message->to($email, $name)->subject($recruiter_name.' invited you for the interview on '.$fairname);
 							});
-						}
+						// }
 						return response()->json([
 				            'code'    => 'success',
 				            'message' => 'Candidate Invited Successfully'
