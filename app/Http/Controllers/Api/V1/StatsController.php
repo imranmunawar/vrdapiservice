@@ -286,6 +286,7 @@ class StatsController extends Controller
           }
           $data['standsCount'][$company_name]++;
         }
+        $data["scheduling"] = array();
         $companies = Company::where('fair_id',$fair_id)->get();
         foreach ($companies as $key => $company) {
           $recruiter_arr = array();
