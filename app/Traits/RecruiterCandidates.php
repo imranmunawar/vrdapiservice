@@ -273,6 +273,7 @@ trait RecruiterCandidates
               'user_image'   => $matchRecr->candidateSetting->user_image,
               'country'      => $matchRecr->candidateSetting->user_country,
               'avatar'       => $matchRecr->candidateSetting->user_image,
+              'cv'           => $matchRecr->candidateSetting->user_cv,
               'last_seen'    => \Carbon\Carbon::parse($value->updated_at)->diffForHumans(),
               'is_candidate_take_test'   => User::isCandidateTakeTest($fair_id,$matchRecr->candidate_id),
               'is_candidate_attend_fair' => User::isCandidateAttendFair($fair_id,$matchRecr->candidate_id),
@@ -281,7 +282,9 @@ trait RecruiterCandidates
             ];
             array_push($matched,$arr);
           }else{
-            if ($agenda->shortlisted == 0 || $agenda->rejected == 0) {
+            if ($agenda->shortlisted == 1 || $agenda->rejected == 1) {
+
+            }else{
               $arr = [
               'candidate_id' => $matchRecr->candidate_id,
               'recruiter_id' => $matchRecr->recruiter_id,
@@ -294,6 +297,7 @@ trait RecruiterCandidates
               'user_image'   => $matchRecr->candidateSetting->user_image,
               'country'      => $matchRecr->candidateSetting->user_country,
               'avatar'       => $matchRecr->candidateSetting->user_image,
+              'cv'           => $matchRecr->candidateSetting->user_cv,
               'last_seen'    => \Carbon\Carbon::parse($value->updated_at)->diffForHumans(),
               'is_candidate_take_test'   => User::isCandidateTakeTest($fair_id,$matchRecr->candidate_id),
               'is_candidate_attend_fair' => User::isCandidateAttendFair($fair_id,$matchRecr->candidate_id),
@@ -301,9 +305,7 @@ trait RecruiterCandidates
               'agenda_viewed'            => $agenda->view
             ];
             array_push($matched,$arr);
-            }
           }
-
         }
       }
 
