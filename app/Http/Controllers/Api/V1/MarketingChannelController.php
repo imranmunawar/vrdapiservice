@@ -110,10 +110,10 @@ class MarketingChannelController extends Controller
                 MarketingChannel::where('channel_name',$channel_name)->where('fair_id',$fair_id)->update(array( 'clicks' => $click_count ));
                 $minutes = 60*24*30;
                 //$response = new Response('Virtual Recruitment Days');
-                return redirect(env('FRONT_APP_URL').'marketing/'.$fairname.'/'.$channel_name)->withCookie(cookie($cookie_name, 'true', $minutes));
+                return redirect(env('FRONT_URL').'marketing/'.$fairname.'/'.$channel_name)->withCookie(cookie($cookie_name, 'true', $minutes));
             }
 
-            return redirect(env('FRONT_APP_URL').'marketing/'.$fairname.'/'.$channel_name);
+            return redirect(env('FRONT_URL').'marketing/'.$fairname.'/'.$channel_name);
         }
     }
 
@@ -128,13 +128,13 @@ class MarketingChannelController extends Controller
 
         $fair = Fair::find($request->fair_id);
         $fairname   = $fair->short_name;
-        $channelUrl = env('FRONT_URL').'marketing/'.$fairname."/".$request->channel_name; 
+        // $channelUrl = env('FRONT_APP_URL').'marketing/'.$fairname."/".$request->channel_name; 
         // Create a new MarketingChannel in the database...
          $MarketingChannel = MarketingChannel::create([
             'fair_id'      => $request->fair_id,
             'channel_name' => $request->channel_name,
             'cost'         => $request->cost,
-            'url'          => $channelUrl,
+            'url'          => $request->channel_name,
             'clicks'       => '0'
          ]);
         if (!$MarketingChannel) {
