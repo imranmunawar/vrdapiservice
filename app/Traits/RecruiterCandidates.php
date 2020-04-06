@@ -259,7 +259,7 @@ trait RecruiterCandidates
         $candidate_questionnaires = CandidateTest::where('candidate_id','=', $value->user_id)->where('fair_id', '=',$fair_id)->count();
         if($candidate_questionnaires > 0){
           $matchRecr = MatchRecruiter::where('recruiter_id', '=', $recruiter_id)->where('candidate_id', '=', $value->user_id)->where('fair_id', '=', $fair_id)->with('candidate','candidateSetting')->first();
-          $agenda = AgendaView::where('recruiter_id', '=', $matchRecr->recruiter_id)->where('candidate_id', '=', $matchRecr->candidate_id)->where('fair_id', '=', $matchRecr->fair_id)->where('shortlisted',0)->where('rejected',0)->first();
+          $agenda = AgendaView::where('recruiter_id', '=', $matchRecr->recruiter_id)->where('candidate_id', '=', $matchRecr->candidate_id)->where('fair_id', '=', $matchRecr->fair_id)->first();
           if (!$agenda) {
             $arr = [
               'candidate_id' => $matchRecr->candidate_id,
@@ -281,7 +281,8 @@ trait RecruiterCandidates
               'agenda_viewed'            => 0
             ];
             array_push($matched,$arr);
-          }else{
+          }
+          else{
             if ($agenda->shortlisted == 0 && $agenda->rejected == 0) {
               $arr = [
                 'candidate_id' => $matchRecr->candidate_id,
