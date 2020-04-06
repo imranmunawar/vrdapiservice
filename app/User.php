@@ -92,7 +92,7 @@ class User extends Authenticatable
 
     public static function isCandidateAttendFair($fair_id, $candidate_id)
     {
-        $candidateTurnout = New CandidateTurnout;
+        $candidateTurnout = New FairCandidates;
         $res = $candidateTurnout->where('fair_id', $fair_id)->where('candidate_id',$candidate_id)->first();
         if ($res) {
             return 1;
