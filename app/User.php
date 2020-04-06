@@ -82,8 +82,8 @@ class User extends Authenticatable
     public static function isCandidateTakeTest($fair_id, $candidate_id)
     {
         $candidateTest = New CandidateTest;
-        $res = $candidateTest->where('fair_id', $fair_id)->where('candidate_id',$candidate_id)->get();
-        if ($res->count() > 0) {
+        $res = $candidateTest->where('fair_id', $fair_id)->where('candidate_id',$candidate_id)->where('is_take_test',1)->first();
+        if ($res) {
             return 1;
         }
 
