@@ -286,6 +286,38 @@ class StatsController extends Controller
           }
           $data['standsCount'][$company_name]++;
         }
+        $companies = Company::where('fair_id',$fair_id)->get();
+        foreach ($companies as $key => $company) {
+          $recruiter_arr = array();
+          $recruiters  = UserSettings::select('user_id')->where('company_id',$company->id)->where('fair_id',$fair_id)->get();
+          foreach ($recruiters  as $key => $recruiter) {
+            $recruiter_arr[] = $recruiter->user_id;
+          }
+          $booked_interviews = RecruiterScheduleBooked::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where(DB::raw("CONCAT(`date`, ' ', `start_time`)"), '>=', date('Y-m-d H:i'))->count();
+
+          $pending_invitations = RecruiterScheduleInvite::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where('cancel', 0)
+                                                                      ->whereHas('SlotInfo', function($query) {
+                                                                           $query->where(DB::raw("CONCAT(`days`, ' ', `start_time`)"), '>=', date('Y-m-d H:i'));
+                                                                      })->count();
+
+          $cancelled_interviews = RecruiterScheduleInvite::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where('cancel', 1)
+                                                                      ->whereHas('SlotInfo', function($query) {
+                                                                           $query->where(DB::raw("CONCAT(`days`, ' ', `start_time`)"), '>=', date('Y-m-d H:i'));
+                                                                      })->count();
+
+          $data["scheduling"][] = array(
+                                    "id" => $company->id,
+                                    "name" => $company->company_name,
+                                    "booked_interviews" => $booked_interviews,
+                                    "pending_invitations" => $pending_invitations,
+                                    "cancelled_interviews" => $cancelled_interviews
+                                  );
+
+
+        }
+
+
+
         return $data;
     }
 
