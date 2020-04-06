@@ -260,7 +260,7 @@ trait RecruiterCandidates
         if($candidate_questionnaires > 0){
           $matchRecr = MatchRecruiter::where('recruiter_id', '=', $recruiter_id)->where('candidate_id', '=', $value->user_id)->where('fair_id', '=', $fair_id)->with('candidate','candidateSetting')->first();
           $agenda = AgendaView::where('recruiter_id', '=', $matchRecr->recruiter_id)->where('candidate_id', '=', $matchRecr->candidate_id)->where('fair_id', '=', $matchRecr->fair_id)->where('shortlisted',0)->where('rejected',0)->first();
-          if ($agenda) {
+          if (!$agenda) {
             $arr = [
               'candidate_id' => $matchRecr->candidate_id,
               'recruiter_id' => $matchRecr->recruiter_id,

@@ -219,8 +219,8 @@ class CompanyController extends Controller
                $preCompany = $checkPreCompanyId->id;
             }
             if (!empty($company->recruiter_id)) {
-                $user = UserSettings::select('recruiter_img')->where('user_id',$company->recruiter_id)->first();
-                $standBackground = $user->recruiter_img; 
+              $user = UserSettings::select('recruiter_img')->where('user_id',$company->recruiter_id)->first();
+              $standBackground = $user->recruiter_img; 
             }
             return response()->json(['company'=>$company,'preCompany'=>$preCompany,'nextCompany'=>$nextCompany,'standBackground'=>$standBackground]);
         }
