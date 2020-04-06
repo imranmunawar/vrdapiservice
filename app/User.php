@@ -81,7 +81,7 @@ class User extends Authenticatable
 
     public static function isCandidateTakeTest($fair_id, $candidate_id)
     {
-        $candidateTest = New CandidateTest;
+        $candidateTest = New FairCandidates;
         $res = $candidateTest->where('fair_id', $fair_id)->where('candidate_id',$candidate_id)->where('is_take_test',1)->first();
         if ($res) {
             return 1;
@@ -92,7 +92,7 @@ class User extends Authenticatable
 
     public static function isCandidateAttendFair($fair_id, $candidate_id)
     {
-        $candidateTurnout = New FairCandidates;
+        $candidateTurnout = New CandidateTurnout;
         $res = $candidateTurnout->where('fair_id', $fair_id)->where('candidate_id',$candidate_id)->first();
         if ($res) {
             return 1;
