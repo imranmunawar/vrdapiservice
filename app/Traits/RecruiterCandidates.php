@@ -280,7 +280,29 @@ trait RecruiterCandidates
               'agenda_viewed'            => 0
             ];
             array_push($matched,$arr);
+          }else{
+            if ($agenda->shortlisted == 0 || $agenda->rejected == 0) {
+                'candidate_id' => $matchRecr->candidate_id,
+              'recruiter_id' => $matchRecr->recruiter_id,
+              'company_id'   => $matchRecr->company_id,
+              'fair_id'      => $matchRecr->fair_id,
+              'percentage'   => $matchRecr->percentage,
+              'name'         => $matchRecr->candidate->name,
+              'email'        => $matchRecr->candidate->email,
+              'name'         => $matchRecr->candidate->name,
+              'user_image'   => $matchRecr->candidateSetting->user_image,
+              'country'      => $matchRecr->candidateSetting->user_country,
+              'avatar'       => $matchRecr->candidateSetting->user_image,
+              'last_seen'    => \Carbon\Carbon::parse($value->updated_at)->diffForHumans(),
+              'is_candidate_take_test'   => User::isCandidateTakeTest($fair_id,$matchRecr->candidate_id),
+              'is_candidate_attend_fair' => User::isCandidateAttendFair($fair_id,$matchRecr->candidate_id),
+              'is_candidate_in_hall'     => User::isCandidateInMainHall($fair_id,$matchRecr->candidate_id),
+              'agenda_viewed'            => $agenda->view
+            ];
+            array_push($matched,$arr);
+            }
           }
+
         }
       }
 
