@@ -278,6 +278,7 @@ class StatsController extends Controller
         $data['candidatesTournouts']  = FairCandidates::where('fair_id',$fair_id)->where('mainhall',1)->count();
         $data['fairRegisteredCandidates']  = $this->fairRegisteredCandidates($fair_id);
         $standsCount  = CompanyStandCount::where('fair_id', $fair_id)->with('company')->get();
+        $data['fairRegisteredCandidatesCount']  = FairCandidates::where('fair_id',$fair_id)->count();
         foreach ($standsCount as $key => $stand) {
           $company_name = $stand->company['company_name'];
           $company_name = strlen($company_name) > 10 ? substr($company_name,0,10)."..." : $company_name;
