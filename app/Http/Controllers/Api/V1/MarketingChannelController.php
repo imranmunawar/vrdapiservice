@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\MarketingChannel;
 use App\Fair;
+use App\FairCandidates;
 use App\MarketingRegistration;
 use App\User;
 use App\CandidateTurnout;
@@ -207,28 +208,51 @@ class MarketingChannelController extends Controller
    
     public function channelRegisteredCandidates($fair_id,$channel_id){
        $candidatesArr = [];
-       $candidates = MarketingRegistration::where('channel_id',$channel_id)->with('candidate','candidateInfo','candidateFairInfo')->get();
-
-       if ($candidates) {
-            foreach ($candidates as $key => $value) {
-                $candidatesArr[] = [
-                    'candidate_id' => $value->user_id,
-                    'name'         => $value->candidate->name,
-                    'email'        => $value->candidate->email,
-                    'name'         => $value->candidate->name,
-                    'country'      => $value->candidateInfo->user_country,
-                    'city'         => $value->candidateInfo->user_country,
-                    'cv'           => $value->candidateInfo->user_country,
-                    'phone'        => $value->candidateInfo->phone,
-                    'marketing_channel' => $value->candidateFairInfo->marketing_channel,
-                    'source'       => $value->candidateFairInfo->source,
-                    'status'       => $value->candidateFairInfo->status,
-                    'created_at'       => date('d-m-Y', strtotime($value->candidateFairInfo->created_at)),
-                    'is_candidate_take_test'  => User::isCandidateTakeTest($fair_id,$value->user_id),
-                    'is_candidate_attend_fair'=> User::isCandidateAttendFair($fair_id,$value->user_id),
-                ];
+       if ($channel_id == 'Organic') {
+         $candidates = FairCandidates::where('marketing_channel',$channel_id)->where('fair_id',$fair_id)->with('candidate','candidateInfo')->get(); 
+             if ($candidates) {
+                  foreach ($candidates as $key => $value) {
+                      $candidatesArr[] = [
+                          'candidate_id' => $value->candidate_id,
+                          'name'         => $value['candidate']['name'],
+                          'email'        => $value['candidate']['email'],
+                          'country'      => $value['candidateInfo']['user_country'],
+                          'city'         => $value['candidateInfo']['ser_city'],
+                          'cv'           => $value['candidateInfo']['ser_cv'],
+                          'phone'        => $value['candidateInfo']['phone'],
+                          'marketing_channel'       => $value->marketing_channel,
+                          'source'                  => $value->source,
+                          'status'                  => $value->status,
+                          'created_at'              => date('d-m-Y', strtotime($value->created_at)),
+                          'is_candidate_take_test'  => User::isCandidateTakeTest($fair_id,$value->candidate_id),
+                          'is_candidate_attend_fair'=> User::isCandidateAttendFair($fair_id,$value->candidate_id),
+                      ];
+                  }
+             }
+       }else{
+         $candidates = MarketingRegistration::where('channel_id',$channel_id)->with('candidate','candidateInfo','candidateFairInfo')->get();
+            if ($candidates) {
+              foreach ($candidates as $key => $value) {
+                  $candidatesArr[] = [
+                      'candidate_id' => $value->user_id,
+                      'name'         => $value->candidate->name,
+                      'email'        => $value->candidate->email,
+                      'country'      => $value->candidateInfo->user_country,
+                      'city'         => $value->candidateInfo->user_city,
+                      'cv'           => $value->candidateInfo->user_cv,
+                      'phone'        => $value->candidateInfo->phone,
+                      'marketing_channel' => $value->candidateFairInfo->marketing_channel,
+                      'source'       => $value->candidateFairInfo->source,
+                      'status'       => $value->candidateFairInfo->status,
+                      'created_at'       => date('d-m-Y', strtotime($value->candidateFairInfo->created_at)),
+                      'is_candidate_take_test'  => User::isCandidateTakeTest($fair_id,$value->user_id),
+                      'is_candidate_attend_fair'=> User::isCandidateAttendFair($fair_id,$value->user_id),
+                  ];
+              }
             }
        }
+
+       
       
        return $candidatesArr;
     } 

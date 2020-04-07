@@ -194,7 +194,7 @@ class StatsController extends Controller
 
     public function fairMarketingStats($fair_id){
         $countArray = [
-            'fairChannelStats'=> $this->getChannelStats($fair_id,'Facebook'),
+            'fairChannelStats' => $this->getChannelStats($fair_id,'Facebook')
         ];
 
         return $countArray; die;
@@ -379,6 +379,7 @@ class StatsController extends Controller
                 }
             }
         }
+        $data['organicCount'] = FairCandidates::where('marketing_channel','Organic')->where('fair_id',$fair_id)->count();
         $data["channels"] = $channels;
         $data["facebook"] = false;
         $data["twitter"] = false;
