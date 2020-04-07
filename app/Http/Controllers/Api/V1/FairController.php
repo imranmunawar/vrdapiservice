@@ -440,6 +440,7 @@ class FairController extends Controller
                     'created_at'   => Carbon::createFromFormat('Y-m-d H:i:s',  $value->created_at)->format('F j, Y g:i A'),
                     'is_candidate_take_test'   => User::isCandidateTakeTest($fair_id,$value->candidate_id),
                     'is_candidate_in_hall'     => User::isCandidateInMainHall($fair_id,$value->candidate_id),
+                    'is_candidate_attend_fair' => User::isCandidateAttendFair($fair_id,$value->candidate_id),
                     'is_candidate_online'      => User::isCandidateOnline($fair_id,$value->candidate_id)
                 ];
             }
