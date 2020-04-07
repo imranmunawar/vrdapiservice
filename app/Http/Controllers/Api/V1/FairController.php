@@ -15,6 +15,7 @@ use App\JobQuestionnaire;
 use App\RecruiterQuestionnaire;
 use App\WebinarQuestionnaire;
 use App\CandidateTest;
+use App\CandidateTurnout;
 use App\UserSettings;
 use App\Traits\MatchingJobs;
 use App\Traits\MatchingRecruiters;
@@ -248,15 +249,27 @@ class FairController extends Controller
             'date'                 => $date,
         ];
 
-          if($dateAndTimeArray['date'] > $dateAndTimeArray['fair_end']){
-            return response()->json([
-               'error'    => true,
-               'fairName' => $fair->name,
-               'message'  => 'Fair Close'
-            ], 200);
-          }else{
-            return response()->json(['fair'=>$fair,'dateAndTime'=>$dateAndTimeArray,'isTakeTest'=>$candidateTest,'addedWebinars'=>$addedWebinars]);
+        if($dateAndTimeArray['date'] >= $dateAndTimeArray['fair_start'] && $dateAndTimeArray['date'] <= $dateAndTimeArray['fair_end']){
+          if (!empty($candidate_id)) {
+            $res = CandidateTurnout::where('fair_id', $fair->id)->where('candidate_id',$candidate_id)->first();
+            if (!$res) {
+                CandidateTurnout::create(array(
+                  'candidate_id'      => $candidate_id,
+                  'fair_id'           => $fair->id
+                ));
+            }
           }
+        }
+
+        if($dateAndTimeArray['date'] > $dateAndTimeArray['fair_end']){
+          return response()->json([
+             'error'    => true,
+             'fairName' => $fair->name,
+             'message'  => 'Fair Close'
+          ], 200);
+        }else{
+          return response()->json(['fair'=>$fair,'dateAndTime'=>$dateAndTimeArray,'isTakeTest'=>$candidateTest,'addedWebinars'=>$addedWebinars]);
+        }
            
         }else{
             return response()->json([

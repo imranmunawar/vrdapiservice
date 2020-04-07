@@ -8,6 +8,7 @@ use App\MarketingChannel;
 use App\Fair;
 use App\MarketingRegistration;
 use App\User;
+use App\CandidateTurnout;
 use Session;
 use DB;
 class MarketingChannelController extends Controller
