@@ -405,6 +405,8 @@ class StatsController extends Controller
         $data = [];
         $company = Company::find($company_id);
         $fair_id = $company->fair_id;
+        $company_name  = $company->company_name;
+        $company_image = $company->company_logo;
         $data['applications'] = CandidateJob::whereHas('jobs', function($query) use ($company_id){
             $query->whereCompanyId($company_id);
         })->count();
@@ -413,6 +415,8 @@ class StatsController extends Controller
         $data['jobs']        = CompanyJob::where('company_id',$company_id)->count();
         $data['shortlisted'] = AgendaView::where('company_id',$company_id)->where('fair_id',$fair_id)->where('shortlisted', '=', '1')->count();
         $data['fair_id'] = $fair_id;
+        $data['company_name']  = $company_name;
+        $data['company_image'] = $company_image;
         $recruiters  = UserSettings::select('user_id')->where('company_id',$company_id)->where('fair_id',$fair_id)->get();
         if ($recruiters->count() > 0) {
             foreach ($recruiters  as $key => $recruiter) {
