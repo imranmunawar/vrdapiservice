@@ -18,9 +18,9 @@ class CompanyJobController extends Controller
     {
         $jobs = '';
         if (empty($recruiter_id) && !empty($company_id)) {
-            $jobs = CompanyJob::all()->where('company_id', $company_id);
-        }elseif (!empty($recruiter_id) && !empty($recruiter_id)) {
-           $jobs = CompanyJob::with('applicationsCount')->where('recruiter_id', $recruiter_id)->where('company_id', $company_id)->get(); 
+            $jobs = CompanyJob::with('applicationsCount')->where('company_id', $company_id)->get(); 
+        }elseif (!empty($company_id)) {
+           $jobs = CompanyJob::with('applicationsCount')->where('company_id', $company_id)->get(); 
         }
     
         return response()->json($jobs);
