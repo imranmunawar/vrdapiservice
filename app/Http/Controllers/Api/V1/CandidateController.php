@@ -97,7 +97,7 @@ class CandidateController extends Controller
         if (empty($data['fair_id'])) {
           return response()->json([
             "code"    => 404,
-            "status"  => "success",
+            "status"  => "error",
             "message" => "Fair Id Is Empty"
           ], 200);
         }
