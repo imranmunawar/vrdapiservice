@@ -96,8 +96,9 @@ class CandidateController extends Controller
 
         if (empty($data['fair_id'])) {
           return response()->json([
-           'error' => true,
-           'message' => 'Fair Id Is Empty'
+            "code"    => 404,
+            "status"  => "success",
+            "message" => "Fair Id Is Empty"
           ], 200);
         }
         $role = Role::IsRoleExist('User');
