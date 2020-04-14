@@ -93,7 +93,14 @@ class CandidateController extends Controller
         $user_id = '';
         $userObject = '';
         $data = $request->all();
-        $role = Role::IsRoleExist($data['role']);
+
+        if (empty($data['fair_id'])) {
+          return response()->json([
+           'error' => true,
+           'message' => 'Fair Id Is Empty'
+          ], 200);
+        }
+        $role = Role::IsRoleExist('User');
         if($role){
             $user = User::create([
               'name'           => $data['name'],
