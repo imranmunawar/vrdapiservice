@@ -123,6 +123,7 @@ class CompanyJobController extends Controller
         $candidates = CandidateJob::where('job_id',$job_id)->get();
         if ($candidates->count() > 0) {
             foreach ($candidates as $row) {
+                $match = MatchJob::where('job_id',$row->job_id)->where('company_id',$candidate_id)->first();
                 $applications [] = [
                     "job_id"       => $row->job_id,
                     "candidate_id" => $row->candidate_id,
@@ -131,9 +132,9 @@ class CompanyJobController extends Controller
                     "name"         => $row->candidate->name,
                     "email"        => $row->candidate->email,
                     "user_country" => $row->candidateInfo->user_country,
-                    "user_city"    => $row->candidateInfo->user_country,
+                    "user_city"    => $row->candidateInfo->user_city,
                     'cv'           => $row->candidateInfo->user_cv,
-                    "match"        => $row->match->percentage,
+                    "match"        => $match->percentage
                 ];
             }
             return response()->json(['success' => true, 'applicant'=> $applications], 200);
