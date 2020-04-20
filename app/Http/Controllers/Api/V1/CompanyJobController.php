@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\CompanyJob;
 use App\CandidateJob;
+use App\MatchJob;
 
 class CompanyJobController extends Controller
 {
