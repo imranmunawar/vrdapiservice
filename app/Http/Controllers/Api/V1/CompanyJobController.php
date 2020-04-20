@@ -135,7 +135,7 @@ class CompanyJobController extends Controller
                     "user_country" => $row->candidateInfo->user_country,
                     "user_city"    => $row->candidateInfo->user_city,
                     'cv'           => $row->candidateInfo->user_cv,
-                    "match"        => $match->percentage
+                    "match"        => $match['percentage']
                 ];
             }
             return response()->json(['success' => true, 'applicant'=> $applications], 200);
