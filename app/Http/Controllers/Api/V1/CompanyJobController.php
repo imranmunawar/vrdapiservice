@@ -124,7 +124,7 @@ class CompanyJobController extends Controller
         $candidates = CandidateJob::where('job_id',$job_id)->get();
         if ($candidates->count() > 0) {
             foreach ($candidates as $row) {
-                $match = MatchJob::where('job_id',$row->job_id)->where('company_id',$candidate_id)->first();
+                $match = MatchJob::where('job_id',$row->job_id)->where('company_id',$row->candidate_id)->first();
                 $applications [] = [
                     "job_id"       => $row->job_id,
                     "candidate_id" => $row->candidate_id,
