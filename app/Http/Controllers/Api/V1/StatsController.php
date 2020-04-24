@@ -219,10 +219,11 @@ class StatsController extends Controller
 
     public function getChannelStats($fair_id){
         $count = [];
-        $channels = MarketingChannel::select('clicks','channel_name')->where('fair_id', '=', $fair_id)->get();
+        $channels = MarketingChannel::select('channel_logo', 'clicks','channel_name')->where('fair_id', '=', $fair_id)->get();
         if ($channels) {
             foreach ($channels as $key => $channel) {
                 $count[] = [
+                    'channel_logo'   => $channel->channel_logo,
                     'name'   => $channel->channel_name,
                     'clicksCount' => $channel->clicks
                 ];
