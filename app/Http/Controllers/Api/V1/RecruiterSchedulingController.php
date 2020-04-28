@@ -964,7 +964,7 @@ class RecruiterSchedulingController extends Controller {
 
 		if (RecruiterScheduleBooked::where('u_id', $u_id)->exists()) {
 			$schedule            = RecruiterScheduleBooked::where('u_id', $u_id)->first();
-			if ($schedule->candidate_id == $candidate_id) {
+			if ($schedule->candidate_id != $candidate_id) {
 				$schedule_date       = $schedule->date;
 				$start_time          = $schedule->start_time;
 				$end_time            = $schedule->end_time;
