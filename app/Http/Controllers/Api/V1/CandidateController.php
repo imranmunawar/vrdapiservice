@@ -32,10 +32,11 @@ use App\MarketingRegistration;
 use App\ChatTranscript;
 use App\FairCandidates;
 use App\CandidateAgenda;
+use App\Traits\CommetChatPro;
 
 class CandidateController extends Controller
 {
-    use MatchingJobs, MatchingRecruiters, MatchingWebinars, RecruiterCandidates, CandidatePersonalAgenda,CandidateEmail;
+    use MatchingJobs, MatchingRecruiters, MatchingWebinars, RecruiterCandidates, CandidatePersonalAgenda,CandidateEmail,CommetChatPro;
     /**
      * Display a listing of the resource.
      *
@@ -166,7 +167,8 @@ class CandidateController extends Controller
 
            if ($user) {
               // Generate Email For Candidate
-              $this->generateEmail($request,$user->id);
+          $this->generateEmail($request,$user->id);
+          $this->createUserOnCommetChatPro($userObject->id,$data['name'],'','Candidate');
               $user = User::find($userObject->id);
               $credentials = ['email'=>$user->email, 'password'=>$user->plan_password];
               if(!Auth::attempt($credentials))
@@ -388,6 +390,7 @@ class CandidateController extends Controller
           Storage::disk('s3')->put($target_file, file_get_contents($file), 'public');
           $profileImage = $filename;
           UserSettings::where('user_id',$request->candidate_id)->update(['user_image'=>$profileImage]);
+          $this->updateCandidateAvatarOnCommetChatPro($request->candidate_id,$profileImage);
           $user = User::find($request->candidate_id);
            $userObject = $this->show($request->candidate_id);
             return response()->json([
@@ -459,8 +462,9 @@ class CandidateController extends Controller
            ];
            $setting->update($settingDataToUpdate);
            if ($setting) {
+              $this->updateUserOnCommetChatPro($request->candidate_id,$request->name,'','Candidate');
               $user = User::find($request->candidate_id);
-               $userObject = $this->show($id);
+              $userObject = $this->show($id);
                 return response()->json([
                     "code"         => 200,
                     "status"       => "success",

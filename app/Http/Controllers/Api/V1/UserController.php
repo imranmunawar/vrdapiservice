@@ -10,10 +10,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Traits\IsExist;
 use App\Traits\UserEmail;
+use App\Traits\CommetChatPro;
 
 class UserController extends Controller
 {
-    use IsExist,UserEmail;
+    use IsExist,UserEmail,CommetChatPro;
     /**
      * Display a listing of the resource.
      *
@@ -100,6 +101,15 @@ class UserController extends Controller
             ]);
             $user->roles()->attach($role);
             $user_id = $user->id;
+            /* Create User On Commet Chat */
+            if ($data['role'] == 'Admin') {
+              $this->createUserOnCommetChatPro(
+                $user_id,
+                $data['fname'].' '.$data['lname'],
+                '',
+                $data['role']
+              );
+            }
           }
 
           if ($data['role'] == 'Organizer') {
@@ -110,8 +120,17 @@ class UserController extends Controller
                 'reg_notification' => array_key_exists('reg_notification', $data) ? $data['reg_notification'] : 0,
                 'enable_exhibitor' => array_key_exists('enable_exhibitor', $data) ? $data['enable_exhibitor'] : 0,
                 'user_info'        => empty($data['user_info']) ? '': $data['user_info'],
-                'user_image'       => empty($data['user_img']) ? '': $data['user_img']
+                'user_image'       => empty($data['user_image']) ? '': $data['user_image']
              ]);
+
+             /* Create User On Commet Chat */
+             $commetAvatar = empty($data['user_image']) ? '': $data['user_image'];
+             $this->createUserOnCommetChatPro(
+               $user_id,
+               $data['fname'].' '.$data['lname'],
+               $commetAvatar,
+               $data['role']
+             );
            }
 
            if ($data['role'] == 'Company Admin') {
@@ -124,6 +143,13 @@ class UserController extends Controller
                 'user_title'            => empty($data['title']) ? '' : $data['title'],
                 'user_info'             => empty($data['user_info']) ? '': $data['user_info'],
               ]);
+              /* Create User On Commet Chat */
+              $this->createUserOnCommetChatPro(
+                $user_id,
+                $data['fname'].' '.$data['lname'],
+                '',
+                $data['role']
+              );
             }
 
             if ($data['role'] == 'Recruiter') {
@@ -143,7 +169,16 @@ class UserController extends Controller
                 'job_email'             => array_key_exists('job_email', $data) ? $data['job_email'] : 0,
                 'recruiter_img'         => empty($data['recruiter_img']) ? '' : $data['recruiter_img']
               ]);
+              /* Create User On Commet Chat */
+               $commetAvatar = $data['user_image'];
+              $this->createUserOnCommetChatPro(
+                $user_id,
+                $data['fname'].' '.$data['lname'],
+                $commetAvatar,
+                $data['role']
+              );
             }
+
 
            if ($user) {
                 $this->generateEmail($request);
@@ -212,8 +247,17 @@ class UserController extends Controller
 		      'name'          => $data['fname'].' '.$data['lname'],
 		      'email'         => $data['email']
 		    ];
-		    $user->fill($userDataToUpdate)->save();
-    	   }
+		     $user->fill($userDataToUpdate)->save();
+           /* Update User On Commet Chat */
+          if ($data['role'] == 'Admin') {
+            $this->updateUserOnCommetChatPro(
+              $id,
+              $data['fname'].' '.$data['lname'],
+              '',
+              $data['role']
+            );
+          }
+    	  }
     	  if ($data['role'] == 'Organizer') {
 		  	$setting = UserSettings::where('user_id', $id);
 		    $settingDataToUpdate = [
@@ -225,7 +269,15 @@ class UserController extends Controller
             'user_image'       => empty($data['user_image']) ? '' : $data['user_image']
 		    ];
 		    $setting->update($settingDataToUpdate);
-    	   }
+          /* Update User On Commet Chat */
+          $commetAvatar = empty($data['user_image']) ? '' : $data['user_image'];
+          $this->updateUserOnCommetChatPro(
+            $id,
+            $data['fname'].' '.$data['lname'],
+            $commetAvatar,
+            $data['role']
+          );
+    	  }
 
     	   if ($data['role'] == 'Company Admin') {
     	       $setting = UserSettings::where('user_id', $id);
@@ -235,8 +287,14 @@ class UserController extends Controller
               'location'   => $data['location'],
               'user_title' => empty($data['title']) ? '' : $data['title'],
     	      ];
-
     	     $setting->update($settingDataToUpdate);
+            /* Update User On Commet Chat */
+            $this->updateUserOnCommetChatPro(
+              $id,
+              $data['fname'].' '.$data['lname'],
+              '',
+              $data['role']
+            );
     	    }
 
            if ($data['role'] == 'Recruiter') {
@@ -257,6 +315,14 @@ class UserController extends Controller
               ];
 
              $setting->update($settingDataToUpdate);
+             /* Update User On Commet Chat */
+              $commetAvatar =  $data['user_image'];
+              $this->updateUserOnCommetChatPro(
+               $id,
+               $data['fname'].' '.$data['lname'],
+               $commetAvatar,
+               $data['role']
+              );
             }
 
 
