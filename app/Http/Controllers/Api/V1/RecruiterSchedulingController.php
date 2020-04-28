@@ -954,7 +954,7 @@ class RecruiterSchedulingController extends Controller {
 
 	public function candidateFrontInterview(Request $request){
 		$data = [];
-		// $candidate_id        = $request->candidate_id;
+		$candidate_id  = $request->candidate_id;
 		// $fair_short_name     = $request->fair_short_name;
 		$u_id  = $request->u_id;
 		$d  = date('Y-m-d H:i:s', strtotime($request->dateTime));
@@ -964,37 +964,45 @@ class RecruiterSchedulingController extends Controller {
 
 		if (RecruiterScheduleBooked::where('u_id', $u_id)->exists()) {
 			$schedule            = RecruiterScheduleBooked::where('u_id', $u_id)->first();
-			$schedule_date       = $schedule->date;
-			$start_time          = $schedule->start_time;
-			$end_time            = $schedule->end_time;
-			$candidate_timezone  = $schedule->userSetting->user_timezone;
-			$userCurrentDate     = AppHelper::dateScheduling($userCurrentDate, $u_id, $candidate_timezone)->format('Y-m-d');
-			$userCurrentTime     = $this->localStatTime($candidate_timezone,$d,$u_id);
-			$schedule_date       = AppHelper::dateScheduling($schedule_date, $u_id, $candidate_timezone)->format('Y-m-d');
-			$start_time          = AppHelper::startTimeScheduling($start_time, $u_id, $candidate_timezone)->format('h:i A');
-		    $end_time            = AppHelper::endTimeScheduling($end_time, $u_id, $candidate_timezone)->format('h:i A');
+			if ($schedule->candidate_id == $candidate_id) {
+				$schedule_date       = $schedule->date;
+				$start_time          = $schedule->start_time;
+				$end_time            = $schedule->end_time;
+				$candidate_timezone  = $schedule->userSetting->user_timezone;
+				$userCurrentDate     = AppHelper::dateScheduling($userCurrentDate, $u_id, $candidate_timezone)->format('Y-m-d');
+				$userCurrentTime     = $this->localStatTime($candidate_timezone,$d,$u_id);
+				$schedule_date       = AppHelper::dateScheduling($schedule_date, $u_id, $candidate_timezone)->format('Y-m-d');
+				$start_time          = AppHelper::startTimeScheduling($start_time, $u_id, $candidate_timezone)->format('h:i A');
+			    $end_time            = AppHelper::endTimeScheduling($end_time, $u_id, $candidate_timezone)->format('h:i A');
 
 
-		    $recruiter      = User::find($schedule->recruiter_id);
-   			$recruiterInfo  = UserSettings::where('user_id',$schedule->recruiter_id)->first();
-   			$recruiterInfo  = [
-   				'id'         => $recruiter->id,
-   				'company_id' => $recruiterInfo->company_id,
-   				'fair_id'    => $recruiterInfo->fair_id,
-   				'name'       => $recruiter->name,
-   				'company_name'     => $recruiterInfo->companyDetail->company_name,
-   				'title'            => $recruiterInfo->user_title,
-   				'public_email'     => $recruiterInfo->public_email,
-   				'linkedin'         => $recruiterInfo->linkedin_profile_link,
-   				'recruiter_img'    => $recruiterInfo->recruiter_img,
-   				'recruiter_status' => $recruiterInfo->recruiter_status,
-   				'user_image'       => $recruiterInfo->user_image,
-   				'location'         => $recruiterInfo->location,
-   			];
-   			$data['recruiterData'] = $recruiterInfo;
-   			$data['slot']          = $schedule;
+			    $recruiter      = User::find($schedule->recruiter_id);
+	   			$recruiterInfo  = UserSettings::where('user_id',$schedule->recruiter_id)->first();
+	   			$recruiterInfo  = [
+	   				'id'         => $recruiter->id,
+	   				'company_id' => $recruiterInfo->company_id,
+	   				'fair_id'    => $recruiterInfo->fair_id,
+	   				'name'       => $recruiter->name,
+	   				'company_name'     => $recruiterInfo->companyDetail->company_name,
+	   				'title'            => $recruiterInfo->user_title,
+	   				'public_email'     => $recruiterInfo->public_email,
+	   				'linkedin'         => $recruiterInfo->linkedin_profile_link,
+	   				'recruiter_img'    => $recruiterInfo->recruiter_img,
+	   				'recruiter_status' => $recruiterInfo->recruiter_status,
+	   				'user_image'       => $recruiterInfo->user_image,
+	   				'location'         => $recruiterInfo->location,
+	   			];
+	   			$data['recruiterData'] = $recruiterInfo;
+	   			$data['slot']          = $schedule;
 
-   			return $data;
+	   			return $data;
+			}else{
+				return response()->json([
+		           'error'   => true,
+		           'message' => 'Interview Schedule Not Found'
+		        ], 200);
+			}
+			
 
 		    // if ($userCurrentDate == $schedule_date) {
 		    // 	if ($userCurrentTime > $start_time && $userCurrentTime < $end_time){
