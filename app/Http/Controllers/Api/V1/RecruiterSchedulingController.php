@@ -127,11 +127,11 @@ class RecruiterSchedulingController extends Controller {
 
 	public function interviewInvitations(Request $req){
 		$interview_arr = array();
-		$fair_id      = $req->fair_id;
-		$recruiter_id = $req->recruiter_id;
-		$company_id   = $req->company_id;
+		$fair_id       = $req->fair_id;
+		$recruiter_id  = $req->recruiter_id;
+		$company_id    = $req->company_id;
 		$start_date    = $req->start_date;
-		$end_date     = $req->end_date;
+		$end_date      = $req->end_date;
 
 		$interviews = RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->orderBy('created_at', 'ASC')->get();
 
@@ -145,7 +145,7 @@ class RecruiterSchedulingController extends Controller {
 
 		// $interview_arr = array();
 		foreach ($interviews as $key => $interview) {
-			$date = Carbon::createFromFormat('Y-m-d',$interview->SlotInfo->days);
+			$date = Carbon::createFromFormat('Y-m-d',$interview['SlotInfo']['days']);
 			$date = $date->englishDayOfWeek.', '.$date->toFormattedDateString().' '.date('h:i A', strtotime($interview->SlotInfo->start_time)).' - '.date('h:i A', strtotime($interview->SlotInfo->end_time));
 			$interview_arr[] = array(
 				'id'        => $interview->id,
