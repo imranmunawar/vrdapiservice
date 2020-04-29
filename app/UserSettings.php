@@ -35,6 +35,7 @@ class UserSettings extends Model
       'user_country',     
       'user_city',
       'user_postal_code',
+      'user_timezone'
     ];
 
 
