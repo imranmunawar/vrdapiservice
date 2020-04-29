@@ -95,6 +95,8 @@ class CandidateController extends Controller
         $userObject = '';
         $data = $request->all();
 
+        // dd($data);
+
         if (empty($data['fair_id'])) {
           return response()->json([
             "code"    => 404,
@@ -135,7 +137,7 @@ class CandidateController extends Controller
               'user_city'        => $data['user_city'],
               'user_postal_code' => $data['user_postal_code'],
               'user_cv'          => $userCV,
-              'user_timezone'    => $data['timezone']
+              'user_timezone'    => 'Europe/London';
              ]);
 
             if (!empty($data['channel'])) {
