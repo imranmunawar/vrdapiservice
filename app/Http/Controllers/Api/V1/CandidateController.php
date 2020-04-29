@@ -137,7 +137,7 @@ class CandidateController extends Controller
               'user_city'        => $data['user_city'],
               'user_postal_code' => $data['user_postal_code'],
               'user_cv'          => $userCV,
-              'user_timezone'    => 'Europe/London';
+              'user_timezone'    => 'Europe/London'
              ]);
 
             if (!empty($data['channel'])) {
