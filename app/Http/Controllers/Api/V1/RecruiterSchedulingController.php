@@ -96,7 +96,7 @@ class RecruiterSchedulingController extends Controller {
 	    		"starttime" => $interview->start_time,
 	    		"endtime"   => $interview->end_time,
 	    		"color"     => "#DA4453",
-	    		"url"       => env('BACKEND_URL').'fair/candidate/detail/'.$interview->candidate_id.'/XHMADWBCLS0GWZVH6M6K'
+	    		"url"       => env('BACKEND_URL').'fair/candidate/detail/'.$interview->candidate_id.'/'.$interview->u_id
 			);
 		}
 
