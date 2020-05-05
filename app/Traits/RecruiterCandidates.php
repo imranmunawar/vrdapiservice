@@ -263,7 +263,7 @@ trait RecruiterCandidates
           if (!$agenda) {
             $arr = [
               'candidate_id' => $matchRecr->candidate_id,
-              'recruiter_id' => $matchRecr->recruiter_id,
+              'recruiter_id' => $matchRecr['recruiter_id'],
               'company_id'   => $matchRecr->company_id,
               'fair_id'      => $matchRecr->fair_id,
               'percentage'   => $matchRecr->percentage,
