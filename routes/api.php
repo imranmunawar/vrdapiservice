@@ -612,6 +612,11 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
         'uses' =>'CandidateController@getMatchingJobs',
         'as'   => 'getMatchingJobs'
     ]);
+     // Get Candidate Recruiter Matching Jobs
+    Route::post('candidate/recruiter/jobs',[
+        'uses' =>'CandidateController@getCandidateRecruiterMatchingJobs',
+        'as'   => 'getCandidateRecruiterMatchingJobs'
+    ]);
     // Get Candidate Matching Webinars
     Route::post('candidate/webinars',[
         'uses' =>'CandidateController@getMatchingWebinars',

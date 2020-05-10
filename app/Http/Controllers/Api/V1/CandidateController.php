@@ -280,6 +280,41 @@ class CandidateController extends Controller
         
     }
 
+    public function getCandidateRecruiterMatchingJobs(Request $request, $candidate = '')
+    {  
+      $fair_id      = $request->fair_id;
+      $candidate_id = $request->candidate_id;
+      $recruiter_id = $request->recruiter_id;
+      if ($candidate == 'true') {
+        $jobs = MatchJob::where('candidate_id',$candidate_id)
+                        ->where('recruiter_id',$recruiter_id)
+                        ->where('fair_id',$fair_id)
+                        ->with('jobDetail')
+                        ->orderBy('percentage', 'Desc')
+                        ->get();
+        $candidateAppliedJobs = CandidateJob::where('candidate_id',$candidate_id)
+                        ->with('job')
+                        ->where('fair_id',$fair_id)
+                        ->get();
+
+        return response()->json(['jobs'=>$jobs,'appliedJobs'=>$candidateAppliedJobs]);
+      }
+
+      $fair_id      = $request->fair_id;
+      $candidate_id = $request->candidate_id;
+      $jobs = MatchJob::where('candidate_id',$candidate_id)
+                      ->where('recruiter_id',$recruiter_id)
+                      ->where('fair_id',$fair_id)
+                      ->with('jobDetail','companyDetail')
+                      ->orderBy('percentage', 'Desc')
+                      ->get();
+      $candidateAppliedJobs = CandidateJob::where('candidate_id',$candidate_id)
+                              ->where('fair_id',$fair_id)->get();
+
+      return response()->json(['jobs'=>$jobs,'appliedJobs'=>$candidateAppliedJobs]);
+        
+    }
+
 
     public function getMatchingRecruiters(Request $request)
     {  
