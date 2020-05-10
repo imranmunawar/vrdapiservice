@@ -309,9 +309,7 @@ trait RecruiterCandidates
         }
       }
 
-      $matchedArray = array_unique($matched);
-
-  return $matchedArray;
+  return $matched;
 }
 
 
