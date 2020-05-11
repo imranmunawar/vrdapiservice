@@ -41,23 +41,31 @@ class RecruiterSchedulingController extends Controller {
 		if ($schedules) {
 			foreach ($schedules as $key => $row) {
 				$dataArr[] = [
-				  'id'           => $row->id,
-				  'fair_id'      => $row->fair_id,
-			      'company_id'   => $row->company_id,
-			      'recruiter_id' => $row->recruiter_id,
-			      'recruiter_name' => $row->RecruiterDetails->name,
-			      'candidate_id' => $row->candidate_id,
-			      'start_time'   => $row->start_time,
-			      'end_time'     => $row->end_time,
-			      'days'         => $row->days,
-			      'days_arr'     => $row->days_arr,
-			      'available'    => $row->available
+				  'id'               => $row->id,
+				  'fair_id'          => $row->fair_id,
+			      'company_id'       => $row->company_id,
+			      'recruiter_id'     => $row->recruiter_id,
+			      'recruiter_name'   => $row->RecruiterDetails->name,
+			      'candidate_id'     => $row->candidate_id,
+			      'start_time'       => $row->start_time,
+			      'end_time'         => $row->end_time,
+			      'days'             => $row->days,
+			      'days_arr'         => $row->days_arr,
+			      'available'        => $this->isSlotNotInvited($row->id,$row->fair_id,$row->recruiter_id),
+			      'isSlotNotInvited' => $this->isSlotNotInvited($row->id,$row->fair_id,$row->recruiter_id)
 				];
 			}
 		}
 
 		return $dataArr;
+	}
 
+	public function isSlotNotInvited($slot_id,$fair_id,$recruiter_id){
+		if(!RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('slot_id',$slot_id)->exists()){
+			return 'true';
+		}
+
+		return 'false';
 	}
 
 	public function scheduledInterviews(Request $req)
@@ -73,17 +81,31 @@ class RecruiterSchedulingController extends Controller {
 		foreach ($schedules as $key => $schedule) {
 			$day = $schedule->days;
 			if(!RecruiterScheduleBooked::where('start_time',$schedule->start_time)->where('end_time',$schedule->end_time)->where('date',$day)->where('recruiter_id',$schedule->recruiter_id)->exists()){
-				$interview_arr[] = array(
-					"id"   => $schedule->id,
-					"name" => $schedule->start_time.' - '.$schedule->end_time.' <i class="fas fa-times-circle pull-right deleteSlotIcon" onclick="deleteSlot('.$schedule->id.')" title="asdasdasd"></i>',
-		    		"startdate" => $day,
-		    		"enddate"   => $day,
-		    		"starttime" => $schedule->start_time,
-		    		"endtime"   => $schedule->end_time,
-		    		"color"     => "#37BC9B",
-		    		"url"       => "",
-		    		'title'     => 'asdadasdasd'
-				);
+				if ($this->isSlotNotInvited($schedule->id,$schedule->fair_id,$schedule->recruiter_id) == 'false') {
+					$interview_arr[] = array(
+						"id"   => $schedule->id,
+						"name" => "Invited: ".$schedule->start_time.' - '.$schedule->end_time,
+			    		"startdate" => $day,
+			    		"enddate"   => $day,
+			    		"starttime" => $schedule->start_time,
+			    		"endtime"   => $schedule->end_time,
+			    		"color"     => "#1976d2",
+			    		"url"       => "",
+			    		'title'     => 'Delete Slot'
+					);
+				}else{
+					$interview_arr[] = array(
+						"id"   => $schedule->id,
+						"name" => $schedule->start_time.' - '.$schedule->end_time.' <i class="fas fa-times-circle pull-right deleteSlotIcon" onclick="deleteSlot('.$schedule->id.')" title="asdasdasd"></i>',
+			    		"startdate" => $day,
+			    		"enddate"   => $day,
+			    		"starttime" => $schedule->start_time,
+			    		"endtime"   => $schedule->end_time,
+			    		"color"     => "#37BC9B",
+			    		"url"       => "",
+			    		'title'     => 'Delete Slot'
+					);
+				}
 			}
 		}
 		// $interview_arr = array();
