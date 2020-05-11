@@ -11,7 +11,7 @@
         <tbody>
         <tr>
             <td align="center" valign="top">
-                <table border="0" cellspacing="0" cellpadding="0" width="600" align="center" style="color:#6666666;line-height:20px;font-size:12px;font-family: 'Poppins', sans-serif;;text-align:left">
+                <table border="0" cellspacing="0" cellpadding="0" width="600" align="center" style="color:#0006;line-height:20px;font-size:12px;font-family: 'Poppins', sans-serif;;text-align:left">
                     <tbody><tr>
                         <td height="30" valign="top" colspan="3">&nbsp;</td>
                     </tr>
@@ -43,8 +43,8 @@
                                 </tr>
                                 <tr>
                                     <td width="20" valign="top">&nbsp;</td>
-                                    <td valign="top" width="560" style="font-family: 'Poppins', sans-serif;;font-weight:normal;font-size:12px;line-height:19px;color:#666666">
-                                        <h2 style="color:#404040;font-family: 'Poppins', sans-serif;background: #f1f1f1;font-size:15px;line-height:28px;font-weight:bold;margin-bottom:10px;padding: 10px">
+                                    <td valign="top" width="560" style="font-family: 'Poppins', sans-serif;;font-weight:normal;font-size:12px;line-height:19px;color:#000">
+                                        <h2 style="color:#000;font-family: 'Poppins', sans-serif;font-size:15px;line-height:28px;font-weight:bold;margin-bottom:10px;padding: 10px">
                                             Interview on {{ $date }} from {{ $start_time }} to {{ $end_time }} in {{ $fairname }} has been reject by {{$recruiterName}}.
                                         </h2>
                                         <!-- <h3>Candiadate Notes :</h3>
@@ -52,10 +52,10 @@
                                             {{$notes}}
                                         </p> -->
 									
-                                        <p style="color:#666666;font-family: 'Poppins', sans-serif;;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
+                                        <p style="color:#000;font-family: 'Poppins', sans-serif;;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
                                             If you have any questions, please contact us at <a href="mailto:info@virtualrecruitmentdays.com" style="color:#0083be;text-decoration:none" target="_blank">info@virtualrecruitmentdays.com</a>.
                                         </p>
-                                        <p style="color:#666666;font-family: 'Poppins', sans-serif;;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
+                                        <p style="color:#000;font-family: 'Poppins', sans-serif;;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
 											<br>
                                             Good Luck and See you at the event
 											<br>

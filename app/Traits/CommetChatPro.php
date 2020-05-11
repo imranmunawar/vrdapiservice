@@ -36,7 +36,10 @@ trait CommetChatPro
         ->withData( $data )
         ->asJson()
         ->post();
+
+    // return true;
   }
+
 
   public function updateUserOnCommetChatPro($uid,$name,$avatar,$role){
     $data = [];

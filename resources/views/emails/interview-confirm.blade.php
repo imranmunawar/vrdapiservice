@@ -43,15 +43,15 @@
                                 </tr>
                                 <tr>
                                     <td width="20" valign="top">&nbsp;</td>
-                                    <td valign="top" width="560" style="font-family:Arial,helvetica,sans-serif;font-weight:normal;font-size:12px;line-height:19px;color:#666666">
-                                        <h2 style="color:#fff;font-family: 'Poppins', sans-serif;background: #333333d4;font-size:15px;line-height:28px;font-weight:bold;margin-bottom:10px;padding: 15px;">
+                                    <td valign="top" width="560" style="font-family:Arial,helvetica,sans-serif;font-weight:normal;font-size:12px;line-height:19px;color:#000">
+                                        <h2 style="color:#000;font-family: 'Poppins', sans-serif;font-size:15px;line-height:28px;font-weight:bold;margin-bottom:10px;padding: 15px;">
                                             Your interview has successfully schedule with {{ $withName }} at {{ $date }} from {{ $start_time }} to {{ $end_time }} in {{ $fairname }}
                                         </h2>
                                         
                                         <span>
                                             <b>Meeting Room Link : </b> {{$meetingLink}}
                                         </span>
-                                        <p style="color:#666666;font-family:Arial,helvetica,sans-serif;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
+                                        <p style="color:#000;font-family:Arial,helvetica,sans-serif;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
                                             <p>Thank You for scheduling your interview to the {{ $fairname }}.</p>
                                         </p>
                                         <h3 style="color:#5D2DDC;font-family:Arial,helvetica,sans-serif;font-size:15px;line-height:28px;font-weight:bold;margin-bottom:10px">

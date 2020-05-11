@@ -44,7 +44,7 @@
                                 <tr>
                                     <td width="20" valign="top">&nbsp;</td>
                                     <td valign="top" width="560" style="font-family: 'Poppins', sans-serif;;font-weight:normal;font-size:12px;line-height:19px;color:#666666">
-                                        <h2 style="color:#404040;font-family: 'Poppins', sans-serif;background: #f1f1f1;font-size:15px;line-height:28px;font-weight:bold;margin-bottom:10px;padding: 10px">
+                                        <h2 style="color:#000;font-family: 'Poppins', sans-serif;background: #f1f1f1;font-size:15px;line-height:28px;font-weight:bold;margin-bottom:10px;padding: 10px">
                                             Interview on {{ $date }} from {{ $start_time }} to {{ $end_time }} in {{ $fairname }} has been Canceled by @if($cancelBy == 'candidate'){{$candidateName}} @else {{$recruiterName}} @endif.
                                         </h2>
 

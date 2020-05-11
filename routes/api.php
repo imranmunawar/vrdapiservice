@@ -617,6 +617,7 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
         'uses' =>'CandidateController@getCandidateRecruiterMatchingJobs',
         'as'   => 'getCandidateRecruiterMatchingJobs'
     ]);
+
     // Get Candidate Matching Webinars
     Route::post('candidate/webinars',[
         'uses' =>'CandidateController@getMatchingWebinars',
@@ -637,10 +638,17 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
         'uses' =>'CandidateController@update',
         'as'   => 'candidateUpdate'
     ]);
+
     // Get Candidate Matching Recruiters
     Route::post('candidate/recruiters',[
         'uses' =>'CandidateController@getMatchingRecruiters',
         'as'   => 'getMatchingRecruiters'
+    ]);
+
+    // Get Candidate Specific Matching Recruiter
+    Route::post('candidate/specific/recruiter',[
+        'uses' =>'CandidateController@getSpecificMatchedRecruiter',
+        'as'   => 'getSpecificMatchedRecruiter'
     ]);
     // Get Candidate Company Jobs
     Route::post('candidate/company/jobs',[

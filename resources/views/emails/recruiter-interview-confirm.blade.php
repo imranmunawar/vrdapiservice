@@ -11,7 +11,7 @@
         <tbody>
         <tr>
             <td align="center" valign="top">
-                <table border="0" cellspacing="0" cellpadding="0" width="600" align="center" style="color:#6666666;line-height:20px;font-size:12px;font-family:Arial,helvetica,sans-serif;text-align:left">
+                <table border="0" cellspacing="0" cellpadding="0" width="600" align="center" style="color:#0006;line-height:20px;font-size:12px;font-family:Arial,helvetica,sans-serif;text-align:left">
                     <tbody><tr>
                         <td height="30" valign="top" colspan="3">&nbsp;</td>
                     </tr>
@@ -43,11 +43,11 @@
                                 </tr>
                                 <tr>
                                     <td width="20" valign="top">&nbsp;</td>
-                                    <td valign="top" width="560" style="font-family:Arial,helvetica,sans-serif;font-weight:normal;font-size:12px;line-height:19px;color:#666666">
-                                        <h2 style="color:#fff;font-family: 'Poppins', sans-serif;background: #333333d4;font-size:15px;line-height:28px;font-weight:bold;margin-bottom:10px;padding: 15px;">
+                                    <td valign="top" width="560" style="font-family:Arial,helvetica,sans-serif;font-weight:normal;font-size:12px;line-height:19px;color:#000">
+                                        <h2 style="color:#000;font-family: 'Poppins', sans-serif;font-size:15px;line-height:28px;font-weight:bold;margin-bottom:10px;padding: 15px;">
                                             Your interview has successfully schedule with {{ $withName }} at {{ $date }} from {{ $start_time }} to {{ $end_time }} in {{ $fairname }}
                                         </h2>
-                                        <p style="color:#666666;font-family:Arial,helvetica,sans-serif;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
+                                        <p style="color:#000;font-family:Arial,helvetica,sans-serif;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
                                             <p>Thank You for scheduling your interview to the {{ $fairname }}.</p>
                                         </p>
                                         <h3 style="color:#5D2DDC;font-family:Arial,helvetica,sans-serif;font-size:15px;line-height:28px;font-weight:bold;margin-bottom:10px">
@@ -67,14 +67,14 @@
                                             </tbody>
                                         </table>
 
-                                        <p style="color:#666666;font-family:Arial,helvetica,sans-serif;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
+                                        <p style="color:#000;font-family:Arial,helvetica,sans-serif;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
                                             If you want to cancel your interview, please click this link anytime. <a href="{{ $cancelUrl }}" style="color:#0083be;text-decoration:none" target="_blank">Cancel Interview</a>.
                                         </p>
 
-                                        <p style="color:#666666;font-family:Arial,helvetica,sans-serif;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
+                                        <p style="color:#000;font-family:Arial,helvetica,sans-serif;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
                                             If you have any questions, please contact us at <a href="mailto:info@virtualrecruitmentdays.com" style="color:#0083be;text-decoration:none" target="_blank">info@virtualrecruitmentdays.com</a>.
                                         </p>
-                                        <p style="color:#666666;font-family:Arial,helvetica,sans-serif;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
+                                        <p style="color:#000;font-family:Arial,helvetica,sans-serif;font-size:12px;font-weight:normal;margin-bottom:20px;margin-top:0px">
                                             Good Luck and See you at the event
                                              <br>
                                              Best Regards

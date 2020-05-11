@@ -169,8 +169,7 @@ class CandidateController extends Controller
 
            if ($user) {
               // Generate Email For Candidate
-          $this->generateEmail($request,$user->id);
-          $this->createUserOnCommetChatPro($userObject->id,$data['name'],'','Candidate');
+             // $this->generateEmail($request,$user->id);
               $user = User::find($userObject->id);
               $credentials = ['email'=>$user->email, 'password'=>$user->plan_password];
               if(!Auth::attempt($credentials))
@@ -345,6 +344,36 @@ class CandidateController extends Controller
         }
         return response()->json(['recruiters'=>$recruitersArr]);
 
+    }
+
+    public function getSpecificMatchedRecruiter(Request $request)
+    {  
+        $recruitersArr = [];
+        $fair_id      = $request->fair_id;
+        $candidate_id = $request->candidate_id;
+        $recruiter_id = $request->recruiter_id;
+        $recruiter = MatchRecruiter::where('candidate_id',$candidate_id)
+                        ->where('recruiter_id',$recruiter_id)
+                        ->where('fair_id',$fair_id)
+                        ->with('recruiter','companyDetail','recruiterSetting')
+                        ->orderBy('percentage', 'Desc')
+                        ->first();
+          $recruitersArr = [
+              "id"                => $recruiter->recruiter_id,
+              "company_id"        => $recruiter->company_id,
+              "fair_id"           => $recruiter->fair_id,
+              "percentage"        => $recruiter->percentage,
+              'name'              => $recruiter->recruiter->name,
+              'company_name'      => $recruiter->companyDetail->company_name,
+              'title'             => $recruiter->recruiterSetting->user_title,
+              'public_email'      => $recruiter->recruiterSetting->public_email,
+              'linkedin'          => $recruiter->recruiterSetting->linkedin_profile_link,
+              'recruiter_img'     => $recruiter->recruiterSetting->recruiter_img,
+              'recruiter_status'  => $recruiter->recruiterSetting->recruiter_status,
+              'user_image'        => $recruiter->recruiterSetting->user_image,
+              'location'          => $recruiter->recruiterSetting->location,
+          ];
+        return response()->json($recruitersArr);
     }
 
     public function getMatchingWebinars(Request $request)
