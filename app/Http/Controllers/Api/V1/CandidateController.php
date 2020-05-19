@@ -169,7 +169,7 @@ class CandidateController extends Controller
 
            if ($user) {
               // Generate Email For Candidate
-             // $this->generateEmail($request,$user->id);
+             $this->generateEmail($request,$user->id);
               $user = User::find($userObject->id);
               $credentials = ['email'=>$user->email, 'password'=>$user->plan_password];
               if(!Auth::attempt($credentials))
