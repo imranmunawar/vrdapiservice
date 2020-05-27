@@ -237,7 +237,9 @@ class AuthController extends Controller
         }
 
         if ($role == 'Organizer') {
+            $userSetting = UserSettings::where('user_id',$userId)->select('credits')->first();
             $userArr['chatId']        = $userId;
+            $userArr['userCredits']   = $userSetting->credits;
             $userArr['ChatApiDetail'] = $this->getCometChatApiDetail($userId);
         }
 
