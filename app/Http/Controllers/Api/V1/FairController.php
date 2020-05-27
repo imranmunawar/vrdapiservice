@@ -26,6 +26,7 @@ use App\Traits\FairEndEmailCandidates;
 use App\FairCandidates;
 use App\CandidateAgenda;
 use App\CompanyWebinar;
+use App\CometChatPro;
 use \Input as Input;
 use DB;
 use Carbon\Carbon;
@@ -103,6 +104,55 @@ class FairController extends Controller
     {
         $fair = Fair::find($id);
         return response()->json($fair);
+    }
+
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function fairChatApiDetail($id)
+    {
+      $dataArr = [];
+      $fair = Fair::find($id);
+      $cometApiDetail = CometChatPro::where('organizer_id',$fair->organiser_id)->first();
+
+      $dataArr = [
+        'id'           => $fair->id,
+        'organiser_id' => $fair->organiser_id,
+        'name'         => $fair->name,
+        'short_name'   => $fair->short_name,
+        'fair_image'   => $fair->fair_image,
+        'layout'       => $fair->layout,
+        'app_id'       => $cometApiDetail->app_id,
+        'api_key'      => $cometApiDetail->api_key,
+        'rest_api_key'  => $cometApiDetail->rest_api_key,
+        'region'       => $cometApiDetail->region
+      ];
+      return response()->json($dataArr);
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function organizerChatApiDetail($organizerId)
+    {
+      $dataArr = [];
+      $cometApiDetail = CometChatPro::where('organizer_id',$organizerId)->first();
+      if ($cometApiDetail) {
+        $dataArr = [
+          'app_id'       => $cometApiDetail->app_id,
+          'api_key'      => $cometApiDetail->api_key,
+          'rest_api_key'  => $cometApiDetail->rest_api_key,
+          'region'       => $cometApiDetail->region
+        ];
+      }
+      return $dataArr;
     }
 
 
@@ -208,6 +258,13 @@ class FairController extends Controller
             $candidateTest = true;
           }
 
+          $chatApiDetail = $this->organizerChatApiDetail($fair->organiser_id);
+
+          $organizerName   = User::find($fair->organiser_id)->name;
+          $organizerImage  = UserSettings::where('user_id',$fair->organiser_id)->select('user_image')->first();
+          $fair['organiser_name']  =  $organizerName;
+          $fair['organiser_image'] =  $organizerImage->user_image;
+
           date_default_timezone_set($timezone);
           //start time of fair
           $cur_date = new \DateTime(date('Y-m-d H:i:s'), new \DateTimeZone($fair->timezone));
@@ -241,22 +298,23 @@ class FairController extends Controller
         $data["time-in-seconds"] = strtotime($data["fair_start"]) - strtotime($data["cur_date"]);
 
         $dateAndTimeArray = [
-            'fair_start'           => $data["fair_start"],
-            'fair_end'             => $data["fair_end"],
-            'fair_start_date_from' => $fairStartDateFrom,
-            'fair_start_time'      => $fairStartTime,
-            'fair_end_time'        => $fairEndTime,
-            'date'                 => $date,
+          'fair_id'              => $fair->id,
+          'fair_start'           => $data["fair_start"],
+          'fair_end'             => $data["fair_end"],
+          'fair_start_date_from' => $fairStartDateFrom,
+          'fair_start_time'      => $fairStartTime,
+          'fair_end_time'        => $fairEndTime,
+          'date'                 => $date
         ];
 
         if($dateAndTimeArray['date'] >= $dateAndTimeArray['fair_start'] && $dateAndTimeArray['date'] <= $dateAndTimeArray['fair_end']){
           if (!empty($candidate_id)) {
             $res = CandidateTurnout::where('fair_id', $fair->id)->where('candidate_id',$candidate_id)->first();
             if (!$res) {
-                CandidateTurnout::create(array(
-                  'candidate_id'      => $candidate_id,
-                  'fair_id'           => $fair->id
-                ));
+              CandidateTurnout::create(array(
+                'candidate_id' => $candidate_id,
+                'fair_id'      => $fair->id
+              ));
             }
           }
         }
@@ -268,7 +326,13 @@ class FairController extends Controller
              'message'  => 'Fair Close'
           ], 200);
         }else{
-          return response()->json(['fair'=>$fair,'dateAndTime'=>$dateAndTimeArray,'isTakeTest'=>$candidateTest,'addedWebinars'=>$addedWebinars]);
+          return response()->json([
+            'fair'          => $fair,
+            'dateAndTime'   => $dateAndTimeArray,
+            'isTakeTest'    => $candidateTest,
+            'addedWebinars' => $addedWebinars,
+            'chatApiDetail' => $chatApiDetail
+          ]);
         }
            
         }else{

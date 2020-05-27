@@ -41,7 +41,7 @@ class CreateFairsTable extends Migration
             $table->string('layout');
             $table->string('presenter');
             $table->string('stand_receptionist');
-            $table->timestamps();
+            $table->timestamps();   
         });
     }
 

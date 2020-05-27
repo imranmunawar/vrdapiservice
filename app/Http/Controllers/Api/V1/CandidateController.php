@@ -32,11 +32,11 @@ use App\MarketingRegistration;
 use App\ChatTranscript;
 use App\FairCandidates;
 use App\CandidateAgenda;
-use App\Traits\CommetChatPro;
+use App\Traits\CometChatProTrait;
 
 class CandidateController extends Controller
 {
-    use MatchingJobs, MatchingRecruiters, MatchingWebinars, RecruiterCandidates, CandidatePersonalAgenda,CandidateEmail,CommetChatPro;
+    use MatchingJobs, MatchingRecruiters, MatchingWebinars, RecruiterCandidates, CandidatePersonalAgenda,CandidateEmail,CometChatProTrait;
     /**
      * Display a listing of the resource.
      *
@@ -169,7 +169,7 @@ class CandidateController extends Controller
 
            if ($user) {
               // Generate Email For Candidate
-             $this->generateEmail($request,$user->id);
+             // $this->generateEmail($request,$user->id);
               $user = User::find($userObject->id);
               $credentials = ['email'=>$user->email, 'password'=>$user->plan_password];
               if(!Auth::attempt($credentials))
@@ -421,10 +421,11 @@ class CandidateController extends Controller
         $company_id   = $request->company_id;
         $CandidateAgenda = CandidateAgenda::where('candidate_id',$candidate_id)->where('webinar_id',$webinar_id)->first(); 
         if($CandidateAgenda){
-          Curl::to('https://api.cometondemand.net/api/v2/removeUsersFromGroup')
-          ->withHeader('api-key: 51374xb73fca7c64f3a49d2ffdefbb1f2e8c76')
-          ->withData('GUID='.$webinar_id.'&UID='.$candidate_id)
-          ->post();
+          $this->removeMemberFromGroupOnCometChatPro(
+            $fair_id,
+            $fair_id.'f'.$webinar_id,
+            $fair_id.'f'.$candidate_id
+          );
           $CandidateAgenda->delete();
         }else{
             CandidateAgenda::create(array(
@@ -433,11 +434,11 @@ class CandidateController extends Controller
                 'fair_id'      => $fair_id,
                 'webinar_type' => 'Webinar'
             ));
-
-            Curl::to('https://api.cometondemand.net/api/v2/addUsersToGroup')
-            ->withHeader('api-key: 51374xb73fca7c64f3a49d2ffdefbb1f2e8c76')
-            ->withData('GUID='.$webinar_id.'&UID='.$candidate_id)
-                      ->post();
+            $this->addMemberIntoGroupOnCometChatPro(
+              $fair_id,
+              $fair_id.'f'.$webinar_id,
+              $fair_id.'f'.$candidate_id
+            );
         }
         $candidateAddedWebinars = CandidateAgenda::where('candidate_id',$candidate_id)
                                 ->where('fair_id',$fair_id)->get();
@@ -456,9 +457,17 @@ class CandidateController extends Controller
           Storage::disk('s3')->put($target_file, file_get_contents($file), 'public');
           $profileImage = $filename;
           UserSettings::where('user_id',$request->candidate_id)->update(['user_image'=>$profileImage]);
-          $this->updateCandidateAvatarOnCommetChatPro($request->candidate_id,$profileImage);
+          /* Update Candidate Profile Image On Commet Chat */
+          $commetAvatar = $profileImage;
+          $chatId       = $request->fair_id.'f'.$request->candidate_id;
+          $this->updateUserProfileImage(
+           $request->fair_id,
+           $chatId,
+           $commetAvatar
+          );
           $user = User::find($request->candidate_id);
-           $userObject = $this->show($request->candidate_id);
+          $userObject = $this->show($request->candidate_id);
+
             return response()->json([
                 "code"         => 200,
                 "status"       => "success",
@@ -510,8 +519,9 @@ class CandidateController extends Controller
      */
     public function update(Request $request)
     {      
-        $id    = $request->id;
-        $user  = User::findOrFail($id);
+        $id      = $request->id;
+        $user    = User::findOrFail($id);
+        $fair_id = $request->fair_id;
         if (!empty($user)) {
             $userDataToUpdate = [
               'name'          => $request->name,
@@ -528,7 +538,15 @@ class CandidateController extends Controller
            ];
            $setting->update($settingDataToUpdate);
            if ($setting) {
-              $this->updateUserOnCommetChatPro($request->candidate_id,$request->name,'','Candidate');
+               /* Update User On Commet Chat */
+              $chatId = $fair_id.'f'.$id;
+               $this->updateUser(
+                $fair_id,
+                $chatId,
+                $request->name,
+                '',
+                'candidate'
+              );
               $user = User::find($request->candidate_id);
               $userObject = $this->show($id);
                 return response()->json([
@@ -632,21 +650,29 @@ class CandidateController extends Controller
     public function chatConversation($one, $two, $user_id)
     {
       $conversations = ChatTranscript::orWhere(function($query) use ($one, $two){
-                        $query->where('from', '=', $one)
-                          ->where('to', '=', $two);
+                        $query->where('sender_id',$one)
+                          ->where('receiver_id',$two);
                         })->orWhere(function($query) use ($one, $two){
-                          $query->where('to', '=', $one)
-                            ->where('from', '=', $two);
-                        })->orderBy('id','asc')->with('userFrom')->get();
+                          $query->where('receiver_id',$one)
+                            ->where('sender_id', '=', $two);
+                        })->orderBy('id','asc')->get();
       $data["user"]    = User::find($user_id)->first_name;
       $data["user_id"] = $user_id;
       if($one != $user_id){
-        $data["candidate"]    = User::find($one)->first_name;
+        $data["candidate"]    = User::find($one)->name;
         $data["candidate_id"] = $one;
       }
       if($two != $user_id){
-        $data["candidate"]    = User::find($two)->first_name;
-        $data["candidate_id"] = $two;
+        $user                   =  User::find($two)->name;
+        $role  =  User::find($two)->roles->first()->name;
+        $data["candidate"]      =  $user;
+        $userSetting            =  UserSettings::where('user_id',$two)->select('user_image')->first();
+        if ($role == 'User') {
+          $data["user_image"]     =  !empty($userSetting->user_image) ? env('CANDIDATE_AVATAR_URL').$userSetting->user_image : 'https://ui-avatars.com/api/?name='.$user.'';
+        }else{
+          $data["user_image"]     =  !empty($userSetting->user_image) ? env('VRD_ASSETS_IMAGES_URL').$userSetting->user_image : 'https://ui-avatars.com/api/?name='.$user.'';
+        }
+        $data["candidate_id"] =  $two;
       }
 
       return response()->json(['conversations'=>$conversations,'userid'=>$user_id,'data'=>$data]); 

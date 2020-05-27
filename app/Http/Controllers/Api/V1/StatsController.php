@@ -19,10 +19,12 @@ use App\FairCandidates;
 use App\RecruiterScheduleInvite;
 use App\RecruiterScheduleBooked;
 use App\CompanyStandCount;
+use App\Traits\UsersList;
 use DB;
 
 class StatsController extends Controller
 {
+    use UsersList;
     public function index()
     {
         $fairs     = Fair::count();
@@ -266,17 +268,17 @@ class StatsController extends Controller
     public function fairStats($fair_id){
         $data = [];
         $data['standsCount'] = array();
-        $data['totalRegistration'] = UserSettings::where('fair_id',$fair_id)->get()->count();
-        $data['jobsApplications']  = CandidateJob::where('fair_id',$fair_id)->get()->count();
-        $data['totalJobs']         = CompanyJob::where('fair_id',$fair_id)->get()->count();
-        $data['totalCompanies']    = Company::where('fair_id',$fair_id)->get()->count();
-        $data['totalShortlist']    = AgendaView::where('fair_id',$fair_id)->where('shortlisted',1)->get()->count();
-        $data["chats"] = ChatTranscript::where('fair_id',$fair_id)->groupBy('from')->get()->count();
-        $data["messages_exchanged"] = ChatTranscript::where('fair_id',$fair_id)->get()->count();
-        $data['fairCompanyJobs']    = $this->fairCompanyJobs($fair_id);
-        $data['fairCompanyChats']    = $this->fairCompanyChats($fair_id);
-        $data['fairMarketingStats']  = $this->getChannelStats($fair_id);
-        $data['candidatesTournouts']  = FairCandidates::where('fair_id',$fair_id)->where('mainhall',1)->count();
+        $data['totalRegistration']    = UserSettings::where('fair_id',$fair_id)->get()->count();
+        $data['jobsApplications']     = CandidateJob::where('fair_id',$fair_id)->get()->count();
+        $data['totalJobs']            = CompanyJob::where('fair_id',$fair_id)->get()->count();
+        $data['totalCompanies']       = Company::where('fair_id',$fair_id)->get()->count();
+        $data['totalShortlist']       = AgendaView::where('fair_id',$fair_id)->where('shortlisted',1)->get()->count();
+        $data["chats"]                     = ChatTranscript::where('fair_id',$fair_id)->groupBy('receiver_id')->get()->count();
+        $data["messages_exchanged"]        = ChatTranscript::where('fair_id',$fair_id)->get()->count();
+        $data['fairCompanyJobs']           = $this->fairCompanyJobs($fair_id);
+        $data['fairCompanyChats']          = $this->fairCompanyChats($fair_id);
+        $data['fairMarketingStats']        = $this->getChannelStats($fair_id);
+        $data['candidatesTournouts']       = FairCandidates::where('fair_id',$fair_id)->where('mainhall',1)->count();
         $data['fairRegisteredCandidates']  = $this->fairRegisteredCandidates($fair_id);
         $standsCount  = CompanyStandCount::where('fair_id', $fair_id)->with('company')->get();
         $data['fairRegisteredCandidatesCount']  = FairCandidates::where('fair_id',$fair_id)->count();
@@ -336,12 +338,12 @@ class StatsController extends Controller
         $companyChats = [];
         $fairCompanies = Company::where('fair_id',$fair_id)->get();
         foreach ($fairCompanies as $key => $value) {
-            $chats = ChatTranscript::where('company_id',$value->id)->groupBy('from')->get();
+            $chats = ChatTranscript::where('company_id',$value->id)->groupBy('receiver_id')->get();
             $chatsCount = $chats->count();
             $messagesCount = ChatTranscript::where('company_id',$value->id)->count();
             $companyChats[] = [
-                'companyName'=> $value->company_name,
-                'chatsCount'  => $chatsCount,
+                'companyName'   => $value->company_name,
+                'chatsCount'    => $chatsCount,
                 'messagesCount' => $messagesCount
             ];
         }
@@ -404,6 +406,8 @@ class StatsController extends Controller
 
     public function companyStats($company_id){
         $data = [];
+        $chatCount = 0;
+        $chatMessagesCount = 0;
         $company = Company::find($company_id);
         $fair_id = $company->fair_id;
         $company_name  = $company->company_name;
@@ -412,31 +416,44 @@ class StatsController extends Controller
             $query->whereCompanyId($company_id);
         })->count();
         // $companyStats['applications'] = $applications;
-        $recruiter_arr = array();
+        $recruiter_arr       = array();
         $data['jobs']        = CompanyJob::where('company_id',$company_id)->count();
         $data['shortlisted'] = AgendaView::where('company_id',$company_id)->where('fair_id',$fair_id)->where('shortlisted', '=', '1')->count();
         $data['fair_id'] = $fair_id;
         $data['company_name']  = $company_name;
         $data['company_image'] = $company_image;
-        $recruiters  = UserSettings::select('user_id')->where('company_id',$company_id)->where('fair_id',$fair_id)->get();
-        if ($recruiters->count() > 0) {
+        $recruiters  = $this->getUsers('Recruiter',$company_id);
+        // return $recruiters; die;
+        if ($recruiters) {
             foreach ($recruiters  as $key => $recruiter) {
-               $user  = User::select('name')->where('id',$recruiter->user_id)->first();
-               $chats = ChatTranscript::where('company_id',$company_id)->where('fair_id',$fair_id)->where('from',$recruiter->user_id)->count();
+            
+                $chat          = ChatTranscript::where('company_id',$company_id)->where('fair_id',$fair_id)->where('sender_id',$recruiter['id'])->groupBy('receiver_id')->get();
+
+                $chats         = $chat->count();
+                $chatCount     += $chats;
+                $chatMessages  = ChatTranscript::where('company_id',$company_id)->where('fair_id',$fair_id)->where('sender_id',$recruiter['id'])->count();
+
+                $chatMessagesCount += $chatMessages;
+
                 $data['recruiterChats'][] = [
-                   'name'  => $user->name,
-                   'chats' => $chats
+                   'name'         => $recruiter['name'],
+                   'email'        => $recruiter['email'],
+                   'avatar'       => env('VRD_ASSETS_IMAGES_URL').$recruiter['user_setting']['user_image'],
+                   'chatMessages' => $chatMessages,
+                   'chats'        => $chats
                 ];
-                $recruiter_arr[] = $recruiter->user_id;
+                $recruiter_arr[] = $recruiter['id'];
+
             }
         }else{
             $data['recruiterChats'] = [];
         }
 
 
-        $data["chats"] = ChatTranscript::where('company_id',$company_id)->where('fair_id',$fair_id)->groupBy('from')->get();
-        $data["chat_count"] = $data["chats"]->count();
-        $data["chat_exchange_count"] = ChatTranscript::where('company_id',$company_id)->where('fair_id',$fair_id)->count();
+        // $data["chats"] = ChatTranscript::where('company_id',$company_id)->where('fair_id',$fair_id)->groupBy('sender_id')->get();
+        $data["chat_count"] = $chatCount;
+        // $data["chat_exchange_count"] = ChatTranscript::where('company_id',$company_id)->where('fair_id',$fair_id)->groupBy('sender_id')->count();
+        $data["chat_exchange_count"] = $chatMessagesCount;
         $data["booked_interviews"] = RecruiterScheduleBooked::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where(DB::raw("CONCAT(`date`, ' ', `start_time`)"), '>=', date('Y-m-d H:i'))->count();
 
         $data["pending_invitations"] = RecruiterScheduleInvite::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where('cancel', 0)

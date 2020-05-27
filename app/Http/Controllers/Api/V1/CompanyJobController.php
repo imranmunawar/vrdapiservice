@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\CompanyJob;
 use App\CandidateJob;
 use App\MatchJob;
+use App\User;
+use App\UserSettings;
 
 class CompanyJobController extends Controller
 {
@@ -122,21 +124,24 @@ class CompanyJobController extends Controller
     public function jobApplications($job_id){
         $applications = [];
         $candidates = CandidateJob::where('job_id',$job_id)->get();
+        // return response()->json($candidates);
         if ($candidates->count() > 0) {
             foreach ($candidates as $row) {
                 $match = MatchJob::where('job_id',$row->job_id)->where('candidate_id',$row->candidate_id)->first();
-                $applications [] = [
-                    "job_id"       => $row->job_id,
-                    "candidate_id" => $row->candidate_id,
-                    "company_id"   => $row->company_id,
-                    "fair_id"      => $row->fair_id,
-                    "name"         => $row->candidate->name,
-                    "email"        => $row->candidate->email,
-                    "user_country" => $row->candidateInfo->user_country,
-                    "user_city"    => $row->candidateInfo->user_city,
-                    'cv'           => $row->candidateInfo->user_cv,
-                    "match"        => $match->percentage
-                ];
+                if (User::where('id', $row->candidate_id)->exists()) {
+                   $applications [] = [
+                       "job_id"       => $row->job_id,
+                       "candidate_id" => $row->candidate_id,
+                       "company_id"   => $row->company_id,
+                       "fair_id"      => $row->fair_id,
+                       "name"         => $row['candidate']['name'],
+                       "email"        => $row['candidate']['email'],
+                       "user_country" => $row['candidateInfo']['user_country'],
+                       "user_city"    => $row['candidateInfo']['user_city'],
+                       'cv'           => $row['candidateInfo']['user_cv'],
+                       "match"        => $match->percentage
+                   ];
+                }
             }
             return response()->json(['success' => true, 'applicant'=> $applications], 200);
         }

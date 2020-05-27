@@ -293,6 +293,12 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
         'uses' => 'FairController@show',
         'as'   => 'showFair'
     ]);
+
+    Route::get('fair/chatapidetail/show/{id}',[
+        'uses' => 'FairController@fairChatApiDetail',
+        'as'   => 'fairChatApiDetail'
+    ]);
+
     Route::get('fairs/list',[
         'uses' => 'FairController@index',
         'as'   => 'listFairs'
@@ -369,7 +375,7 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
     ]);
 
     Route::post('/fair/chat/transcript',[
-        'uses' => 'CandidateController@userChats',
+        'uses' => 'ChatController@userChats',
         'as'   => 'userChats'
     ]);
 
@@ -536,6 +542,19 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
 
 
 
+      // Get Detail Of CometChat Againts Fair
+      Route::get('/cometchatpro/apidetail/{fair_id}',[
+          'uses' => 'CometChatProController@show',
+          'as'   => 'getChatApiDetailByFair'
+      ]);
+
+      // Save Detail Of CometChat Againts Fair
+      Route::post('/save/fair/cometchat/apidetail',[
+          'uses' => 'CometChatProController@store',
+          'as'   => 'saveCometChatProApiDetail'
+      ]);
+
+
     /* -------------- Dashboard Stats Routes --------------------- */
 
     Route::get('admin/stats',[
@@ -579,6 +598,14 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
         'uses' => 'UserController@candidateListing',
         'as'   => 'candidateListing'
     ]);
+
+    /* -------------- Commet Chat Stats Routes --------------------- */
+
+    Route::get('fetch/users/chats/messages/{fair_id}',[
+        'uses' => 'ChatController@getAllUserChats',
+        'as'   => 'getAllUserChats'
+    ]);
+
 
     /*-------------------- VRD Front Routes ----------------------*/
 
@@ -677,6 +704,7 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
         'uses' => 'CandidateController@inHall',
         'as'   => 'candidateinHall'
     ]);
+
 
     /* Messages Routes */
 

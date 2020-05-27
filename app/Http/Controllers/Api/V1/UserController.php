@@ -10,11 +10,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Traits\IsExist;
 use App\Traits\UserEmail;
-use App\Traits\CommetChatPro;
+use App\Traits\CometChatProTrait;
+use App\CometChatPro;
 
 class UserController extends Controller
 {
-    use IsExist,UserEmail,CommetChatPro;
+    use IsExist,UserEmail,CometChatProTrait;
     /**
      * Display a listing of the resource.
      *
@@ -101,15 +102,6 @@ class UserController extends Controller
             ]);
             $user->roles()->attach($role);
             $user_id = $user->id;
-            /* Create User On Commet Chat */
-            if ($data['role'] == 'Admin') {
-              $this->createUserOnCommetChatPro(
-                $user_id,
-                $data['fname'].' '.$data['lname'],
-                '',
-                $data['role']
-              );
-            }
           }
 
           if ($data['role'] == 'Organizer') {
@@ -123,32 +115,46 @@ class UserController extends Controller
                 'user_image'       => empty($data['user_image']) ? '': $data['user_image']
              ]);
 
-             /* Create User On Commet Chat */
-             $commetAvatar = empty($data['user_image']) ? '': $data['user_image'];
-             $this->createUserOnCommetChatPro(
-               $user_id,
-               $data['fname'].' '.$data['lname'],
-               $commetAvatar,
-               $data['role']
-             );
+            CometChatPro::create([
+                'organizer_id' => $user_id,
+                'rest_api_key' => $request->rest_api_key,
+                'app_id'       => $request->app_id,
+                'api_key'      => $request->api_key,
+                'region'       => $request->region
+              ]);
+
+            /* Create User On Commet Chat */
+            $commetAvatar = empty($data['user_image']) ? '': $data['user_image'];
+            $this->createUserOnCometChatPro(
+              $user_id,
+              $user_id,
+              $data['fname'].' '.$data['lname'],
+              $commetAvatar,
+              'organizer'
+            );
+
            }
 
            if ($data['role'] == 'Company Admin') {
                $user = UserSettings::create([
                 'user_id'               => $user_id,
                 'company_id'            => $data['company_id'],
+                'fair_id'               => $data['fair_id'],
                 // 'company_name'          => $data['company_name'],
                 'phone'                 => $data['phone'],
                 'location'              => $data['location'],
                 'user_title'            => empty($data['title']) ? '' : $data['title'],
                 'user_info'             => empty($data['user_info']) ? '': $data['user_info'],
               ]);
+
               /* Create User On Commet Chat */
-              $this->createUserOnCommetChatPro(
-                $user_id,
+              $chatId  = $data['fair_id'].'f'.$user_id;
+              $this->createCompanyAdminOnCometChatPro(
+                $data['fair_id'],
+                $chatId,
                 $data['fname'].' '.$data['lname'],
                 '',
-                $data['role']
+                'companyadmin'
               );
             }
 
@@ -169,10 +175,14 @@ class UserController extends Controller
                 'job_email'             => array_key_exists('job_email', $data) ? $data['job_email'] : 0,
                 'recruiter_img'         => empty($data['recruiter_img']) ? '' : $data['recruiter_img']
               ]);
+
+              
               /* Create User On Commet Chat */
-               $commetAvatar = $data['user_image'];
-              $this->createUserOnCommetChatPro(
-                $user_id,
+              $commetAvatar = $data['user_image'];
+              $chatId       = $data['fair_id'].'f'.$user_id;
+              $this->createRecruiterOnCometChatPro(
+                $data['fair_id'],
+                $chatId,
                 $data['fname'].' '.$data['lname'],
                 $commetAvatar,
                 $data['role']
@@ -269,13 +279,14 @@ class UserController extends Controller
             'user_image'       => empty($data['user_image']) ? '' : $data['user_image']
 		    ];
 		    $setting->update($settingDataToUpdate);
-          /* Update User On Commet Chat */
-          $commetAvatar = empty($data['user_image']) ? '' : $data['user_image'];
-          $this->updateUserOnCommetChatPro(
+          /* Create User On Commet Chat */
+          $commetAvatar = empty($data['user_image']) ? '': $data['user_image'];
+          $this->updateUserOnCometChatPro(
+            $id,
             $id,
             $data['fname'].' '.$data['lname'],
             $commetAvatar,
-            $data['role']
+            'organizer'
           );
     	  }
 
@@ -287,13 +298,15 @@ class UserController extends Controller
               'location'   => $data['location'],
               'user_title' => empty($data['title']) ? '' : $data['title'],
     	      ];
-    	     $setting->update($settingDataToUpdate);
-            /* Update User On Commet Chat */
-            $this->updateUserOnCommetChatPro(
-              $id,
+    	      $setting->update($settingDataToUpdate);
+            /* Create User On Commet Chat */
+            $chatId       = $data['fair_id'].'f'.$id;
+            $this->updateUser(
+              $data['fair_id'],
+              $chatId,
               $data['fname'].' '.$data['lname'],
               '',
-              $data['role']
+              'companyadmin'
             );
     	    }
 
@@ -315,13 +328,15 @@ class UserController extends Controller
               ];
 
              $setting->update($settingDataToUpdate);
-             /* Update User On Commet Chat */
-              $commetAvatar =  $data['user_image'];
-              $this->updateUserOnCommetChatPro(
-               $id,
-               $data['fname'].' '.$data['lname'],
-               $commetAvatar,
-               $data['role']
+             /* Create User On Commet Chat */
+              $commetAvatar = $data['user_image'];
+              $chatId       = $data['fair_id'].'f'.$id;
+              $this->updateUser(
+                $data['fair_id'],
+                $chatId,
+                $data['fname'].' '.$data['lname'],
+                $commetAvatar,
+                $data['role']
               );
             }
 

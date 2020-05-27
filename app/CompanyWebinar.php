@@ -6,7 +6,7 @@ class CompanyWebinar extends Model {
 
     public function company()
     {
-        return $this->belongsTo('App\Company', 'id', 'company_id' );
+        return $this->hasOne('App\Company', 'id', 'company_id' );
     }
 
     public function fair()

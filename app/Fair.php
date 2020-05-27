@@ -21,6 +21,11 @@ class Fair extends Model
         return $this->hasOne('App\FairSetting', 'fair_id', 'id');
     }
 
+    public function cometChatPro()
+    {
+        return $this->hasOne('App\CometChatPro', 'fair_id', 'id');
+    }
+
     /**
      * The attributes that are mass assignable.
      *

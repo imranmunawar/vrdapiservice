@@ -5,6 +5,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\User;
+use App\UserSettings;
+use App\Fair;
+use App\CometChatPro;
+use App\Company;
 use DB;
 class AuthController extends Controller
 {
@@ -181,6 +185,24 @@ class AuthController extends Controller
             'message' => 'Successfully logged out'
         ]);
     }
+
+    public function getCometChatApiDetail($organizerId){
+        $cometApiDetail = CometChatPro::where('organizer_id',$organizerId)->first();
+        $appId      = $cometApiDetail->app_id;
+        $appKey     = $cometApiDetail->api_key;
+        $restApiKey = $cometApiDetail->rest_api_key;
+        $region     = $cometApiDetail->region;
+
+        $detail = [
+            'appId'      => $appId,
+            'appKey'     => $appKey,
+            'restApiKey' => $restApiKey,
+            'region'     => $region
+        ];
+
+        return $detail;
+
+    }
   
     /**
      * Get the authenticated User
@@ -189,10 +211,40 @@ class AuthController extends Controller
      */
     public function user(Request $request)
     {
+        $userArr     = []; 
+        $role        = $request->user()->roles->first()->name;
+        $userId      = $request->user()->id;
+        $userName    = $request->user()->name;
+        $userEmail   = $request->user()->email;
+        $userArr['role']               = $role;
+        $userArr['userId']             = $userId;
+        $userArr['userName']           = $userName;
+        $userArr['userEmail']          = $userEmail;
+
+        if ($role == 'Recruiter' || $role == 'Company Admin') {
+            $userSetting = UserSettings::where('user_id',$userId)->select('fair_id','company_id','recruiter_status')->first();
+            UserSettings::where('user_id',$userId)->update(['recruiter_status'=>'online']);
+            $userFairId      = $userSetting->fair_id;
+            $organiserId     = $userSetting->organiser_id;
+            $companyId       = $userSetting->company_id;
+            $recruiterStatus = $userSetting->recruiter_status;
+            $userArr['userFairId']         = $userFairId;
+            $userArr['companyId']          = $companyId;
+            $userArr['recruiterStatus']    = $recruiterStatus;
+            $userArr['chatId']             = $userFairId.'f'.$userId;
+            $userFairSetting = Fair::where('id',$userFairId)->first();
+            $userArr['ChatApiDetail'] = $this->getCometChatApiDetail($userFairSetting->organiser_id);
+        }
+
+        if ($role == 'Organizer') {
+            $userArr['chatId']        = $userId;
+            $userArr['ChatApiDetail'] = $this->getCometChatApiDetail($userId);
+        }
+
         return response()->json([
             "code"   => 200,
             "status" => "success",
-            "data"   => $request->user()->load('roles','userSetting')
+            "data"   => $userArr
          ]);
     }
 }

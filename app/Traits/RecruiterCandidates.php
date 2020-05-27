@@ -32,16 +32,16 @@ trait RecruiterCandidates
       $resultSet = [];
       foreach ($data as $key => $row) {
         $resultSet[] = [
-              'recruiter_id' => $row->recruiter_id,
-              'candidate_id' => $row->candidate_id,
-              'percentage'   => $row->percentage,
-              'id'           => $row->id,
-              'shortlisted'  => $row->shortlisted,
-              'rejected'     => $row->rejected,
-              'name'         => $row->name,
-              'email'        => $row->email,
-              'cv'           => $row->user_cv,
-              'user_skype'   => $row->user_skype,
+              'recruiter_id'  => $row->recruiter_id,
+              'candidate_id'  => $row->candidate_id,
+              'percentage'    => $row->percentage,
+              'id'            => $row->id,
+              'shortlisted'   => $row->shortlisted,
+              'rejected'      => $row->rejected,
+              'name'          => $row->name,
+              'email'         => $row->email,
+              'cv'            => $row->user_cv,
+              'user_skype'    => $row->user_skype,
               'phone'         => $row->phone,
               'user_country'  => $row->user_country,
               'notes'         => $row->notes,
@@ -183,11 +183,11 @@ trait RecruiterCandidates
         AgendaView::create(array(
           'recruiter_id' => $recruiter_id,
           'candidate_id' => $candidate_id,
-          'fair_id' => $fair_id,
-          'company_id' => $company_id,
-          'percentage' => $percentage,
-          'shortlisted' => 0,
-          'rejected' => 0
+          'fair_id'      => $fair_id,
+          'company_id'   => $company_id,
+          'percentage'   => $percentage,
+          'shortlisted'  => 0,
+          'rejected'     => 0
         ));
       }
         return response()->json([
@@ -201,11 +201,11 @@ trait RecruiterCandidates
         AgendaView::create(array(
           'recruiter_id' => $recruiter_id,
           'candidate_id' => $candidate_id,
-          'fair_id' => $fair_id,
-          'company_id' => $company_id,
-          'percentage' => $percentage,
-          'shortlisted' => 0,
-          'rejected' => 1
+          'fair_id'      => $fair_id,
+          'company_id'   => $company_id,
+          'percentage'   => $percentage,
+          'shortlisted'  => 0,
+          'rejected'     => 1
         ));
       }
       return response()->json([
@@ -220,11 +220,11 @@ trait RecruiterCandidates
         AgendaView::create(array(
           'recruiter_id' => $recruiter_id,
           'candidate_id' => $candidate_id,
-          'fair_id' => $fair_id,
-          'company_id' => $company_id,
-          'percentage' => $percentage,
-          'shortlisted' => 0,
-          'rejected' => 0
+          'fair_id'      => $fair_id,
+          'company_id'   => $company_id,
+          'percentage'   => $percentage,
+          'shortlisted'  => 0,
+          'rejected'     => 0
         ));
       }
       return response()->json([
@@ -267,13 +267,12 @@ trait RecruiterCandidates
               'company_id'   => $matchRecr->company_id,
               'fair_id'      => $matchRecr->fair_id,
               'percentage'   => $matchRecr->percentage,
-              'name'         => $matchRecr->candidate->name,
-              'email'        => $matchRecr->candidate->email,
-              'name'         => $matchRecr->candidate->name,
-              'user_image'   => $matchRecr->candidateSetting->user_image,
-              'cv'           => $matchRecr->candidateSetting->user_cv,
-              'country'      => $matchRecr->candidateSetting->user_country,
-              'avatar'       => $matchRecr->candidateSetting->user_image,
+              'name'         => $matchRecr['candidate']['name'],
+              'email'        => $matchRecr['candidate']['email'],
+              'user_image'   => $matchRecr['candidateSetting']['user_image'],
+              'cv'           => $matchRecr['candidateSetting']['user_cv'],
+              'country'      => $matchRecr['candidateSetting']['user_country'],
+              'avatar'       => $matchRecr['candidateSetting']['user_image'],
               'last_seen'    => \Carbon\Carbon::parse($value->updated_at)->diffForHumans(),
               'is_candidate_take_test'   => User::isCandidateTakeTest($fair_id,$matchRecr->candidate_id),
               'is_candidate_attend_fair' => User::isCandidateAttendFair($fair_id,$matchRecr->candidate_id),
@@ -290,13 +289,12 @@ trait RecruiterCandidates
                 'company_id'   => $matchRecr->company_id,
                 'fair_id'      => $matchRecr->fair_id,
                 'percentage'   => $matchRecr->percentage,
-                'name'         => $matchRecr->candidate->name,
-                'email'        => $matchRecr->candidate->email,
-                'name'         => $matchRecr->candidate->name,
-                'user_image'   => $matchRecr->candidateSetting->user_image,
-                'cv'           => $matchRecr->candidateSetting->user_cv,
-                'country'      => $matchRecr->candidateSetting->user_country,
-                'avatar'       => $matchRecr->candidateSetting->user_image,
+                'name'         => $matchRecr['candidate']['name'],
+                'email'        => $matchRecr['candidate']['email'],
+                'user_image'   => $matchRecr['candidateSetting']['user_image'],
+                'cv'           => $matchRecr['candidateSetting']['user_cv'],
+                'country'      => $matchRecr['candidateSetting']['user_country'],
+                'avatar'       => $matchRecr['candidateSetting']['user_image'],
                 'last_seen'    => \Carbon\Carbon::parse($value->updated_at)->diffForHumans(),
                 'is_candidate_take_test'   => User::isCandidateTakeTest($fair_id,$matchRecr->candidate_id),
                 'is_candidate_attend_fair' => User::isCandidateAttendFair($fair_id,$matchRecr->candidate_id),

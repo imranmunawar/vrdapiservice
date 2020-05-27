@@ -7,10 +7,12 @@ use App\Http\Controllers\Controller;
 use Ixudra\Curl\Facades\Curl;
 use App\Traits\WebinarEmail;
 use App\CompanyWebinar;
+use App\Company;
+use App\Traits\CometChatProTrait;
 
 class WebinarController extends Controller
 {
-    use WebinarEmail;
+    use WebinarEmail,CometChatProTrait;
     /**
      * Display a listing of the resource.
      *SSS
@@ -43,10 +45,16 @@ class WebinarController extends Controller
         // Create a new webinar in the database...
         $webinar = CompanyWebinar::create($request->all());
         if ($webinar) {
-            $response = Curl::to('https://api.cometondemand.net/api/v2/createGroup')
-            ->withHeader('api-key: 51374xb73fca7c64f3a49d2ffdefbb1f2e8c76')
-            ->withData('GUID='.$webinar->id.'&name='.$request->title.'&type=0')
-            ->post();
+           // Create Group On Comet Chat Pro
+           $this->createGroupOnCometChatPro(
+                $request->fair_id,
+                $request->company_id,
+                $request->fair_id.'f'.$webinar->id,
+                $request->title,
+                'public',
+                $request->fair_id.'f'.$request->recruiter_id
+
+           );
         }
         if (!$webinar) {
             return response()->json([ 
@@ -82,7 +90,9 @@ class WebinarController extends Controller
      */
     public function edit($id)
     {
-        $webinar = CompanyWebinar::find($id);
+        $webinar       = CompanyWebinar::find($id);
+        $webinarComany = Company::find($webinar->company_id)->company_logo;
+        $webinar['company_logo'] =  $webinarComany;
         return response()->json($webinar); 
     }
 
@@ -98,14 +108,12 @@ class WebinarController extends Controller
         $data = $request->all(); 
         $webinar = CompanyWebinar::findOrFail($id);
         if ($webinar) {
-            $response = Curl::to('https://api.cometondemand.net/api/v2/deleteGroup')
-                ->withHeader('api-key: 51374xb73fca7c64f3a49d2ffdefbb1f2e8c76')
-                ->withData('GUID='.$id)
-                    ->post();
-                $response = Curl::to('https://api.cometondemand.net/api/v2/createGroup')
-                ->withHeader('api-key: 51374xb73fca7c64f3a49d2ffdefbb1f2e8c76')
-                ->withData('GUID='.$id.'&name='.$request->title.'&type=0')
-                    ->post();
+           $this->updateGroupOnCometChatPro(
+                $request->fair_id,
+                $request->company_id,
+                $request->fair_id.'f'.$webinar->id,
+                $request->title
+           );
         }
         $webinar->fill($data)->save();
         return response()->json([
