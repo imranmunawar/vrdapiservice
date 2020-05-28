@@ -111,7 +111,7 @@ class UserController extends Controller
                 'credits'          => $data['credits'],
                 'reg_notification' => array_key_exists('reg_notification', $data) ? $data['reg_notification'] : 0,
                 'enable_exhibitor' => array_key_exists('enable_exhibitor', $data) ? $data['enable_exhibitor'] : 0,
-                'user_info'        => array_key_exists('user_info', $data) ? $data['user_info'] : '';
+                'user_info'        => array_key_exists('user_info', $data) ? $data['user_info'] : '',
                 'user_image'       => empty($data['user_image']) ? '': $data['user_image']
              ]);
 
