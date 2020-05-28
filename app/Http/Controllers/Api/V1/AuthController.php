@@ -232,7 +232,7 @@ class AuthController extends Controller
             $userArr['companyId']          = $companyId;
             $userArr['recruiterStatus']    = $recruiterStatus;
             $userArr['chatId']             = $userFairId.'f'.$userId;
-            $userFairSetting = Fair::where('id',$userFairId)->first();
+            $userFairSetting = Fair::where('id',$userFairId)->select('organiser_id')->first();
             $userArr['ChatApiDetail'] = $this->getCometChatApiDetail($userFairSetting->organiser_id);
         }
 
