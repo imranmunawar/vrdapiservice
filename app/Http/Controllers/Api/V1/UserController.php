@@ -93,11 +93,11 @@ class UserController extends Controller
         if($role){
           if ($data['role'] == 'Admin' || $data['role'] == 'Organizer' || $data['role'] == 'Company Admin' || $data['role'] == 'Recruiter' || $data['role'] == 'Receptionist') {
             $user = User::create([
-              'first_name'=> $data['fname'],
-              'last_name' => $data['lname'],
-              'name'      => $data['fname'].' '.$data['lname'],
-              'email'     => $data['email'],
-              'password'  => bcrypt($data['password']),
+              'first_name'    => $data['fname'],
+              'last_name'     => $data['lname'],
+              'name'          => $data['fname'].' '.$data['lname'],
+              'email'         => $data['email'],
+              'password'      => bcrypt($data['password']),
               'plan_password' => $data['password'],
             ]);
             $user->roles()->attach($role);
@@ -112,16 +112,16 @@ class UserController extends Controller
                 'reg_notification' => array_key_exists('reg_notification', $data) ? $data['reg_notification'] : 0,
                 'enable_exhibitor' => array_key_exists('enable_exhibitor', $data) ? $data['enable_exhibitor'] : 0,
                 'user_info'        => array_key_exists('user_info', $data) ? $data['user_info'] : '',
-                'user_image'       => empty($data['user_image']) ? '': $data['user_image']
+                'user_image'       => array_key_exists('user_image', $data) ? $data['user_image'] : ''
              ]);
 
             CometChatPro::create([
-                'organizer_id' => $user_id,
-                'rest_api_key' => $request->rest_api_key,
-                'app_id'       => $request->app_id,
-                'api_key'      => $request->api_key,
-                'region'       => $request->region
-              ]);
+              'organizer_id' => $user_id,
+              'rest_api_key' => $request->rest_api_key,
+              'app_id'       => $request->app_id,
+              'api_key'      => $request->api_key,
+              'region'       => $request->region
+            ]);
 
             /* Create User On Commet Chat */
             $commetAvatar = empty($data['user_image']) ? '': $data['user_image'];
@@ -143,8 +143,8 @@ class UserController extends Controller
                 // 'company_name'          => $data['company_name'],
                 'phone'                 => $data['phone'],
                 'location'              => $data['location'],
-                'user_title'            => empty($data['title']) ? '' : $data['title'],
-                'user_info'             => empty($data['user_info']) ? '': $data['user_info'],
+                'user_title'            => array_key_exists('title', $data) ? $data['title'] : '',
+                'user_info'             => array_key_exists('user_info', $data) ? $data['user_info'] : '',
               ]);
 
               /* Create User On Commet Chat */
@@ -165,20 +165,20 @@ class UserController extends Controller
                 'company_id'            => $data['company_id'],
                 'phone'                 => $data['phone'],
                 'location'              => $data['location'],
-                'user_title'            => empty($data['title']) ? '' : $data['title'],
-                'user_info'             => empty($data['user_info']) ? '': $data['user_info'],
-                'user_image'            => $data['user_image'],
-                'linkedin_profile_link' => empty($data['linkedin_profile_link']) ? '' : $data['linkedin_profile_link'],
+                'user_title'            => array_key_exists('title', $data) ? $data['title'] : '',
+                'user_info'             => array_key_exists('user_info', $data) ? $data['user_info'] : '',
+                'user_image'            => array_key_exists('user_image', $data) ? $data['user_image'] : '',
+                'linkedin_profile_link' => array_key_exists('linkedin_profile_link', $data) ? $data['linkedin_profile_link'] : '',
                 'match_persantage'      => $data['match_persantage'],
-                'public_email'          => empty($data['public_email']) ? '' : $data['public_email'],
+                'public_email'          => array_key_exists('public_email', $data) ? $data['public_email'] : '',
                 'show_email'            => array_key_exists('show_email', $data) ? $data['show_email'] : 0,
                 'job_email'             => array_key_exists('job_email', $data) ? $data['job_email'] : 0,
-                'recruiter_img'         => empty($data['recruiter_img']) ? '' : $data['recruiter_img']
+                'recruiter_img'         => array_key_exists('recruiter_img', $data) ? $data['recruiter_img'] : '',
               ]);
 
               
               /* Create User On Commet Chat */
-              $commetAvatar = $data['user_image'];
+              $commetAvatar = array_key_exists('user_image', $data) ? $data['user_image'] : '';
               $chatId       = $data['fair_id'].'f'.$user_id;
               $this->createRecruiterOnCometChatPro(
                 $data['fair_id'],
@@ -187,7 +187,7 @@ class UserController extends Controller
                 $commetAvatar,
                 $data['role']
               );
-            }
+          }
 
 
            if ($user) {
@@ -275,12 +275,12 @@ class UserController extends Controller
 		        'credits'          => $data['credits'],
 		        'reg_notification' => array_key_exists('reg_notification', $data) ? $data['reg_notification'] : 0,
             'enable_exhibitor' => array_key_exists('enable_exhibitor', $data) ? $data['enable_exhibitor'] : 0,
-		        'user_info'        => $data['user_info'] ? $data['user_info'] : '',
-            'user_image'       => empty($data['user_image']) ? '' : $data['user_image']
+            'user_info'        => array_key_exists('user_info', $data) ? $data['user_info'] : '',
+            'user_image'       => array_key_exists('user_image', $data) ? $data['user_image'] : ''
 		    ];
 		    $setting->update($settingDataToUpdate);
           /* Create User On Commet Chat */
-          $commetAvatar = empty($data['user_image']) ? '': $data['user_image'];
+          $commetAvatar = array_key_exists('user_image', $data) ? $data['user_image'] : '';
           $this->updateUserOnCometChatPro(
             $id,
             $id,
@@ -296,7 +296,8 @@ class UserController extends Controller
     	        'company_id' => $data['company_id'],
               'phone'      => $data['phone'],
               'location'   => $data['location'],
-              'user_title' => empty($data['title']) ? '' : $data['title'],
+              'user_title' => array_key_exists('title', $data) ? $data['title'] : '',
+              'user_info'  => array_key_exists('user_info', $data) ? $data['user_info'] : '',
     	      ];
     	      $setting->update($settingDataToUpdate);
             /* Create User On Commet Chat */
@@ -316,15 +317,15 @@ class UserController extends Controller
                 'company_id'            => $data['company_id'],
                 'phone'                 => $data['phone'],
                 'location'              => $data['location'],
-                'user_title'            => empty($data['title']) ? '' : $data['title'],
-                'user_info'             => empty($data['user_info']) ? '': $data['user_info'],
+                'user_title'            => array_key_exists('title', $data) ? $data['title'] : '',
+                'user_info'             => array_key_exists('user_info', $data) ? $data['user_info'] : '',
                 'user_image'            => $data['user_image'],
-                'linkedin_profile_link' => empty($data['linkedin_profile_link']) ? '' : $data['linkedin_profile_link'],
+                'linkedin_profile_link' => array_key_exists('linkedin_profile_link', $data) ? $data['linkedin_profile_link'] : '',
                 'match_persantage'      => $data['match_persantage'],
-                'public_email'          => empty($data['public_email']) ? '' : $data['public_email'],
+                'public_email'          => array_key_exists('public_email', $data) ? $data['public_email'] : '',
                 'show_email'            => array_key_exists('show_email', $data) ? $data['show_email'] : 0,
                 'job_email'             => array_key_exists('job_email', $data) ? $data['job_email'] : 0,
-                'recruiter_img'         => $data['recruiter_img']
+                'recruiter_img'         => array_key_exists('recruiter_img', $data) ? $data['recruiter_img'] : '',
               ];
 
              $setting->update($settingDataToUpdate);

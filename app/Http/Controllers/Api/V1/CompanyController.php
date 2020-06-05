@@ -11,6 +11,7 @@ use App\CandidateJob;
 use App\MatchRecruiter;
 use App\MatchWebinar;
 use App\CompanyStandCount;
+use Illuminate\Support\Facades\Mail;
 
 class CompanyController extends Controller
 {
@@ -55,16 +56,18 @@ class CompanyController extends Controller
         }
 
         $name  = $request->name;
-        $email = $request->email;
-        Mail::send('emails.company',['name' => $name, 'email' => $email],
+        $email = $request->company_email;
+        $loginUrl = env('BACKEND_URL').'/login';
+        Mail::send('emails.company',['name' => $name, 'email' => $email,'loginUrl'=>$loginUrl],
             function($message) use ($email,$name){
             $message->to($email, $name)->subject('Welcome! '.$name);
         });
 
         return response()->json(
-            [
-                'success' => true,
-                'message' => 'Company Created Successfully' ],200);
+          [
+            'success' => true,
+            'message' => 'Company Created Successfully'
+          ],200);
 
 
     }
