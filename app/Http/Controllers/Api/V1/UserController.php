@@ -124,7 +124,7 @@ class UserController extends Controller
             ]);
 
             /* Create User On Commet Chat */
-            $commetAvatar = empty($data['user_image']) ? '': $data['user_image'];
+            $commetAvatar = array_key_exists('user_image', $data) ? $data['user_image'] : '';
             $this->createUserOnCometChatPro(
               $user_id,
               $user_id,
@@ -319,7 +319,7 @@ class UserController extends Controller
                 'location'              => $data['location'],
                 'user_title'            => array_key_exists('title', $data) ? $data['title'] : '',
                 'user_info'             => array_key_exists('user_info', $data) ? $data['user_info'] : '',
-                'user_image'            => $data['user_image'],
+                'user_image'            => array_key_exists('user_image', $data) ? $data['user_image'] : '',
                 'linkedin_profile_link' => array_key_exists('linkedin_profile_link', $data) ? $data['linkedin_profile_link'] : '',
                 'match_persantage'      => $data['match_persantage'],
                 'public_email'          => array_key_exists('public_email', $data) ? $data['public_email'] : '',
@@ -330,7 +330,7 @@ class UserController extends Controller
 
              $setting->update($settingDataToUpdate);
              /* Create User On Commet Chat */
-              $commetAvatar = $data['user_image'];
+              $commetAvatar = array_key_exists('user_image', $data) ? $data['user_image'] : '';
               $chatId       = $data['fair_id'].'f'.$id;
               $this->updateUser(
                 $data['fair_id'],
