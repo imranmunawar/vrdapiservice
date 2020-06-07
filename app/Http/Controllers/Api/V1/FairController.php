@@ -549,9 +549,10 @@ class FairController extends Controller
   					$candidates_list[$loop][] = $candidate->candidate_id;
   				}
     		}
-    		if($loop == 1){
+    		if(count($candidates_list) == 1){
     			$candidates_list[$loop + 1] = $candidates_list[1];
     		}
+
     		// return $candidates_list;
     		$search = call_user_func_array('array_intersect', $candidates_list);
 
@@ -600,6 +601,7 @@ class FairController extends Controller
                     'created_at'   => date('d-m-Y', strtotime($value->created_at)),
                     'is_candidate_take_test'   => User::isCandidateTakeTest($fair_id,$value->candidate_id),
                     'is_candidate_attend_fair' => User::isCandidateAttendFair($fair_id,$value->candidate_id),
+                    'is_candidate_online'      => User::isCandidateOnline($fair_id,$value->candidate_id)
                 ];
             }
         }
