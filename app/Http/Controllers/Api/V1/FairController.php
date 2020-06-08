@@ -549,8 +549,12 @@ class FairController extends Controller
   					$candidates_list[$loop][] = $candidate->candidate_id;
   				}
     		}
+        // return reset($candidates_list); die;
     		if(count($candidates_list) == 1){
-    			$candidates_list[$loop + 1] = $candidates_list[1];
+          $newArr = reset($candidates_list);
+          $candidates_list = array();
+          $candidates_list[0]  = $newArr;
+    			$candidates_list[1]  = $newArr;
     		}
 
     		// return $candidates_list;
