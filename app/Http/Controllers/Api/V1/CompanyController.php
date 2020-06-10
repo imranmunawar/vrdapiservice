@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\User;
 use App\UserSettings;
 use App\Company;
 use App\MatchJob;
@@ -11,7 +12,11 @@ use App\CandidateJob;
 use App\MatchRecruiter;
 use App\MatchWebinar;
 use App\CompanyStandCount;
+use App\CompanyJob;
+use App\CompanyMedia;
+use App\CompanyWebinar;
 use Illuminate\Support\Facades\Mail;
+use DB;
 
 class CompanyController extends Controller
 {
@@ -121,12 +126,33 @@ class CompanyController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
-        $company  = Company::findOrFail($id);
-        if ($company) {
-          $deleteUser = Company::destroy($id);
-          return response()->json(['success'=>true, 'message'=> 'Company Delete Successfully'], 200);
+    public function destroy($id){
+      try {
+        
+        $companyDelete  = Company::destroy($id);
+        $companyUsers   = UserSettings::where('company_id',$id)->get();
+        if ($companyUsers) {
+          foreach ($companyUsers as $key => $user) {
+            User::destroy($user->user_id);
+          }
+        }
+        $companyUsersSettings = UserSettings::where('company_id',$id)->delete();
+        $companyMedia         = CompanyMedia::where('company_id',$id)->delete();
+        $companyMedia         = CompanyJob::where('company_id',$id)->delete();
+        $companyWebinar       = CompanyWebinar::where('company_id',$id)->delete();
+        $companyStandCount    = CompanyStandCount::where('company_id',$id)->delete();
+          DB::commit();
+          return response()->json([
+            'success'   => true,
+            'message'   => 'Company Delete Successfully'
+          ], 200);
+          return Redirect::back();
+        } catch (\Exception $e) {
+          DB::rollback();
+          return response()->json([
+           'error'   => true,
+           'message' => 'Company Not Deleted'
+          ], 401);
         }
     }
 

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Storage;
 use Ixudra\Curl\Facades\Curl;
 use AWS;
+use DB;
 use App\Http\Requests\StoreCandidate;
 use Carbon\Carbon;
 use App\User;
@@ -33,6 +34,9 @@ use App\ChatTranscript;
 use App\FairCandidates;
 use App\CandidateAgenda;
 use App\Traits\CometChatProTrait;
+use App\CandidateTurnout;
+use App\CandidateScheduleNote;
+use App\CompanyStandCount;
 
 class CandidateController extends Controller
 {
@@ -781,20 +785,55 @@ class CandidateController extends Controller
   }
 
   public function deleteCandidate($candidate_id,$fair_id){
-    User::destroy($candidate_id);
-    UserSettings::where('user_id',$candidate_id)->delete();
-    $fairCandidateDelete = FairCandidates::where('fair_id',$fair_id)->where('candidate_id',$candidate_id)->delete();
-    if ($fairCandidateDelete) {
+    DB::beginTransaction();
+    try {
+     $candidateDelete  = User::destroy($candidate_id);
+     $candidateDelete  = UserSettings::where('user_id',$candidate_id)->delete();
+     $candidateDelete  = FairCandidates::where('candidate_id',$candidate_id)->delete();
+     $candidateDelete  = CandidateAgenda::where('candidate_id',$candidate_id)->delete();
+     $candidateDelete  = CandidateJob::where('candidate_id',$candidate_id)->delete();
+     $candidateDelete  = CandidateTest::where('candidate_id',$candidate_id)->delete();
+     $candidateDelete  = CandidateTurnout::where('candidate_id',$candidate_id)->delete();
+     $candidateDelete  = MatchJob::where('candidate_id',$candidate_id)->delete();
+     $candidateDelete  = MatchRecruiter::where('candidate_id',$candidate_id)->delete();
+     $candidateDelete  = MatchWebinar::where('candidate_id',$candidate_id)->delete();
+     $candidateDelete  = MarketingRegistration::where('user_id',$candidate_id)->delete();
+     $candidateDelete  = CandidateScheduleNote::where('candidate_id',$candidate_id)->delete();
+     $candidateDelete  = CompanyStandCount::where('candidate_id',$candidate_id)->delete();
+     $candidateDelete  = ChatTranscript::where('sender_id',$candidate_id)->orWhere('receiver_id',$candidate_id)->delete();
+
+      DB::commit();
       return response()->json([
         'success'   => true,
         'message'   => 'Candidate Deleted Successfully'
       ], 200);
+      return Redirect::back();
+    } catch (\Exception $e) {
+      DB::rollback();
+      return response()->json([
+       'error'   => true,
+       'message' => 'Candidate Not Deleted'
+      ], 401);
     }
 
-    return response()->json([
-     'error'   => true,
-     'message' => 'Candidate Not Deleted'
-    ], 401);
+
+
+    //  return response()->json([
+    //     'success'   => true,
+    //     'message'   => 'Candidate Deleted Successfully'
+    //   ], 200);
+
+    // if ($candidateDelete) {
+    //   return response()->json([
+    //     'success'   => true,
+    //     'message'   => 'Candidate Deleted Successfully'
+    //   ], 200);
+    // }
+
+    // return response()->json([
+    //  'error'   => true,
+    //  'message' => 'Candidate Not Deleted'
+    // ], 401);
   }
 
   public function downloadCV($candidate_id){

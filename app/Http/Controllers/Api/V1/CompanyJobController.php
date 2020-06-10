@@ -19,14 +19,37 @@ class CompanyJobController extends Controller
      */
     public function index($company_id = '', $recruiter_id = '')
     {
-        $jobs = '';
+        $companyJobs = [];
         if (empty($recruiter_id) && !empty($company_id)) {
-            $jobs = CompanyJob::with('applicationsCount')->where('company_id', $company_id)->get(); 
+            $jobs = CompanyJob::where('company_id', $company_id)->get(); 
         }elseif (!empty($company_id)) {
-           $jobs = CompanyJob::with('applicationsCount')->where('company_id', $company_id)->get(); 
+           $jobs = CompanyJob::where('company_id', $company_id)->get(); 
+        }
+
+        foreach ($jobs as $key => $job) {
+           $companyJobs[]=[
+             'id'           => $job->id,
+             'fair_id'      => $job->fair_id,
+             'company_id'   => $job->company_id,
+             'title'        => $job->title,
+             'job_type'     => $job->job_type,
+             'language'     => $job->language,
+             'recruiter_id' => $job->recruiter_id,
+             'location'     => $job->location,
+             'contact_name' => $job->contact_name,
+             'phone'        => $job->phone,
+             'email'        => $job->email,
+             'url'          => $job->url,
+             'salary'       => $job->salary,
+             'match'        => $job->match,
+             'status'       => $job->status,
+             'jobApplicationsCount' => CompanyJob::jobApplicationsCount($job->id),
+             'created_at'   => $job->created_at,
+             'updated_at'   => $job->updated_at
+           ];
         }
     
-        return response()->json($jobs);
+        return response()->json($companyJobs);
     }
 
     /**

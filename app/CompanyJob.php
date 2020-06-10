@@ -23,6 +23,23 @@ class CompanyJob extends Model
         return $this->hasOne('App\Fair','id','fair_id')->select('name');
     }
 
+
+    public static function jobApplicationsCount($id){
+        $count = 0;
+        $candidateJob = New CandidateJob;
+        $user         = New User;
+        $result = $candidateJob->where('job_id', $id)->get();
+        if ($result) {
+            foreach ($result as $key => $res) {
+                if ($user->where('id',$res->candidate_id)->exists()) {
+                   $count++;
+                }
+            }
+        }
+
+        return $count;
+    }
+
     protected $fillable = [
         'fair_id',
         'company_id',
