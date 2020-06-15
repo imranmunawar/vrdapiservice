@@ -766,7 +766,7 @@ class RecruiterSchedulingController extends Controller {
 					'host_id'	     => $meeting["host_id"],
 					'start_url'		 => $meeting["start_url"],
 					'join_url'		 => $meeting["join_url"],
-					'password'		 => ''
+					'password'		 => $password
 				));
 				if($booked){
 					RecruiterScheduleInvite::where('u_id',$u_id)->update(array('expire' => 1,'cancel'=>2));
