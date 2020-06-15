@@ -2,19 +2,19 @@
 <head>
     <title>Interview Room</title>
     <meta charset="utf-8" />
-    <link type="text/css" rel="stylesheet" href="https://source.zoom.us/1.7.2/css/bootstrap.css"/>
-    <link type="text/css" rel="stylesheet" href="https://source.zoom.us/1.7.2/css/react-select.css"/>
+    <link type="text/css" rel="stylesheet" href="https://source.zoom.us/1.7.8/css/bootstrap.css"/>
+    <link type="text/css" rel="stylesheet" href="https://source.zoom.us/1.7.8/css/react-select.css"/>
     <meta name="format-detection" content="telephone=no">
 </head>
 <body>
-<script src="https://source.zoom.us/1.7.2/lib/vendor/react.min.js"></script>
-<script src="https://source.zoom.us/1.7.2/lib/vendor/react-dom.min.js"></script>
-<script src="https://source.zoom.us/1.7.2/lib/vendor/redux.min.js"></script>
-<script src="https://source.zoom.us/1.7.2/lib/vendor/redux-thunk.min.js"></script>
-<script src="https://source.zoom.us/1.7.2/lib/vendor/jquery.min.js"></script>
-<script src="https://source.zoom.us/1.7.2/lib/vendor/lodash.min.js"></script>
+<script src="https://source.zoom.us/1.7.8/lib/vendor/react.min.js"></script>
+<script src="https://source.zoom.us/1.7.8/lib/vendor/react-dom.min.js"></script>
+<script src="https://source.zoom.us/1.7.8/lib/vendor/redux.min.js"></script>
+<script src="https://source.zoom.us/1.7.8/lib/vendor/redux-thunk.min.js"></script>
+<script src="https://source.zoom.us/1.7.8/lib/vendor/jquery.min.js"></script>
+<script src="https://source.zoom.us/1.7.8/lib/vendor/lodash.min.js"></script>
 
-<script src="https://source.zoom.us/zoom-meeting-1.7.2.min.js"></script>
+<script src="https://source.zoom.us/zoom-meeting-1.7.8.min.js"></script>
 <!-- <script src="js/zoom.js"></script> -->
 
 <script>
@@ -24,8 +24,8 @@
     console.log(JSON.stringify(ZoomMtg.checkSystemRequirements()));
 
     // it's option if you want to change the WebSDK dependency link resources.
-    // ZoomMtg.setZoomJSLib('https://source.zoom.us/1.7.2/lib', '/av'); // CDN version default
-    // ZoomMtg.setZoomJSLib('https://jssdk.zoomus.cn/1.7.2/lib', '/av'); // china cdn option
+    // ZoomMtg.setZoomJSLib('https://source.zoom.us/1.7.8/lib', '/av'); // CDN version default
+    // ZoomMtg.setZoomJSLib('https://jssdk.zoomus.cn/1.7.8/lib', '/av'); // china cdn option
     // ZoomMtg.setZoomJSLib('http://localhost:9999/node_modules/@zoomus/websdk/dist/lib', '/av'); // Local version default
 
     ZoomMtg.preLoadWasm();

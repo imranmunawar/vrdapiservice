@@ -9,6 +9,8 @@ use App\CandidateJob;
 use App\MatchJob;
 use App\User;
 use App\UserSettings;
+use App\JobQuestionnaire;
+use DB;
 
 class CompanyJobController extends Controller
 {
@@ -121,10 +123,11 @@ class CompanyJobController extends Controller
         $data = $request->all(); 
         $job = CompanyJob::findOrFail($id);
         $job->fill($data)->save();
-            return response()->json([
-               'success' => true,
-               'message' => 'Job Updated Successfully'
-            ], 200);
+
+        return response()->json([
+           'success' => true,
+           'message' => 'Job Updated Successfully'
+        ], 200);
         
     }
 
@@ -134,12 +137,27 @@ class CompanyJobController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
-        $job  = CompanyJob::findOrFail($id);
-        if ($job) {
-          $deleteJob = CompanyJob::destroy($id);
-          return response()->json(['success'=>true, 'message'=> 'Job Deleted Successfully'], 200); 
+    public function destroy($id){
+
+        DB::beginTransaction();
+        try {
+            $job              = CompanyJob::destroy($id);
+            $candidateJob     = CandidateJob::where('job_id',$id)->delete();
+            $matchJob         = MatchJob::where('job_id',$id)->delete();
+            $jobQuestionnaire = JobQuestionnaire::where('job_id',$id)->delete();
+
+          DB::commit();
+          return response()->json([
+            'success'   => true,
+            'message'   => 'Job Deleted Successfully'
+          ], 200);
+          return Redirect::back();
+        } catch (\Exception $e) {
+          DB::rollback();
+          return response()->json([
+           'error'   => true,
+           'message' => 'Job Not Deleted Successfully'
+          ], 401);
         }
     }
 

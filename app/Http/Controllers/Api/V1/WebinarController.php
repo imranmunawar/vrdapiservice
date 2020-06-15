@@ -8,7 +8,11 @@ use Ixudra\Curl\Facades\Curl;
 use App\Traits\WebinarEmail;
 use App\CompanyWebinar;
 use App\Company;
+use App\CandidateAgenda;
+use App\MatchWebinar;
+use App\WebinarQuestionnaire;
 use App\Traits\CometChatProTrait;
+use DB;
 
 class WebinarController extends Controller
 {
@@ -131,13 +135,25 @@ class WebinarController extends Controller
      */
     public function destroy($id)
     {
-        $webinar  = CompanyWebinar::findOrFail($id);
-        if ($webinar) {
-          CompanyWebinar::destroy($id);
+        DB::beginTransaction();
+        try {
+            $webinar                  = CompanyWebinar::destroy($id);
+            $candidateAgenda          = CandidateAgenda::where('webinar_id',$id)->delete();
+            $matchWebinar             = MatchWebinar::where('webinar_id',$id)->delete();
+            $webinarQuestionnaire     = WebinarQuestionnaire::where('webinar_id',$id)->delete();
+
+          DB::commit();
           return response()->json([
-            'success'=>true, 
-            'message'=> 'Webinar Deleted Successfully'
-          ], 200); 
+            'success'   => true,
+            'message'   => 'Webinar Deleted Successfully'
+          ], 200);
+          return Redirect::back();
+        } catch (\Exception $e) {
+          DB::rollback();
+          return response()->json([
+           'error'   => true,
+           'message' => 'Webinar Not Deleted Successfully'
+          ], 401);
         }
     }
 }
