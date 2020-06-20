@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Traits\ZoomMeetings;
+use Spatie\CalendarLinks\Link;
 
 
 class RecruiterSchedulingController extends Controller {
@@ -34,10 +35,28 @@ class RecruiterSchedulingController extends Controller {
 	public function index(Request $req)
 	{
 		$dataArr = [];
+		$start_date    = $req->start_date;
+		$end_date      = $req->end_date;
+		$status        = $req->status;
+
 		$schedules = RecruiterSchedule::where('fair_id',$req->fair_id)
-		            ->where('company_id',$req->company_id)
-		            ->where('recruiter_id',$req->recruiter_id)
-		            ->get();
+		    ->where('company_id',$req->company_id)
+		    ->where('recruiter_id',$req->recruiter_id)
+		    ->orderBy("days")
+		    ->get();
+
+		if (!empty($start_date) && !empty($end_date)) {
+			$filtered  = $schedules->filter(function ($value, $key) use ($start_date,$end_date) {
+				$slotDate   = date("d-m-Y",strtotime($value->days));
+				$start_date = date("d-m-Y",strtotime($start_date));
+				$end_date   = date("d-m-Y",strtotime($end_date));
+			    if ($slotDate >= $start_date && $slotDate  <= $end_date) {
+			        return true;
+			    }
+			});
+			$schedules = $filtered->all();
+		}
+
 		if ($schedules) {
 			foreach ($schedules as $key => $row) {
 				$dataArr[] = [
@@ -47,12 +66,11 @@ class RecruiterSchedulingController extends Controller {
 			      'recruiter_id'     => $row->recruiter_id,
 			      'recruiter_name'   => $row->RecruiterDetails->name,
 			      'candidate_id'     => $row->candidate_id,
-			      'start_time'       => $row->start_time,
-			      'end_time'         => $row->end_time,
-			      'days'             => $row->days,
+			      'start_time'       => date('h:i A', strtotime($row->start_time)),
+			      'end_time'         => date('h:i A', strtotime($row->end_time)),
+			      'days'             => Carbon::createFromFormat('d-m-Y',$row->days)->format('F j, Y'),
 			      'days_arr'         => $row->days_arr,
-			      'available'        => $this->isSlotNotInvited($row->id,$row->fair_id,$row->recruiter_id),
-			      'isSlotNotInvited' => $this->isSlotNotInvited($row->id,$row->fair_id,$row->recruiter_id)
+			      'slotStatus' => $this->slotStatus($row->id,$row->fair_id,$row->recruiter_id)
 				];
 			}
 		}
@@ -60,12 +78,22 @@ class RecruiterSchedulingController extends Controller {
 		return $dataArr;
 	}
 
-	public function isSlotNotInvited($slot_id,$fair_id,$recruiter_id){
-		if(!RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('slot_id',$slot_id)->exists()){
-			return 'true';
+	public function slotStatus($slot_id,$fair_id,$recruiter_id){
+		$slot = RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('slot_id',$slot_id)->select('cancel')->first();
+		if ($slot) {
+			if ($slot->cancel == 0) {
+                return 'invited';
+            }
+            if ($slot->cancel == 1) {
+                return 'canceled';
+            }
+
+            if ($slot->cancel == 2) {
+                return 'booked';
+            }
 		}
 
-		return 'false';
+		return 'invite';
 	}
 
 	public function scheduledInterviews(Request $req)
@@ -131,9 +159,9 @@ class RecruiterSchedulingController extends Controller {
 		$candidateNotes = CandidateScheduleNote::where('candidate_id',$candidate_id)->get();
 		if ($candidateNotes) {
 			foreach ($candidateNotes as $key => $row) {
-				// $date = Carbon::createFromFormat('Y-m-d',$row->created_at);
+				// $date = Carbon::createFromFormat('d-m-Y',$row->created_at);
 				// $date = Carbon::create($row->created_at);
-				$date = Carbon::createFromFormat('Y-m-d H:i:s',  $row->created_at)->format('F j, Y g:i:s a');
+				$date = Carbon::parse($row->created_at)->format('F j, Y g:i:s a');
 				// $date = $date->englishDayOfWeek.', '.$date->toFormattedDateString();
 				$notes[] = [
 					'id'      => $row->id,
@@ -154,20 +182,30 @@ class RecruiterSchedulingController extends Controller {
 		$company_id    = $req->company_id;
 		$start_date    = $req->start_date;
 		$end_date      = $req->end_date;
+		$slotStatus    = $req->status;
 
-		$interviews = RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->orderBy('created_at', 'ASC')->get();
-
+		if ($slotStatus != 'all') {
+			$interviews = RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('cancel',$slotStatus)->orderBy('created_at', 'DESC')->get();
+		}else{
+          $interviews = RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->orderBy('created_at', 'DESC')->get();
+		}
 		if (!empty($start_date) && !empty($end_date)) {
 			// echo "asdasdas"; die;
 			$filtered  = $interviews->filter(function ($value, $key) use ($start_date,$end_date) {
-			    return $value->SlotInfo->days == $start_date || $value->SlotInfo->days == $end_date;
+				$slotDate   = date("d-m-Y",strtotime($value->SlotInfo->days));
+				$start_date = date("d-m-Y",strtotime($start_date));
+				$end_date   = date("d-m-Y",strtotime($end_date));
+				if ($slotDate >= $start_date && $slotDate  <= $end_date) {
+				    return true;
+			    }
 			});
+
 			$interviews = $filtered->all();
 		}
 
 		// $interview_arr = array();
 		foreach ($interviews as $key => $interview) {
-			$date = Carbon::createFromFormat('Y-m-d',$interview['SlotInfo']['days']);
+			$date = Carbon::createFromFormat('d-m-Y',$interview['SlotInfo']['days']);
 			$date = $date->englishDayOfWeek.', '.$date->toFormattedDateString().' '.date('h:i A', strtotime($interview->SlotInfo->start_time)).' - '.date('h:i A', strtotime($interview->SlotInfo->end_time));
 			$interview_arr[] = array(
 				'id'        => $interview->id,
@@ -283,16 +321,16 @@ class RecruiterSchedulingController extends Controller {
 		// $date_to      = strtotime($selectedDays[1]); // Convert date to a UNIX timestamp
 		// $days         = array();
 		// for ($i = $date_from; $i <= $date_to; $i+=86400) {
-		//     $days[] = date("Y-m-d", $i);
+		//     $days[] = date("d-m-Y", $i);
 		// }
 
-		$selectedDays = explode(" - ", $request->days);
-		$date_from = strtotime($selectedDays[0]); // Convert date to a UNIX timestamp
-		$date_to = strtotime($selectedDays[1]); // Convert date to a UNIX timestamp
-		$days = array();
-		for ($i = $date_from; $i <= $date_to; $i+=86400) {
-		    $days[] = date("Y-m-d", $i);
-		}
+		// $selectedDays = explode(" - ", $request->days);
+		// $date_from = strtotime($selectedDays[0]); // Convert date to a UNIX timestamp
+		// $date_to = strtotime($selectedDays[1]); // Convert date to a UNIX timestamp
+		$days = $request->days;
+		// for ($i = $date_from; $i <= $date_to; $i+=86400) {
+		//     $days[] = date("d-m-Y", $i);
+		// }
 
 
 		foreach ($days as $key => $day) {
@@ -308,9 +346,9 @@ class RecruiterSchedulingController extends Controller {
 			while ($end_time_interval  < $end_time) {
 				    // 12:00
 				if($loopCount > 0){
-					$start_time_interval = date('H:i', strtotime("+$intervel minutes", strtotime($start_time_interval)));
+					$start_time_interval = date('h:i A', strtotime("+$intervel minutes", strtotime($start_time_interval)));
 				}
-				$end_time_interval = date('H:i', strtotime("+$intervel minutes", strtotime($start_time_interval)));
+				$end_time_interval = date('h:i A', strtotime("+$intervel minutes", strtotime($start_time_interval)));
 				$return =  $start_time_interval." - ".$end_time_interval."</br>";
 				$loopCount++;
 				// if ($loopCount > 5) {
@@ -414,7 +452,7 @@ class RecruiterSchedulingController extends Controller {
 				'email' 			=> $user->email,
 			);
 
-			$meeting_number = $data["meeting_id"];
+		$meeting_number = $data["meeting_id"];
 	    $name = $data["name"];
 	    $password = $data["password"];
 	    $email = $data["email"];
@@ -448,7 +486,7 @@ class RecruiterSchedulingController extends Controller {
 		$date_to = strtotime($selectedDays[1]); // Convert date to a UNIX timestamp
 		$days = array();
 		for ($i = $date_from; $i <= $date_to; $i+=86400) {
-				$days[] = date("Y-m-d", $i);
+				$days[] = date("d-m-Y", $i);
 		}
 		$update = RecruiterSchedule::where('id',$req->schedule_id)->update(array(
 			'recruiter_id' => $req->recruiter_id,
@@ -475,14 +513,45 @@ class RecruiterSchedulingController extends Controller {
 	 */
 	public function deleteSchedule($id)
  	{
- 		$delete = RecruiterSchedule::where('id',$id)->delete();
-		if ($delete) {
-			return response()->json([
-            'success' => true,
-            'message' => 'Time Slot Deleted Successfully'
-            ],200);
-		}
+ 		$deleteSlot = RecruiterSchedule::destroy($id);
+ 		$checkInvitedSlot = RecruiterScheduleInvite::where('slot_id',$id)->first();
+ 		if ($checkInvitedSlot) {
+ 			$deleteSlot = RecruiterScheduleBooked::where('u_id',$checkInvitedSlot->u_id)->delete();
+ 		}
+        $deleteSlot = RecruiterScheduleInvite::where('slot_id',$id)->delete();
+		return response()->json([
+        'success' => true,
+        'message' => 'Time Slot Deleted Successfully'
+        ],200);
  	}
+
+ 	/**
+	 * Remove the specified resource from storage.
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function blukDeleteSlots(Request $request)
+ 	{
+ 	  $ids  = $request->ids;
+      for ($i=0; $i < count($ids) ; $i++) {
+        $deleteSlot       = RecruiterSchedule::destroy($ids[$i]);
+        $checkInvitedSlot = RecruiterScheduleInvite::where('slot_id',$ids[$i])->first();
+ 		if ($checkInvitedSlot) {
+ 			$deleteSlot = RecruiterScheduleBooked::where('u_id',$checkInvitedSlot->u_id)->delete();
+ 		}
+        $deleteSlot = RecruiterScheduleInvite::where('slot_id',$ids[$i])->delete();
+      }
+      
+      return response()->json([
+	    'success' => true,
+	    'message' => 'Time Slots Deleted Successfully'
+	  ],200);
+ 	}
+
+
+
+
 	public function inviteCandidate(Request $request)
 	{
 		$candidate_id = $request->candidate_id;
@@ -494,7 +563,7 @@ class RecruiterSchedulingController extends Controller {
 		$fair         = Fair::find($fair_id);
 		$recruiterSchedule = RecruiterSchedule::find($slot_id);
 		if ($recruiterSchedule) {
-			if(!RecruiterScheduleBooked::where('start_time',$recruiterSchedule->start_time)->where('end_time',$recruiterSchedule->end_time)->where('date',$recruiterSchedule->days)->exists()){
+			if(!RecruiterScheduleBooked::where('fair_id',$fair_id)->where('candidate_id',$candidate_id)->where('start_time',$recruiterSchedule->start_time)->where('end_time',$recruiterSchedule->end_time)->where('date',$recruiterSchedule->days)->exists()){
 				if($candidate){
 					$name     = $candidate->name;
 					$email    = $candidate->email;
@@ -524,7 +593,7 @@ class RecruiterSchedulingController extends Controller {
 							$acceptInvitationLink = env('BACKEND_URL').'interview/invitation/'.$u_id;
 						$cancelUrl    = env('BACKEND_URL').'cancel/interview/invitation/'.$u_id;
 						$backendLogin = env('BACKEND_URL').'login';
-						$date = Carbon::createFromFormat('Y-m-d',$recruiterSchedule->days)->toFormattedDateString();
+						$date = Carbon::createFromFormat('d-m-Y',$recruiterSchedule->days)->toFormattedDateString();
 				        $start_time = $recruiterSchedule->start_time;
 				        $end_time   = $recruiterSchedule->end_time;
 				        $start_time = AppHelper::startTimeScheduling($start_time, $u_id, $candidate_timezone)->format('h:i A');
@@ -547,7 +616,51 @@ class RecruiterSchedulingController extends Controller {
 
 								], function($message) use ($email,$name, $fairname, $recruiter_name)
 							{
+
+								// $filename = "invite.ics";
+								// 		$meeting_duration = (3600 * 2); // 2 hours
+								// 		$meetingstamp = strtotime( '12-6-2020' . " UTC");
+								// 		$dtstart = gmdate('Ymd\THis\Z', $meetingstamp);
+								// 		$dtend =  gmdate('Ymd\THis\Z', $meetingstamp + $meeting_duration);
+								// 		$todaystamp = gmdate('Ymd\THis\Z');
+								// 		$uid = date('Ymd').'T'.date('His').'-'.rand().'@yourdomain.com';
+								// 		$description = strip_tags('asdasdasdasdasdadasdasd');
+								// 		$location = "651 Chester Rd, Ellesmere Port, CH66 2LN";
+								// 		$titulo_invite = "Your meeting title";
+								// 		$organizer = "CN=Ali Sultwn Khan:mailto:noreply@goalenvision.com";
+										
+								// 		// ICS
+								// 		$mail[0]  = "BEGIN:VCALENDAR";
+								// 		$mail[1] = "PRODID:-//Google Inc//Google Calendar 70.9054//EN";
+								// 		$mail[2] = "VERSION:2.0";
+								// 		$mail[3] = "CALSCALE:GREGORIAN";
+								// 		$mail[4] = "METHOD:REQUEST";
+								// 		$mail[5] = "BEGIN:VEVENT";
+								// 		$mail[6] = "DTSTART;TZID=America/Sao_Paulo:" . $dtstart;
+								// 		$mail[7] = "DTEND;TZID=America/Sao_Paulo:" . $dtend;
+								// 		$mail[8] = "DTSTAMP;TZID=America/Sao_Paulo:" . $todaystamp;
+								// 		$mail[9] = "UID:" . $uid;
+								// 		// $mail[10]  = "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS";
+								// 		// $mail[11]  = "ACTION;RSVP=TRUE;CN=Test:mailto:user123@gmail.com";
+								// 		$mail[12] = "ORGANIZER;" . $organizer;
+								// 		$mail[13] = "CREATED:" . $todaystamp;
+								// 		$mail[14] = "DESCRIPTION:" . $description;
+								// 		$mail[15] = "LAST-MODIFIED:" . $todaystamp;
+								// 		$mail[16] = "LOCATION:" . $location;
+								// 		$mail[17] = "SEQUENCE:0";
+								// 		$mail[18] = "SUMMARY:" . $titulo_invite;
+								// 		$mail[19] = "STATUS:CONFIRMED";
+								// 		$mail[20] = "TRANSP:OPAQUE";
+								// 		$mail[21] = "END:VEVENT";
+								// 		$mail[22] = "END:VCALENDAR";
+										
+								// 		$mail = implode("\r\n", $mail);
+								// 		header("text/calendar");
+								// 		file_put_contents($filename, $mail);
+                                        
+								// 		$message->attachData($mail, $filename, ['mime' => 'text/calendar; method=REQUEST; charset=UTF-8']);
 								$message->to($email, $name)->subject($recruiter_name.' invited you for the interview on '.$fairname);
+
 							});
 						// }
 						return response()->json([
@@ -556,21 +669,27 @@ class RecruiterSchedulingController extends Controller {
 				        ],200);
 					}else{
 						return response()->json([
-				            'code'    => 'error',
+				            'code'    => 'success',
 				            'message' => 'Candidate Not Invited Successfully'
 				        ],200);
 					}
 				}
+			}else{
+				return response()->json([
+		            'code'    => 'error',
+		            'message' => 'Candidate is already engaged with other recruiter on this time '.$recruiterSchedule->days.' | '.$recruiterSchedule->start_time.'-'.$recruiterSchedule->end_time
+		        ],200);
 			}
 		}
 
 	}
 
-	public function getRecruiterAvailableSlots($fair_id,$recruiter_id){
+	public function getRecruiterAvailableSlots($fair_id,$recruiter_id,$date){
 		$slots = [];
 		$fair_id      = $fair_id;
 		$recruiter_id = $recruiter_id;
-		$schedules    = RecruiterSchedule::where('recruiter_id',$recruiter_id)->orderBy('days', 'ASC')->get();
+		$date         = $date;
+		$schedules    = RecruiterSchedule::where('recruiter_id',$recruiter_id)->where('days',$date)->orderBy('days', 'ASC')->get();
 		$fair         = Fair::find($fair_id);
 
 		foreach ($schedules as $key => $row) {
@@ -578,15 +697,15 @@ class RecruiterSchedulingController extends Controller {
 				if (!RecruiterScheduleInvite::where('slot_id',$row->id)->where('cancel',0)->exists()) {
 					$date = new DateTime($row->days.$row->start_time,new DateTimeZone($fair->timezone));
 					$date = $row->days.$row->start_time;
-					$date = Carbon::createFromFormat('Y-m-d',$row->days);
+					$date = Carbon::createFromFormat('d-m-Y',$row->days);
 					// $start_time = Carbon::createFromFormat('H:i',$row->start_time)->format('H:i');
 					// $end_time   = Carbon::createFromFormat($row->end_time);
 
 					$currentDateTime = new DateTime("now",new DateTimeZone($fair->timezone));
                     $slotDateTime    = new DateTime($row->days.$row->start_time);
 
-                    // if ($slotDateTime->format('Y-m-d H:i:s') > $currentDateTime->format('Y-m-d H:i:s')) {
-                    	$slots[$date->englishDayOfWeek.', '.$date->toFormattedDateString()][] = [
+                    // if ($slotDateTime->format('d-m-Y H:i:s') > $currentDateTime->format('d-m-Y H:i:s')) {
+                    	$slots[] = [
 							'id'   => $row->id,
 							'slot' => date('h:i A', strtotime($row->start_time)).' - '.date('h:i A', strtotime($row->end_time)),
 						];
@@ -654,7 +773,7 @@ class RecruiterSchedulingController extends Controller {
 		// $acceptInvitationLink = env('BACKEND_URL').'interview/invitation/'.$u_id;
 		// $cancelUrl    = env('BACKEND_URL').'cancel/interview/invitation/'.$u_id;
 		// $backendLogin = env('BACKEND_URL').'login';
-		$date = Carbon::createFromFormat('Y-m-d',$recruiterSchedule->days)->toFormattedDateString();
+		$date = Carbon::createFromFormat('d-m-Y',$recruiterSchedule->days)->toFormattedDateString();
         $start_time = date('h:i A', strtotime($recruiterSchedule->start_time));
         $end_time   = date('h:i A', strtotime($recruiterSchedule->end_time));
 
@@ -789,12 +908,12 @@ class RecruiterSchedulingController extends Controller {
 					$recruiterEmail     = $recruiter->email;
 					$cancelUrl    = env('BACKEND_URL').'cancel/interview/invitation/'.$u_id;
 					$meetingLink  = env('FRONT_URL').$fair->short_name.'/recruiter/interview/room/'.$u_id;
-					$date         = Carbon::createFromFormat('Y-m-d',$date);
+					$date         = Carbon::createFromFormat('d-m-Y',$date);
 					$date         = $date->englishDayOfWeek.', '.$date->toFormattedDateString();
 					$start_time = AppHelper::startTimeScheduling($start_time, $u_id, $candidate_timezone)->format('h:i A');
 					$end_time   = AppHelper::endTimeScheduling($end_time, $u_id, $candidate_timezone)->format('h:i A');
 					$calendar_time = date('Ymd', strtotime($slot->days))."T".date('His', strtotime($start_time))."/".date('Ymd', strtotime($slot->days))."T".date('His', strtotime($end_time));
-
+                    //Email For Candidate
 					Mail::send('emails.interview-confirm',
 						[
 							'name'  => $name,
@@ -836,7 +955,7 @@ class RecruiterSchedulingController extends Controller {
 							'calendar_time' => $calendar_time,
 							'candidateName' => $candidate->name,
 							'withName'      =>$candidate->name,
-							'cancelUrl'     => $cancelUrl
+							'cancelUrl'     => $cancelUrl,
 						], function($message) use ($recruiterEmail,$recruiterName)
 					{
 					    $message->to($recruiterEmail, $recruiterName)->subject('Congratulation! Interview is successfully scheduled');
@@ -890,7 +1009,7 @@ class RecruiterSchedulingController extends Controller {
 	}
 	public function candidateFetchSchedules(Request $req){
 		$timestamp = strtotime($req->date);
-		$date = date('Y-m-d', $timestamp);
+		$date = date('d-m-Y', $timestamp);
 		$recruiter_id = $req->recruiter_id;
 		$bookedStart = array();
 		$bookedEnd = array();
@@ -968,7 +1087,7 @@ class RecruiterSchedulingController extends Controller {
 		$data = RecruiterScheduleInvite::where('u_id',$u_id)->first();
 		$fair_timezone = $data->FairDetails->timezone;
     	$datetime = new DateTime($dt);
-    	$datetime->format('Y-m-d H:i:s');
+    	$datetime->format('d-m-Y H:i:s');
 		$la_time  = new DateTimeZone($fair_timezone);
 		$datetime->setTimezone($la_time);
 		return $datetime->format('h:i A');
@@ -979,8 +1098,8 @@ class RecruiterSchedulingController extends Controller {
 		$candidate_id  = $request->candidate_id;
 		// $fair_short_name     = $request->fair_short_name;
 		$u_id  = $request->u_id;
-		$d  = date('Y-m-d H:i:s', strtotime($request->dateTime));
-		$userCurrentDate  = date('Y-m-d', strtotime($request->dateTime));
+		$d  = date('d-m-Y H:i:s', strtotime($request->dateTime));
+		$userCurrentDate  = date('d-m-Y', strtotime($request->dateTime));
 		$userCurrentTime  = date('h:i A', strtotime($request->dateTime));
 		// $schedule         = RecruiterScheduleBooked::where('u_id', $u_id)->exists();
 
@@ -991,9 +1110,9 @@ class RecruiterSchedulingController extends Controller {
 				$start_time          = $schedule->start_time;
 				$end_time            = $schedule->end_time;
 				$candidate_timezone  = $schedule->userSetting->user_timezone;
-				$userCurrentDate     = AppHelper::dateScheduling($userCurrentDate, $u_id, $candidate_timezone)->format('Y-m-d');
+				$userCurrentDate     = AppHelper::dateScheduling($userCurrentDate, $u_id, $candidate_timezone)->format('d-m-Y');
 				$userCurrentTime     = $this->localStatTime($candidate_timezone,$d,$u_id);
-				$schedule_date       = AppHelper::dateScheduling($schedule_date, $u_id, $candidate_timezone)->format('Y-m-d');
+				$schedule_date       = AppHelper::dateScheduling($schedule_date, $u_id, $candidate_timezone)->format('d-m-Y');
 				$start_time          = AppHelper::startTimeScheduling($start_time, $u_id, $candidate_timezone)->format('h:i A');
 			    $end_time            = AppHelper::endTimeScheduling($end_time, $u_id, $candidate_timezone)->format('h:i A');
 

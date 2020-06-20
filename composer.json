@@ -19,6 +19,7 @@
         "laravel/tinker": "^1.0",
         "league/flysystem-aws-s3-v3": "^1.0",
         "nesbot/carbon": "1.32",
+        "spatie/calendar-links": "^1.4",
         "spatie/laravel-cors": "^1.5"
     },
     "require-dev": {

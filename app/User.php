@@ -112,7 +112,7 @@ class User extends Authenticatable
         return 0;
     }
 
-     public static function isCandidateOnline($fair_id, $candidate_id)
+    public static function isCandidateOnline($fair_id, $candidate_id)
     {
         $fairTracking = New Tracking;
         $candidate = $fairTracking->where('fair_id', $fair_id)->where('user_id',$candidate_id)->orderBy('updated_at', 'DESC')->first();
@@ -125,6 +125,28 @@ class User extends Authenticatable
         }
 
         return 0;
+    }
+
+
+    public static function candidateInterviewStatus($fair_id, $recruiter_id,$candidate_id)
+    {
+        $recruiterScheduleInvite = New RecruiterScheduleInvite;
+        $slot = $recruiterScheduleInvite->where('fair_id', $fair_id)->where('recruiter_id',$recruiter_id)->where('candidate_id',$candidate_id)->select('cancel')->first();
+
+        if ($slot) {
+            if ($slot->cancel == 0) {
+                return 'invited';
+            }
+            if ($slot->cancel == 1) {
+                return 'canceled';
+            }
+
+            if ($slot->cancel == 2) {
+                return 'booked';
+            }
+        }else{
+            return 'invite';
+        }
     }
 
 }
