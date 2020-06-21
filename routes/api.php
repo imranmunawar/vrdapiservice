@@ -191,7 +191,7 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
         'uses' => 'CompanyController@show',
         'as'   => 'showCompany'
     ]);
-    Route::get('companies/list/{fair_id?}',[
+    Route::get('companies/list/{fair_id?}/{hall_id?}',[
         'uses' => 'CompanyController@index',
         'as'   => 'listCompanies'
     ]);
@@ -307,13 +307,29 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
         'uses' => 'FairController@store',
         'as'   => 'createFair'
     ]);
+    Route::post('createFairHall',[
+        'uses' => 'FairController@createFairHall',
+        'as'   => 'createFairHall'
+    ]);
     Route::get('fair/edit/{id}',[
         'uses' => 'FairController@edit',
         'as'   => 'editFair'
     ]);
+    Route::get('fair/hall/{id}',[
+        'uses' => 'FairController@aboutHall',
+        'as'   => 'aboutHall'
+    ]);
+    Route::get('fair/hallname/{id}',[
+        'uses' => 'FairController@hallnames',
+        'as'   => 'hallnames'
+    ]);
     Route::patch('fair/update/{id}',[
         'uses' => 'FairController@update',
         'as'   => 'updateFair'
+    ]);
+    Route::patch('fair/update/updateFairHall/{id}',[
+        'uses' => 'FairController@updateFairHall',
+        'as'   => 'updateFairHall'
     ]);
     Route::delete('fair/delete/{id}',[
         'uses' => 'FairController@destroy',

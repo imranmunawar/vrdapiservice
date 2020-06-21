@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\User;
 use App\Fair;
+use App\FairHalls;
 use App\Company;
 use App\CompanyJob;
 use App\FairSetting;
@@ -67,6 +68,18 @@ class FairController extends Controller
     public function testRoute(){
         echo env('S3_PRIVATE_EP'); die;
     }
+    
+    public function aboutHall($fair_id)
+    {
+        $fair = Fair::find($fair_id);
+        return response()->json(['total_hall'=>$fair->total_hall],200);
+    }
+    
+    public function hallnames($fair_id)
+    {
+        $fair = FairHalls::where('fair_id',$fair_id)->get();
+        return response()->json($fair);
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -88,10 +101,11 @@ class FairController extends Controller
     {
         // Create a new Fair in the database...
         $fair = Fair::create($request->all());
+        $insertId = $fair->id;
         if (!$fair) {
-            return response()->json(['success' => false,'message' => 'Fair Media Not Created Successfully'],200);
+            return response()->json(['success' => false,'message' => 'Fair Not Created Successfully'],200);
         }
-        return response()->json(['success' => true,'message' => 'Fair Media Created Successfully' ],200);
+        return response()->json(['success' => true,'message' => 'Fair Created Successfully', 'insertId' => $insertId ],200);
     }
 
     /**
@@ -177,12 +191,54 @@ class FairController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = $request->all();
+        $data = $request->all();        
         $fair  = Fair::findOrFail($id);
         $fair->fill($data)->save();
         return response()->json([
            'success' => true,
            'message' => 'Fair Updated Successfully'
+        ], 200);
+
+    }
+    
+    public function createFairHall(Request $request)
+    {
+        $data = $request->all();
+        if($data['total_hall'] > 1){
+           FairHalls::where('fair_id',$id)->delete();
+           for($i= 1; $i <= $data['total_hall']; $i++){
+              $multi_hall = array(
+                  'fair_id' => $id,
+                  'hall_id' => $i,
+                  'hall_name' => $data['hall_name_'.$i.''],
+              );
+              FairHalls::create($multi_hall);
+           }
+        }
+        return response()->json([
+           'success' => true,
+           'message' => 'Fair Hall Updated Successfully'
+        ], 200);
+
+    }
+    
+    public function updateFairHall(Request $request, $id)
+    {
+        $data = $request->all();
+        if($data['total_hall'] > 1){
+           FairHalls::where('fair_id',$id)->delete();
+           for($i= 1; $i <= $data['total_hall']; $i++){
+              $multi_hall = array(
+                  'fair_id' => $id,
+                  'hall_id' => $i,
+                  'hall_name' => $data['hall_name_'.$i.''],
+              );
+              FairHalls::create($multi_hall);
+           }
+        }
+        return response()->json([
+           'success' => true,
+           'message' => 'Fair Hall Updated Successfully'
         ], 200);
 
     }
@@ -232,6 +288,8 @@ class FairController extends Controller
 
     public function showFairByShortname(Request $request)
     {
+        $fairTotalHalls = 1;
+        $fairHallsData = [];
         $addedWebinars = [];
         $candidateTest = false;
         $candidate_id  = $request->candidate_id;
@@ -260,6 +318,20 @@ class FairController extends Controller
 
           $chatApiDetail = $this->organizerChatApiDetail($fair->organiser_id);
 
+          // Get Fair halls Count And Their Data
+          if ($fair->total_hall > 1) {
+            $fairTotalHalls = $fair->total_hall;
+            $halls   = FairHalls::where('fair_id',$fair->id)->get();
+            foreach ($halls as $key => $row) {
+              $fairHallsData[] = [
+                'hall_id'   => $row->hall_id,
+                'hall_name' => $row->hall_name,
+              ];
+            }
+          }
+
+          $fair['fair_total_halls']  = $fairTotalHalls;
+          $fair['fair_halls_data']   = $fairHallsData;
           $organizerName   = User::find($fair->organiser_id)->name;
           $organizerImage  = UserSettings::where('user_id',$fair->organiser_id)->select('user_image')->first();
           $fair['organiser_name']  =  $organizerName;
@@ -304,7 +376,7 @@ class FairController extends Controller
           'fair_start_date_from' => $fairStartDateFrom,
           'fair_start_time'      => $fairStartTime,
           'fair_end_time'        => $fairEndTime,
-          'date'                 => $date
+          'date'                 => $date,
         ];
 
         if($dateAndTimeArray['date'] >= $dateAndTimeArray['fair_start'] && $dateAndTimeArray['date'] <= $dateAndTimeArray['fair_end']){
@@ -331,7 +403,7 @@ class FairController extends Controller
             'dateAndTime'   => $dateAndTimeArray,
             'isTakeTest'    => $candidateTest,
             'addedWebinars' => $addedWebinars,
-            'chatApiDetail' => $chatApiDetail
+            'chatApiDetail' => $chatApiDetail,
           ]);
         }
            

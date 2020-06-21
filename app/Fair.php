@@ -53,9 +53,10 @@ class Fair extends Model
         'fair_type',
         'fair_status',
         'chat_status',
+        'total_hall',
         'layout',
         'presenter',
-        'stand_receptionist'
+        'stand_receptionist',
     ];
 
     public function setting()

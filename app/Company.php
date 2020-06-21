@@ -26,6 +26,7 @@ class Company extends Model
         'description',
         'company_logo',
         'company_stand_image',
+        'company_hall',
     ];
 
     public function stand()

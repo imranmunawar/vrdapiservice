@@ -25,11 +25,20 @@ class CompanyController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($fair_id = '')
+    public function index($fair_id = '', $hall_id = '')
     {
-
-        $companies = !empty($fair_id) ? Company::where('fair_id',$fair_id)->where('fair_id',$fair_id)->with('stand')->get() :  Company::all();
-        return response()->json($companies);
+       if($hall_id){
+          if($hall_id == 'min'){
+             $companies = Company::where('fair_id',$fair_id)->limit(1)->orderBy('company_hall', 'ASC')->with('stand')->get();
+             $hall_id = $companies[0]['company_hall'];
+             $companies = Company::where('fair_id',$fair_id)->where('company_hall',$hall_id)->with('stand')->get();
+          }else{
+             $companies = Company::where('fair_id',$fair_id)->where('company_hall',$hall_id)->with('stand')->get();
+          }
+       }else{
+          $companies = !empty($fair_id) ? Company::where('fair_id',$fair_id)->with('stand')->get() :  Company::all();
+       }
+       return response()->json($companies);
     }
 
     /**

@@ -144,16 +144,16 @@ class StatsController extends Controller
 
         $data["rejectedCount"]     = AgendaView::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('shortlisted',0)->where('rejected',1)->count();
 
-        $data["booked_interviews"]     = RecruiterScheduleBooked::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where(DB::raw("CONCAT(`date`, ' ', `start_time`)"), '>=', date('Y-m-d H:i'))->count();
+        $data["booked_interviews"]     = RecruiterScheduleBooked::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where(DB::raw("CONCAT(`date`, ' ', `start_time`)"), '>=', date('d-m-Y h:i A'))->count();
 
         $data["pending_invitations"]     = RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('cancel', 0)
                                                                     ->whereHas('SlotInfo', function($query) {
-                                                                         $query->where(DB::raw("CONCAT(`days`, ' ', `start_time`)"), '>=', date('Y-m-d H:i'));
+                                                                         $query->where(DB::raw("CONCAT(`days`, ' ', `start_time`)"), '>=', date('d-m-Y h:i A'));
                                                                     })->count();
 
         $data["cancelled_interviews"]     = RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('cancel', 1)
                                                                     ->whereHas('SlotInfo', function($query) {
-                                                                         $query->where(DB::raw("CONCAT(`days`, ' ', `start_time`)"), '>=', date('Y-m-d H:i'));
+                                                                         $query->where(DB::raw("CONCAT(`days`, ' ', `start_time`)"), '>=', date('d-m-Y h:i A'));
                                                                     })->count();
 
         return response()->json([
