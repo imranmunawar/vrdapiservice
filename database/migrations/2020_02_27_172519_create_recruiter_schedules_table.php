@@ -23,7 +23,7 @@ class CreateRecruiterSchedulesTable extends Migration
             $table->string('end_time');
             $table->string('days');
             $table->text('days_arr');
-            $table->tinyInteger('available')->default(1);
+            $table->string('status')->default('available');
             $table->timestamps();
         });
     }

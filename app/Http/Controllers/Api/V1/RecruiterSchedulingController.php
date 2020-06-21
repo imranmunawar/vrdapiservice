@@ -39,11 +39,21 @@ class RecruiterSchedulingController extends Controller {
 		$end_date      = $req->end_date;
 		$status        = $req->status;
 
-		$schedules = RecruiterSchedule::where('fair_id',$req->fair_id)
+		if($status != 'all' ) {
+		  $schedules = RecruiterSchedule::where('fair_id',$req->fair_id)
+		    ->where('company_id',$req->company_id)
+		    ->where('recruiter_id',$req->recruiter_id)
+		    ->where('status',$status)
+		    ->orderBy("days")
+		    ->get();
+		}else{
+			$schedules = RecruiterSchedule::where('fair_id',$req->fair_id)
 		    ->where('company_id',$req->company_id)
 		    ->where('recruiter_id',$req->recruiter_id)
 		    ->orderBy("days")
 		    ->get();
+		}
+
 
 		if (!empty($start_date) && !empty($end_date)) {
 			$filtered  = $schedules->filter(function ($value, $key) use ($start_date,$end_date) {
@@ -70,7 +80,7 @@ class RecruiterSchedulingController extends Controller {
 			      'end_time'         => date('h:i A', strtotime($row->end_time)),
 			      'days'             => Carbon::createFromFormat('d-m-Y',$row->days)->format('F j, Y'),
 			      'days_arr'         => $row->days_arr,
-			      'slotStatus' => $this->slotStatus($row->id,$row->fair_id,$row->recruiter_id)
+			      'slotStatus'       => $row->status
 				];
 			}
 		}
@@ -79,18 +89,9 @@ class RecruiterSchedulingController extends Controller {
 	}
 
 	public function slotStatus($slot_id,$fair_id,$recruiter_id){
-		$slot = RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('slot_id',$slot_id)->select('cancel')->first();
+		$slot = RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('slot_id',$slot_id)->select('status')->first();
 		if ($slot) {
-			if ($slot->cancel == 0) {
-                return 'invited';
-            }
-            if ($slot->cancel == 1) {
-                return 'canceled';
-            }
-
-            if ($slot->cancel == 2) {
-                return 'booked';
-            }
+			return $slot->status;
 		}
 
 		return 'invite';
@@ -185,7 +186,7 @@ class RecruiterSchedulingController extends Controller {
 		$slotStatus    = $req->status;
 
 		if ($slotStatus != 'all') {
-			$interviews = RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('cancel',$slotStatus)->orderBy('created_at', 'DESC')->get();
+			$interviews = RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('status',$slotStatus)->orderBy('created_at', 'DESC')->get();
 		}else{
           $interviews = RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->orderBy('created_at', 'DESC')->get();
 		}
@@ -212,7 +213,7 @@ class RecruiterSchedulingController extends Controller {
 				"u_id"      => $interview->u_id,
 				'slot_id'   => $interview->slot_id,
 				'notes'     => $this->getCandidateNotes($interview->candidate_id),
-				'status'    => $interview->cancel,
+				'status'    => $interview->status,
 				"name"      => $interview->CandidateDetails->name,
 				'email'     => $interview->CandidateDetails->email,
 				'slot'      => $date,
@@ -363,17 +364,9 @@ class RecruiterSchedulingController extends Controller {
 					'end_time'     => $end_time_interval,
 					'days'         => $day,
 					'days_arr'     => json_encode($request->days),
-					'available'    => '1'
 				));
 			}
 		}
-
-		// if ($create) {
-		// 	return response()->json([
-  //           'success' => true,
-  //           'message' => 'Time Slots Added Successfully'
-  //           ],200);
-		// }
 
 		return response()->json([
             'success' => true,
@@ -575,7 +568,7 @@ class RecruiterSchedulingController extends Controller {
 						$SQL = RecruiterScheduleInvite::where('fair_id',$fair_id)
 						            ->where('recruiter_id',$recruiter_id)
 						            ->where('candidate_id',$candidate_id)
-						            ->update(array('expire' => 0,'cancel'=> 0, 'slot_id'=>$slot_id,'u_id'=>$u_id));
+						            ->update(array('expire' => 0,'status'=> 'pending', 'slot_id'=>$slot_id,'u_id'=>$u_id));
 					}else{
 						$SQL = RecruiterScheduleInvite::create(array(
 							'u_id'         => $u_id,
@@ -584,6 +577,7 @@ class RecruiterSchedulingController extends Controller {
 							'candidate_id' => $candidate_id,
 							'slot_id'      => $slot_id
 						));
+						RecruiterSchedule::where('id',$slot_id)->update(array('status' => 'pending'));
 					}
 
 
@@ -694,7 +688,7 @@ class RecruiterSchedulingController extends Controller {
 
 		foreach ($schedules as $key => $row) {
 			if(!RecruiterScheduleBooked::where('fair_id',$fair_id)->where('recruiter_id',$recruiter_id)->where('start_time',$row->start_time)->where('end_time',$row->end_time)->where('date',$row->days)->exists()){
-				if (!RecruiterScheduleInvite::where('slot_id',$row->id)->where('cancel',0)->exists()) {
+				if (!RecruiterScheduleInvite::where('slot_id',$row->id)->where('status','pending')->exists()) {
 					$date = new DateTime($row->days.$row->start_time,new DateTimeZone($fair->timezone));
 					$date = $row->days.$row->start_time;
 					$date = Carbon::createFromFormat('d-m-Y',$row->days);
@@ -729,7 +723,9 @@ class RecruiterSchedulingController extends Controller {
 		$slot_id = $request->slot_id;
 		$u_id    = $request->u_id;
 		$notes   = $request->notes;
-		RecruiterScheduleInvite::where('u_id',$u_id)->update(array('expire' => 1,'cancel'=>1));
+		$slot    = RecruiterScheduleInvite::where('u_id',$u_id)->select('slot_id')->first();
+		RecruiterSchedule::where('id',$slot->slot_id)->update(array('status'=>'available'));
+		RecruiterScheduleInvite::where('u_id',$u_id)->update(array('expire' => 1,'status'=>'canceled'));
 		$invite = RecruiterScheduleInvite::where('u_id',$u_id)->first();
 		CandidateScheduleNote::create(array(
 			'slot_id'      => $slot_id,
@@ -826,7 +822,9 @@ class RecruiterSchedulingController extends Controller {
 		$slot_id = $request->slot_id;
 		$u_id    = $request->u_id;
 		$notes   = '';
-		RecruiterScheduleInvite::where('u_id',$u_id)->update(array('expire' => 1,'cancel'=>1));
+		$slot    = RecruiterScheduleInvite::where('u_id',$u_id)->select('slot_id')->first();
+		RecruiterSchedule::where('id',$slot->slot_id)->update(array('status'=>'available'));
+		RecruiterScheduleInvite::where('u_id',$u_id)->update(array('expire' => 1,'status'=>'canceled'));
 		RecruiterScheduleBooked::where('u_id', $u_id)->delete();
 		$this->generateCandidateCancelInterviewEmail($slot_id,$u_id,$notes,'recruiter');
 		return response()->json([
@@ -888,7 +886,8 @@ class RecruiterSchedulingController extends Controller {
 					'password'		 => $password
 				));
 				if($booked){
-					RecruiterScheduleInvite::where('u_id',$u_id)->update(array('expire' => 1,'cancel'=>2));
+					RecruiterSchedule::where('id',$slot->slot_id)->update(array('status'=>'booked'));
+					RecruiterScheduleInvite::where('u_id',$u_id)->update(array('expire' => 1,'status'=>'booked'));
 					$candidate = User::find($data->candidate_id);
 					$recruiter = User::find($data->recruiter_id);
 					$fair = Fair::find($data->fair_id);

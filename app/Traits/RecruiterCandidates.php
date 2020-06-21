@@ -72,6 +72,7 @@ trait RecruiterCandidates
             })
             ->join('users', 'match_recruiters.candidate_id', '=', 'users.id')
             ->join('user_settings', 'match_recruiters.candidate_id', '=', 'user_settings.user_id')
+            ->where('agenda_views.view',1)
             ->orderBy('agenda_views.updated_at', 'desc')
             ->select('match_recruiters.recruiter_id', 'match_recruiters.candidate_id','match_recruiters.percentage', 'agenda_views.id','agenda_views.view','agenda_views.updated_at', 'agenda_views.shortlisted', 'agenda_views.rejected','agenda_views.notes', 'users.name','users.email', 'user_settings.user_skype', 'user_settings.phone','user_settings.user_cv', 'user_settings.user_country', 'user_settings.user_image','candidate_turnouts.id as turnout')
             ->get();  
@@ -230,7 +231,7 @@ trait RecruiterCandidates
       }
       return response()->json([
         'success' => true,
-        'message' => 'Candidate Successfully  Removed From Reject Listt'
+        'message' => 'Candidate Successfully Removed From Rejected List'
       ], 200);
     }
   }
@@ -241,13 +242,13 @@ trait RecruiterCandidates
       $fair_id      = $request->fair_id;
       $company_id   = $request->company_id;
       $recruiter_id = $request->recruiter_id;
-      $candidates = Tracking::where('fair_id', $fair_id)->where('user_id','>',0)->orderBy('updated_at', 'DESC')->get();
+      $candidates = Tracking::where('fair_id', $fair_id)->where('user_id','>',0)->orderBy('updated_at', 'DESC')->groupBy('user_id')->get();
 
       $filtered = $candidates->filter(function ($value, $key) {
         $interval = strtotime(date('Y-m-d H:i:s')) - strtotime($value->updated_at); 
         $interval = $interval/60;
         // echo $interval; die;
-        if ($interval < 5) {
+        if ($interval < 4) {
           // echo "asdasdas"; die;
           return $value;
         }

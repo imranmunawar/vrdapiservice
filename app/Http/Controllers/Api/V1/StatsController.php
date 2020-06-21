@@ -16,6 +16,7 @@ use App\CandidateJob;
 use App\ChatTranscript;
 use App\MarketingChannel;
 use App\FairCandidates;
+use App\RecruiterSchedule;
 use App\RecruiterScheduleInvite;
 use App\RecruiterScheduleBooked;
 use App\CompanyStandCount;
@@ -132,7 +133,7 @@ class StatsController extends Controller
     public function recruiterStats($recruiter_id,$fair_id){
 
         $data = [];
-        $data["agendaViewsCount"] = AgendaView::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->count();
+        $data["agendaViewsCount"] = AgendaView::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('view',1)->count();
 
         $data["jobApplicationsCount"] = CandidateJob::where('fair_id',$fair_id)
                                                       ->whereHas('jobs', function($query) use ($recruiter_id){
@@ -144,17 +145,25 @@ class StatsController extends Controller
 
         $data["rejectedCount"]     = AgendaView::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('shortlisted',0)->where('rejected',1)->count();
 
-        $data["booked_interviews"]     = RecruiterScheduleBooked::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where(DB::raw("CONCAT(`date`, ' ', `start_time`)"), '>=', date('d-m-Y h:i A'))->count();
+        // $data["booked_interviews"]     = RecruiterScheduleBooked::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where(DB::raw("CONCAT(`date`, ' ', `start_time`)"), '>=', date('d-m-Y h:i A'))->count();
 
-        $data["pending_invitations"]     = RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('cancel', 0)
-                                                                    ->whereHas('SlotInfo', function($query) {
-                                                                         $query->where(DB::raw("CONCAT(`days`, ' ', `start_time`)"), '>=', date('d-m-Y h:i A'));
-                                                                    })->count();
+        $data["booked_interviews"]    = RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('status', 'booked')->count();
+        $data["pending_invitations"]  = RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('status', 'pending')->count();
+        $data["cancelled_interviews"] = RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('status', 'canceled')->count();
 
-        $data["cancelled_interviews"]     = RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('cancel', 1)
-                                                                    ->whereHas('SlotInfo', function($query) {
-                                                                         $query->where(DB::raw("CONCAT(`days`, ' ', `start_time`)"), '>=', date('d-m-Y h:i A'));
-                                                                    })->count();
+        $data['available_slots'] =  RecruiterSchedule::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('status','available')->count();
+
+        // $data["booked_interviews"] = RecruiterScheduleBooked::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where(DB::raw("CONCAT(`date`, ' ', `start_time`)"), '>=', date('d-m-Y h:i A'))->count();
+
+        // $data["pending_invitations"]     = RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('cancel', 0)
+        //                                                             ->whereHas('SlotInfo', function($query) {
+        //                                                                  $query->where(DB::raw("CONCAT(`days`, ' ', `start_time`)"), '>=', date('d-m-Y h:i A'));
+        //                                                             })->count();
+
+        // $data["cancelled_interviews"]     = RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('cancel', 1)
+        //                                                             ->whereHas('SlotInfo', function($query) {
+        //                                                                  $query->where(DB::raw("CONCAT(`days`, ' ', `start_time`)"), '>=', date('d-m-Y h:i A'));
+        //                                                             })->count();
 
         return response()->json([
             "code"   => 200,
@@ -300,17 +309,17 @@ class StatsController extends Controller
           }
           $booked_interviews = RecruiterScheduleBooked::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->count();
 
-          $pending_invitations = RecruiterScheduleInvite::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where('cancel', 0)->count();
+          $pending_invitations = RecruiterScheduleInvite::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where('status', 'pending')->count();
 
-          $cancelled_interviews = RecruiterScheduleInvite::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where('cancel', 1)->count();
+          $cancelled_interviews = RecruiterScheduleInvite::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where('status', 'cancel')->count();
 
           $data["scheduling"][] = array(
-                                    "id" => $company->id,
-                                    "name" => $company->company_name,
-                                    "booked_interviews" => $booked_interviews,
-                                    "pending_invitations" => $pending_invitations,
-                                    "cancelled_interviews" => $cancelled_interviews
-                                  );
+                "id"                   => $company->id,
+                "name"                 => $company->company_name,
+                "booked_interviews"    => $booked_interviews,
+                "pending_invitations"  => $pending_invitations,
+                "cancelled_interviews" => $cancelled_interviews
+            );
 
 
         }

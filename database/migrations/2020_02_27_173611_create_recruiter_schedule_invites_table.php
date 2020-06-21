@@ -20,7 +20,7 @@ class CreateRecruiterScheduleInvitesTable extends Migration
             $table->integer('recruiter_id');
             $table->integer('candidate_id');
             $table->integer('slot_id');
-            $table->integer('cancel')->default(0);
+            $table->string('status')->default('pending');
             $table->longText('notes')->nullable();
             $table->tinyInteger('expire')->default(0);
             $table->timestamps();

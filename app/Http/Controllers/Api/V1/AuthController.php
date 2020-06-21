@@ -227,11 +227,13 @@ class AuthController extends Controller
             $userFairId      = $userSetting->fair_id;
             $organiserId     = $userSetting->organiser_id;
             $companyId       = $userSetting->company_id;
+            $compnayLogo     = Company::where('id',$companyId)->select('company_logo')->first();
             $recruiterStatus = $userSetting->recruiter_status;
             $userArr['userFairId']         = $userFairId;
             $userArr['companyId']          = $companyId;
             $userArr['recruiterStatus']    = $recruiterStatus;
             $userArr['chatId']             = $userFairId.'f'.$userId;
+            $userArr['userCompanyLogo']       = $compnayLogo->company_logo;
             $userFairSetting = Fair::where('id',$userFairId)->select('organiser_id')->first();
             $userArr['ChatApiDetail'] = $this->getCometChatApiDetail($userFairSetting->organiser_id);
         }

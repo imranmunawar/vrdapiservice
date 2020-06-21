@@ -12,6 +12,10 @@ class RecruiterSchedule extends Model
     return $this->hasOne('App\User',  'id', 'recruiter_id');
   }
 
+  public function SlotInfo(){
+    return $this->hasOne('App\User',  'id', 'slot_id');
+  }
+
   protected $fillable = array(
       'fair_id',
       'company_id',
@@ -21,7 +25,7 @@ class RecruiterSchedule extends Model
       'end_time',
       'days',
       'days_arr',
-      'available'
+      'status'
   );
 
 }

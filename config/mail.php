@@ -57,7 +57,7 @@ return [
 
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'no-reply@virtualopendays.com'),
-        'name' => env('MAIL_FROM_NAME', 'Virtual Open Days'),
+        'name' => env('MAIL_FROM_NAME', 'Virtual Recruitment Days'),
     ],
 
     /*

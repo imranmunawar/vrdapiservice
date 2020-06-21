@@ -131,19 +131,10 @@ class User extends Authenticatable
     public static function candidateInterviewStatus($fair_id, $recruiter_id,$candidate_id)
     {
         $recruiterScheduleInvite = New RecruiterScheduleInvite;
-        $slot = $recruiterScheduleInvite->where('fair_id', $fair_id)->where('recruiter_id',$recruiter_id)->where('candidate_id',$candidate_id)->select('cancel')->first();
+        $slot = $recruiterScheduleInvite->where('fair_id', $fair_id)->where('recruiter_id',$recruiter_id)->where('candidate_id',$candidate_id)->select('status')->first();
 
         if ($slot) {
-            if ($slot->cancel == 0) {
-                return 'invited';
-            }
-            if ($slot->cancel == 1) {
-                return 'canceled';
-            }
-
-            if ($slot->cancel == 2) {
-                return 'booked';
-            }
+           return $slot->status;
         }else{
             return 'invite';
         }

@@ -321,7 +321,7 @@ class FairController extends Controller
           // Get Fair halls Count And Their Data
           if ($fair->total_hall > 1) {
             $fairTotalHalls = $fair->total_hall;
-            $halls   = FairHalls::where('fair_id',$fair->id)->get();
+            $halls   = FairHalls::where('fair_id',$fair->id)->orderBy('hall_id', 'ASC')->get();
             foreach ($halls as $key => $row) {
               $fairHallsData[] = [
                 'hall_id'   => $row->hall_id,

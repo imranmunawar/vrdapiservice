@@ -32,6 +32,6 @@ class RecruiterScheduleInvite extends Model
         'candidate_id',
         'slot_id',
         'notes',
-        'cancel'
+        'status'
      );
 }
