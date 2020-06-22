@@ -336,14 +336,14 @@ class CandidateController extends Controller
                 "fair_id"    => $row->fair_id,
                 "percentage" => $row->percentage,
                 'name'       => $row->recruiter->name,
-                'company_name'   => $row->companyDetail->company_name,
-                'title'          => $row->recruiterSetting->user_title,
-                'public_email'   => $row->recruiterSetting->public_email,
-                'linkedin'       => $row->recruiterSetting->linkedin_profile_link,
-                'recruiter_img'  => $row->recruiterSetting->recruiter_img,
+                'company_name'      => $row->companyDetail->company_name,
+                'title'             => $row->recruiterSetting->user_title,
+                'public_email'      => $row->recruiterSetting->public_email,
+                'linkedin'          => $row->recruiterSetting->linkedin_profile_link,
+                'recruiter_img'     => $row->recruiterSetting->recruiter_img,
                 'recruiter_status'  => $row->recruiterSetting->recruiter_status,
-                'user_image'  => $row->recruiterSetting->user_image,
-                'location'       => $row->recruiterSetting->location,
+                'user_image'        => $row->recruiterSetting->user_image,
+                'location'          => $row->recruiterSetting->location,
             ];
         }
         return response()->json(['recruiters'=>$recruitersArr]);

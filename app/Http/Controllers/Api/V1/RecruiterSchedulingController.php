@@ -711,6 +711,42 @@ class RecruiterSchedulingController extends Controller {
 		return $slots;
 	}
 
+	public function getRecruiterAvailableSlotDates($fair_id,$recruiter_id,$candidate_id){
+		$dates = [];
+		$fair_id      = $fair_id;
+		$recruiter_id = $recruiter_id;
+		$candidate_id = $candidate_id;
+
+		if (RecruiterScheduleInvite::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('candidate_id',$candidate_id)->where('status','pending')->orWhere('status','booked')->exists()) {
+			return response()->json([
+	            'code'    => 'error',
+	            'message' => 'You are already engaged with this recruiter'
+	        ],200);
+		}
+		$schedules = RecruiterSchedule::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('status','available')->select('id','days','start_time','end_time')->get();
+
+		if ($schedules) {
+			foreach ($schedules as $key => $row) {
+				$dates[] = [
+					'id'   => $row->id,
+					'date' => date('Y-m-d',strtotime($row->days))
+				];
+			}
+
+			return response()->json([
+	            'code'    => 'success',
+	            'message' => 'Dates Found',
+	            'data'    =>  $dates
+	        ],200);
+
+		}else{
+			return response()->json([
+	            'code'    => 'error',
+	            'message' => 'No Calendar Found'
+	        ],200);
+		}
+	}
+
 
 
 

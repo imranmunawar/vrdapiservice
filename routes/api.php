@@ -747,6 +747,7 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
     Route::delete('/delete/slot/{id}', 'RecruiterSchedulingController@deleteSlot');
     Route::post('/recuiter/cancel/interview', 'RecruiterSchedulingController@recruiterCancelInterview');
     Route::get('/recruiter/available/slots/{fair_id}/{recruiter_id}/{date}', 'RecruiterSchedulingController@getRecruiterAvailableSlots');
+    Route::get('/recruiter/available/slot/dates/{fair_id}/{recruiter_id}/{candidate_id}', 'RecruiterSchedulingController@getRecruiterAvailableSlotDates');
     Route::post('/recruiter/slots/bulk/delete',[
       'uses' => 'RecruiterSchedulingController@blukDeleteSlots',
       'as'   => 'blukDeleteSlots'

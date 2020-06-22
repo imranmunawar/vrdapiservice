@@ -311,7 +311,7 @@ class StatsController extends Controller
 
           $pending_invitations = RecruiterScheduleInvite::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where('status', 'pending')->count();
 
-          $cancelled_interviews = RecruiterScheduleInvite::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where('status', 'cancel')->count();
+          $cancelled_interviews = RecruiterScheduleInvite::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where('status', 'canceled')->count();
 
           $data["scheduling"][] = array(
                 "id"                   => $company->id,
@@ -465,12 +465,12 @@ class StatsController extends Controller
         $data["chat_exchange_count"] = $chatMessagesCount;
         $data["booked_interviews"] = RecruiterScheduleBooked::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where(DB::raw("CONCAT(`date`, ' ', `start_time`)"), '>=', date('Y-m-d H:i'))->count();
 
-        $data["pending_invitations"] = RecruiterScheduleInvite::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where('cancel', 0)
+        $data["pending_invitations"] = RecruiterScheduleInvite::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where('status', 'pending')
                                                                     ->whereHas('SlotInfo', function($query) {
                                                                          $query->where(DB::raw("CONCAT(`days`, ' ', `start_time`)"), '>=', date('Y-m-d H:i'));
                                                                     })->count();
 
-        $data["cancelled_interviews"] = RecruiterScheduleInvite::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where('cancel', 1)
+        $data["cancelled_interviews"] = RecruiterScheduleInvite::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where('status','canceled')
                                                                     ->whereHas('SlotInfo', function($query) {
                                                                          $query->where(DB::raw("CONCAT(`days`, ' ', `start_time`)"), '>=', date('Y-m-d H:i'));
                                                                     })->count();
