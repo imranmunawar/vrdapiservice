@@ -217,6 +217,7 @@ class RecruiterSchedulingController extends Controller {
 				"name"      => $interview->CandidateDetails->name,
 				'email'     => $interview->CandidateDetails->email,
 				'slot'      => $date,
+				'invited_by'     => $interview->invited_by,
 				'candidate_id' => $interview->candidate_id,
 	    		"url"       => env('BACKEND_URL').'fair/candidate/detail/'.$interview->candidate_id
 			);
@@ -542,6 +543,24 @@ class RecruiterSchedulingController extends Controller {
 	  ],200);
  	}
 
+ 	public function getUniqueId(){
+ 		return substr(base_convert(sha1(uniqid(mt_rand())), 16, 36), 0, 8).time().substr(base_convert(sha1(uniqid(mt_rand())), 16, 36), 0, 8);
+ 	}
+
+ 	public function rcInvitationEmail($emailArray,$email,$name,$fairname,$recruiter_name){
+ 		Mail::send('emails.scheduling-invitation',$emailArray, function($message) use ($email,$name, $fairname,$recruiter_name){
+			$message->to($email, $name)->subject($recruiter_name.' invited you for the interview on '.$fairname);
+
+		});
+ 	}
+
+ 	public function crInvitationEmail($emailArray,$email,$name,$fairname,$recruiter_name){
+ 		Mail::send('emails.crInvitationEmail',$emailArray, function($message) use ($email,$name, $fairname,$recruiter_name){
+			$message->to($email, $name)->subject($name.' requested you for the interview on '.$fairname);
+
+		});
+ 	}
+
 
 
 
@@ -551,6 +570,7 @@ class RecruiterSchedulingController extends Controller {
 		$recruiter_id = $request->recruiter_id;
 		$slot_id      = $request->slot_id;
 		$fair_id      = $request->fair_id;
+		$invited_by   = $request->invited_by;
 		$candidate    = User::find($candidate_id);
 		$recruiter    = User::find($recruiter_id);
 		$fair         = Fair::find($fair_id);
@@ -558,105 +578,80 @@ class RecruiterSchedulingController extends Controller {
 		if ($recruiterSchedule) {
 			if(!RecruiterScheduleBooked::where('fair_id',$fair_id)->where('candidate_id',$candidate_id)->where('start_time',$recruiterSchedule->start_time)->where('end_time',$recruiterSchedule->end_time)->where('date',$recruiterSchedule->days)->exists()){
 				if($candidate){
-					$name     = $candidate->name;
-					$email    = $candidate->email;
-					$fairname = $fair->name;
-					$recruiter_name = $recruiter->name;
+					$name               = $candidate->name;
+					$email              = $candidate->email;
+					$recruiter_email    = $recruiter->email;
+					$fairname           = $fair->name;
+					$recruiter_name     = $recruiter->name;
 					$candidate_timezone = $candidate->userSetting->user_timezone;
-					$u_id = substr(base_convert(sha1(uniqid(mt_rand())), 16, 36), 0, 8).time().substr(base_convert(sha1(uniqid(mt_rand())), 16, 36), 0, 8);
-					if (RecruiterScheduleInvite::where('fair_id',$fair_id)->where('recruiter_id',$recruiter_id)->where('candidate_id',$candidate_id)->exists()) {
+					$u_id = $this->getUniqueId();
+					if (RecruiterScheduleInvite::where('fair_id',$fair_id)
+						    ->where('recruiter_id',$recruiter_id)
+						    ->where('candidate_id',$candidate_id)
+						    ->exists()) {
 						$SQL = RecruiterScheduleInvite::where('fair_id',$fair_id)
-						            ->where('recruiter_id',$recruiter_id)
-						            ->where('candidate_id',$candidate_id)
-						            ->update(array('expire' => 0,'status'=> 'pending', 'slot_id'=>$slot_id,'u_id'=>$u_id));
+						        ->where('recruiter_id',$recruiter_id)
+						        ->where('candidate_id',$candidate_id)
+						        ->update(array(
+						         	'expire'  => 0,
+						         	'status'  => 'pending',
+						         	'slot_id' =>  $slot_id,
+						         	'u_id'    =>  $u_id
+						        ));
 					}else{
 						$SQL = RecruiterScheduleInvite::create(array(
 							'u_id'         => $u_id,
 							'fair_id'      => $fair_id,
 							'recruiter_id' => $recruiter_id,
 							'candidate_id' => $candidate_id,
-							'slot_id'      => $slot_id
+							'slot_id'      => $slot_id,
+							'invited_by'   => $invited_by
 						));
 						RecruiterSchedule::where('id',$slot_id)->update(array('status' => 'pending'));
 					}
 
 
 					if($SQL){
-						$emails = FairCandidates::where('candidate_id',$candidate_id)->where('fair_id',$fair_id)->first();
+						$emails = FairCandidates::where('candidate_id',$candidate_id)
+						          ->where('fair_id',$fair_id)
+						          ->first();
 						$faircandidate_id = $emails->id;
 							$acceptInvitationLink = env('BACKEND_URL').'interview/invitation/'.$u_id;
 						$cancelUrl    = env('BACKEND_URL').'cancel/interview/invitation/'.$u_id;
 						$backendLogin = env('BACKEND_URL').'login';
-						$date = Carbon::createFromFormat('d-m-Y',$recruiterSchedule->days)->toFormattedDateString();
-				        $start_time = $recruiterSchedule->start_time;
-				        $end_time   = $recruiterSchedule->end_time;
-				        $start_time = AppHelper::startTimeScheduling($start_time, $u_id, $candidate_timezone)->format('h:i A');
-					    $end_time = AppHelper::endTimeScheduling($end_time, $u_id, $candidate_timezone)->format('h:i A');
+						$date         = Carbon::createFromFormat('d-m-Y',$recruiterSchedule->days)->toFormattedDateString();
+				        $st           = $recruiterSchedule->start_time;
+				        $et           = $recruiterSchedule->end_time;
+				        $start_time   = $this->localTime($st,$candidate_timezone,$fair->timezone);
+					    $end_time     = $this->localTime($et,$candidate_timezone,$fair->timezone);
 
-						// if($emails->email_notification == 1){
-							Mail::send('emails.scheduling-invitation',
-								[
-									'name'  => $name,
-									'email' => $email,
-									'u_id'  => $u_id,
-									'faircandidate_id' => $faircandidate_id,
-									'candidate_id'     => $candidate_id,
-									'fairname'         => $fairname,
-									'acceptInvitationLink'=>$acceptInvitationLink,
-									'cancelUrl'           => $cancelUrl,
-									'start_time'          => $start_time,
-									'end_time'            => $end_time,
-									'date'                => $date
+					    $emailArr = [
+							'name'  => $name,
+							'email' => $email,
+							'u_id'  => $u_id,
+							'faircandidate_id' => $faircandidate_id,
+							'candidate_id'     => $candidate_id,
+							'fairname'         => $fairname,
+							'recruiter_name'   => $recruiter_name,
+							'recruiter_start_time' => $st,
+							'recruiter_end_time'   => $et,
+							'acceptInvitationLink' =>$acceptInvitationLink,
+							'cancelUrl'            => $cancelUrl,
+							'start_time'           => $start_time,
+							'end_time'             => $end_time,
+							'date'                 => $date
+						];
 
-								], function($message) use ($email,$name, $fairname, $recruiter_name)
-							{
+					    if ($invited_by == 'recruiter') {
+					    	// invitation from recruiter To candidate
+					    	$this->rcInvitationEmail($emailArr,$email,$name,$fairname,$recruiter_name);
+					    }
+					    if ($invited_by == 'candidate') {
+					    	// invitation from candidate to recruiter
+					    	$email = $recruiter_email;
+					    	$this->crInvitationEmail($emailArr,$email,$name,$fairname,$recruiter_name);
+					    }
 
-								// $filename = "invite.ics";
-								// 		$meeting_duration = (3600 * 2); // 2 hours
-								// 		$meetingstamp = strtotime( '12-6-2020' . " UTC");
-								// 		$dtstart = gmdate('Ymd\THis\Z', $meetingstamp);
-								// 		$dtend =  gmdate('Ymd\THis\Z', $meetingstamp + $meeting_duration);
-								// 		$todaystamp = gmdate('Ymd\THis\Z');
-								// 		$uid = date('Ymd').'T'.date('His').'-'.rand().'@yourdomain.com';
-								// 		$description = strip_tags('asdasdasdasdasdadasdasd');
-								// 		$location = "651 Chester Rd, Ellesmere Port, CH66 2LN";
-								// 		$titulo_invite = "Your meeting title";
-								// 		$organizer = "CN=Ali Sultwn Khan:mailto:noreply@goalenvision.com";
-										
-								// 		// ICS
-								// 		$mail[0]  = "BEGIN:VCALENDAR";
-								// 		$mail[1] = "PRODID:-//Google Inc//Google Calendar 70.9054//EN";
-								// 		$mail[2] = "VERSION:2.0";
-								// 		$mail[3] = "CALSCALE:GREGORIAN";
-								// 		$mail[4] = "METHOD:REQUEST";
-								// 		$mail[5] = "BEGIN:VEVENT";
-								// 		$mail[6] = "DTSTART;TZID=America/Sao_Paulo:" . $dtstart;
-								// 		$mail[7] = "DTEND;TZID=America/Sao_Paulo:" . $dtend;
-								// 		$mail[8] = "DTSTAMP;TZID=America/Sao_Paulo:" . $todaystamp;
-								// 		$mail[9] = "UID:" . $uid;
-								// 		// $mail[10]  = "ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS";
-								// 		// $mail[11]  = "ACTION;RSVP=TRUE;CN=Test:mailto:user123@gmail.com";
-								// 		$mail[12] = "ORGANIZER;" . $organizer;
-								// 		$mail[13] = "CREATED:" . $todaystamp;
-								// 		$mail[14] = "DESCRIPTION:" . $description;
-								// 		$mail[15] = "LAST-MODIFIED:" . $todaystamp;
-								// 		$mail[16] = "LOCATION:" . $location;
-								// 		$mail[17] = "SEQUENCE:0";
-								// 		$mail[18] = "SUMMARY:" . $titulo_invite;
-								// 		$mail[19] = "STATUS:CONFIRMED";
-								// 		$mail[20] = "TRANSP:OPAQUE";
-								// 		$mail[21] = "END:VEVENT";
-								// 		$mail[22] = "END:VCALENDAR";
-										
-								// 		$mail = implode("\r\n", $mail);
-								// 		header("text/calendar");
-								// 		file_put_contents($filename, $mail);
-                                        
-								// 		$message->attachData($mail, $filename, ['mime' => 'text/calendar; method=REQUEST; charset=UTF-8']);
-								$message->to($email, $name)->subject($recruiter_name.' invited you for the interview on '.$fairname);
-
-							});
-						// }
 						return response()->json([
 				            'code'    => 'success',
 				            'message' => 'Candidate Invited Successfully'
@@ -678,11 +673,19 @@ class RecruiterSchedulingController extends Controller {
 
 	}
 
-	public function getRecruiterAvailableSlots($fair_id,$recruiter_id,$date){
+	public function localTime($time,$localTimezone,$fairTimezone)
+	{
+		$date = new DateTime($time, new DateTimeZone($fairTimezone));
+		$date->setTimezone(new DateTimeZone($localTimezone));
+		return $date->format('h:i A');
+	}
+
+	public function getRecruiterAvailableSlots(Request $request){
 		$slots = [];
-		$fair_id      = $fair_id;
-		$recruiter_id = $recruiter_id;
-		$date         = $date;
+		$fair_id            = $request->fair_id;
+		$recruiter_id       = $request->recruiter_id;
+		$date               = $request->date;
+		$timezone           = $request->timezone;
 		$schedules    = RecruiterSchedule::where('recruiter_id',$recruiter_id)->where('days',$date)->orderBy('days', 'ASC')->get();
 		$fair         = Fair::find($fair_id);
 
@@ -698,12 +701,20 @@ class RecruiterSchedulingController extends Controller {
 					$currentDateTime = new DateTime("now",new DateTimeZone($fair->timezone));
                     $slotDateTime    = new DateTime($row->days.$row->start_time);
 
-                    // if ($slotDateTime->format('d-m-Y H:i:s') > $currentDateTime->format('d-m-Y H:i:s')) {
+                    $startTime = date('h:i A', strtotime($row->start_time));
+                    $end_time  = date('h:i A', strtotime($row->end_time));
+
+                    if (!empty($timezone)) {
                     	$slots[] = [
 							'id'   => $row->id,
-							'slot' => date('h:i A', strtotime($row->start_time)).' - '.date('h:i A', strtotime($row->end_time)),
+							'slot' => $this->localTime($row->start_time,$timezone,$fair->timezone).' - '.$this->localTime($row->end_time,$timezone,$fair->timezone)
 						];
-                    // }
+                    }else{
+                    	$slots[] = [
+							'id'   => $row->id,
+							'slot' =>  $startTime.' - '.$end_time
+						];
+                    }
 				}
 		    }
 		}
@@ -725,7 +736,7 @@ class RecruiterSchedulingController extends Controller {
 		}
 		$schedules = RecruiterSchedule::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('status','available')->select('id','days','start_time','end_time')->get();
 
-		if ($schedules) {
+		if (count($schedules) > 0) {
 			foreach ($schedules as $key => $row) {
 				$dates[] = [
 					'id'   => $row->id,

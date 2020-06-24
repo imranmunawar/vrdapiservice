@@ -277,18 +277,28 @@
                                                             <tbody>
                                                                <tr style="border-collapse:collapse">
                                                                   <td class="esd-block-text" align="left" style="margin:0; padding:0">
-                                                                     <h3 style='font-family:arial, "helvetica neue", helvetica, sans-serif; line-height:120%; margin:0; mso-line-height-rule:exactly; color:#666; font-size:20px; font-style:normal; font-weight:normal'>Hi, {{ $name }},<br></h3>
+                                                                     <h3 style='font-family:arial, "helvetica neue", helvetica, sans-serif; line-height:120%; margin:0; mso-line-height-rule:exactly; color:#666; font-size:20px; font-style:normal; font-weight:normal'>Hi, {{ $recruiter_name }},<br></h3>
                                                                   </td>
                                                                </tr>
                                                                <tr style="border-collapse:collapse">
                                                                   <td class="esd-block-text es-p15t" align="left" style="margin:0; padding:0; padding-top:15px">
-                                                                     <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:15px; line-height:150%; color:#999'>Invitation for the Interview on {{ $date }} from {{ $start_time }} to {{ $end_time }} in {{ $fairname }}</p>
+                                                                     <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:15px; line-height:150%; color:#999'>You have request for the Interview on {{ $date }} from {{ $recruiter_start_time }} to {{ $recruiter_end_time }} in {{ $fairname }}</p>
+                                                                  </td>
+                                                               </tr>
+                                                                <tr style="border-collapse:collapse">
+                                                                  <td class="esd-block-text es-p15t" align="left" style="margin:0; padding:0; padding-top:15px">
+                                                                    <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:15px; line-height:150%; color:#999'> <span>Candidate Name : {{$name}}</span>
+                                                                    </p>
+                                                                   <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:15px; line-height:150%; color:#999'>
+                                                                    <span>Candidate Email : {{$email}}</span>
+                                                                  </p> 
+                                                                    
                                                                   </td>
                                                                </tr>
                                                                <tr style="border-collapse:collapse">
                                                                  <td class="esd-block-text es-p15t" align="left" style="margin:0; padding:0; padding-top:15px">
                                                                    <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:13px; line-height:150%; color:#999'>
-                                                                         Please click on the confirm button and book your interview.
+                                                                         Please click on the confirm button and accept interview request.
                                                                      </p>
                                                                  </td>
                                                                </tr>
@@ -298,7 +308,7 @@
                                                                </tr>
                                                                <tr style="border-collapse:collapse">
                                                                   <td class="esd-block-text es-p15t" align="left" style="margin:0; padding:0; padding-top:15px">
-                                                                     <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:14px; line-height:150%; color:#999'>  If you want to cancel your interview, please click this link anytime. <a href="{{$cancelUrl}}" style="color:#0083be;text-decoration:none" target="_blank">Cancel Interview</a></p>
+                                                                     <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:14px; line-height:150%; color:#999'>  If you want to cancel interview request, please click this link anytime. <a href="{{$cancelUrl}}" style="color:#0083be;text-decoration:none" target="_blank">Cancel Interview</a></p>
                                                                   </td>
                                                                </tr>
                                                                <tr style="border-collapse:collapse">
