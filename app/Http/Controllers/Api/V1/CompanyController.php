@@ -217,6 +217,8 @@ class CompanyController extends Controller
                 'recruiter_status'  => $row->recruiterSetting->recruiter_status,
                 'user_image'        => $row->recruiterSetting->user_image,
                 'location'          => $row->recruiterSetting->location,
+                'allow_schedule'    => $row->recruiterSetting->allow_schedule,
+                'scheduling_percentage' => $row->recruiterSetting->scheduling_percentage
             ];
         }
         return response()->json(['recruiters'=>$recruitersArr]);

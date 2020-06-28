@@ -302,23 +302,18 @@ class StatsController extends Controller
         $data["scheduling"] = array();
         $companies = Company::where('fair_id',$fair_id)->get();
         foreach ($companies as $key => $company) {
-          $recruiter_arr = array();
-          $recruiters  = UserSettings::select('user_id')->where('company_id',$company->id)->where('fair_id',$fair_id)->get();
-          foreach ($recruiters  as $key => $recruiter) {
-            $recruiter_arr[] = $recruiter->user_id;
-          }
-          $booked_interviews = RecruiterScheduleBooked::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->count();
-
-          $pending_invitations = RecruiterScheduleInvite::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where('status', 'pending')->count();
-
-          $cancelled_interviews = RecruiterScheduleInvite::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where('status', 'canceled')->count();
+          $booked_interviews     = RecruiterScheduleInvite::where('fair_id', $fair_id)->where('company_id',$company->id)->where('status', 'booked')->count();
+          $pending_invitations   = RecruiterScheduleInvite::where('fair_id', $fair_id)->where('company_id',$company->id)->where('status', 'pending')->count();
+          $cancelled_interviews  = RecruiterScheduleInvite::where('fair_id', $fair_id)->where('company_id',$company->id)->where('status', 'canceled')->count();
+           $available_slots      =  RecruiterSchedule::where('fair_id', $fair_id)->where('company_id',$company->id)->where('status','available')->count();
 
           $data["scheduling"][] = array(
                 "id"                   => $company->id,
                 "name"                 => $company->company_name,
                 "booked_interviews"    => $booked_interviews,
                 "pending_invitations"  => $pending_invitations,
-                "cancelled_interviews" => $cancelled_interviews
+                "cancelled_interviews" => $cancelled_interviews,
+                'available_slots'      => $available_slots
             );
 
 
@@ -458,22 +453,13 @@ class StatsController extends Controller
             $data['recruiterChats'] = [];
         }
 
-
-        // $data["chats"] = ChatTranscript::where('company_id',$company_id)->where('fair_id',$fair_id)->groupBy('sender_id')->get();
         $data["chat_count"] = $chatCount;
-        // $data["chat_exchange_count"] = ChatTranscript::where('company_id',$company_id)->where('fair_id',$fair_id)->groupBy('sender_id')->count();
-        $data["chat_exchange_count"] = $chatMessagesCount;
-        $data["booked_interviews"] = RecruiterScheduleBooked::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where(DB::raw("CONCAT(`date`, ' ', `start_time`)"), '>=', date('Y-m-d H:i'))->count();
+        $data["chat_exchange_count"]   = $chatMessagesCount;
+         $data["booked_interviews"]    = RecruiterScheduleInvite::where('fair_id', $fair_id)->where('company_id',$company_id)->where('status', 'booked')->count();
+        $data["pending_invitations"]   = RecruiterScheduleInvite::where('fair_id', $fair_id)->where('company_id',$company_id)->where('status', 'pending')->count();
+        $data["cancelled_interviews"]  = RecruiterScheduleInvite::where('fair_id', $fair_id)->where('company_id',$company_id)->where('status', 'canceled')->count();
+        $data['available_slots']       =  RecruiterSchedule::where('fair_id', $fair_id)->where('company_id',$company_id)->where('status','available')->count();
 
-        $data["pending_invitations"] = RecruiterScheduleInvite::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where('status', 'pending')
-                                                                    ->whereHas('SlotInfo', function($query) {
-                                                                         $query->where(DB::raw("CONCAT(`days`, ' ', `start_time`)"), '>=', date('Y-m-d H:i'));
-                                                                    })->count();
-
-        $data["cancelled_interviews"] = RecruiterScheduleInvite::whereIn('recruiter_id',$recruiter_arr)->where('fair_id',$fair_id)->where('status','canceled')
-                                                                    ->whereHas('SlotInfo', function($query) {
-                                                                         $query->where(DB::raw("CONCAT(`days`, ' ', `start_time`)"), '>=', date('Y-m-d H:i'));
-                                                                    })->count();
         $data["standsCount"]  = CompanyStandCount::where('fair_id', $fair_id)->where('company_id',$company_id)->count();
 
         return $data;

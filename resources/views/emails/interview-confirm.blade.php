@@ -245,7 +245,7 @@
                                                          <table width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse; border-spacing:0; mso-table-lspace:0; mso-table-rspace:0">
                                                             <tbody>
                                                                <tr style="border-collapse:collapse">
-                                                                  <td class="esd-block-image" align="center" style="margin:0; padding:0; font-size:0"><a href="https://viewstripo.email/" target="_blank" style='-ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:14px; text-decoration:none; color:#677d9e'><img src="https://virtualrecruitmentdays.com/wp-content/uploads/2019/10/logo.png" alt="Financial logo" title="Financial logo" width="134" style="-ms-interpolation-mode:bicubic; border:0; display:block; outline:none; text-decoration:none"></a></td>
+                                                                  <td class="esd-block-image" align="center" style="margin:0; padding:0; font-size:0"><a href="https://viewstripo.email/" target="_blank" style='-ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:14px; text-decoration:none; color:#677d9e'><img src="https://virtualrecruitmentdays.com/wp-content/uploads/2019/10/logo.png" alt="Virtual Recruitment Days Logo" title="Virtual Recruitment Days Logo" width="134" style="-ms-interpolation-mode:bicubic; border:0; display:block; outline:none; text-decoration:none"></a></td>
                                                                </tr>
                                                             </tbody>
                                                          </table>
@@ -282,7 +282,7 @@
                                                                </tr>
                                                                <tr style="border-collapse:collapse">
                                                                   <td class="esd-block-text es-p15t" align="left" style="margin:0; padding:0; padding-top:15px">
-                                                                     <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:15px; line-height:150%; color:#999'> Your interview has successfully schedule with {{ $withName }} at {{ $date }} from {{ $start_time }} to {{ $end_time }} in {{ $fairname }}</p>
+                                                                     <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:15px; line-height:150%; color:#999'> Your interview has successfully schedule with {{ $withName }} on {{ $date }} from {{ $start_time }} to {{ $end_time }} at {{ $fairname }}.</p>
                                                                   </td>
                                                                </tr>
                                                                <tr style="border-collapse:collapse">
@@ -293,19 +293,19 @@
                                                                <tr style="border-collapse:collapse">
                                                                  <td class="esd-block-text es-p15t" align="left" style="margin:0; padding:0; padding-top:15px">
                                                                    <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:13px; line-height:150%; color:#999'>
-                                                                        Thank You for scheduling your interview to the {{ $fairname }}.
+                                                                        Thank You for scheduling your interview at {{ $fairname }}.
                                                                      </p>
                                                                  </td>
                                                                </tr>
                                                                <tr style="border-collapse:collapse">
-                                                                  <td class="esd-block-button es-p10" style="margin:0; padding: 18px 0px"><span class="es-button-border" style="background:#2980d9; border-color:#2cb543 #2cb543 #2cb543 #2cb543; border-radius:5px; border-style:solid solid solid solid; border-width:0 0 0 0; display:inline-block; width:auto" width="auto"><a href="https://calendar.google.com/calendar/r/eventedit?dates={{$calendar_time}}&text={{ $fairname }}&location={{ url('/'.$url) }}&details=&pli=1&sf=true" class="es-button" target="_blank" style='-ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:roboto, "helvetica neue", helvetica, arial, sans-serif; font-size:18px; text-decoration:none; color:#fff; background:#2980d9; border-color:#2980d9; border-radius:5px; border-style:solid; border-width:10px 99px; display:inline-block; font-style:normal; font-weight:normal; line-height:120%; text-align:center; width:auto; mso-style-priority:100' align="center" width="auto">Add to Calendar</a>
+                                                                  <td class="esd-block-button es-p10" style="margin:0; padding: 18px 0px"><span class="es-button-border" style="background:#2980d9; border-color:#2cb543 #2cb543 #2cb543 #2cb543; border-radius:5px; border-style:solid solid solid solid; border-width:0 0 0 0; display:inline-block; width:auto" width="auto"><a href="{{$calendar_time}}" class="es-button" target="_blank" style='-ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:roboto, "helvetica neue", helvetica, arial, sans-serif; font-size:18px; text-decoration:none; color:#fff; background:#2980d9; border-color:#2980d9; border-radius:5px; border-style:solid; border-width:10px 99px; display:inline-block; font-style:normal; font-weight:normal; line-height:120%; text-align:center; width:auto; mso-style-priority:100' align="center" width="auto">Add to Calendar</a>
                                                                   </span>
-                                                                  <a  style="text-decoration:none;font-size: 12px" href="{{ url('/'.$url) }}" target="_blank">Click to Login</a></td>
+                                                                </td>
 
                                                                </tr>
                                                                <tr style="border-collapse:collapse">
                                                                   <td class="esd-block-text es-p15t" align="left" style="margin:0; padding:0; padding-top:15px">
-                                                                     <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:14px; line-height:150%; color:#999'>  If you want to cancel your interview, please click this link anytime. <a href="{{$cancelUrl}}" style="color:#0083be;text-decoration:none" target="_blank">Cancel Interview</a></p>
+                                                                     <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:14px; line-height:150%; color:#999'>  If you change your mind and want to cancel your interview, please click this link anytime. <a href="{{$cancelUrl}}" style="color:#0083be;text-decoration:none" target="_blank">Cancel Interview</a></p>
                                                                   </td>
                                                                </tr>
                                                                <tr style="border-collapse:collapse">
@@ -314,11 +314,6 @@
                                                                   </td>
                                                                </tr>
                                                                
-                                                               <tr style="border-collapse:collapse">
-                                                                  <td class="esd-block-text es-p25t" align="left" style="margin:0; padding:0; padding-top:25px">
-                                                                     <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:14px; line-height:150%; color:#999'>Good Luck and See you at the event.<br></p>
-                                                                  </td>
-                                                               </tr>
                                                                <tr style="border-collapse:collapse">
                                                                   <td class="esd-block-text es-p15t" align="left" style="margin:0; padding:0; padding-top:15px">
                                                                      <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:14px; line-height:150%; color:#999'>Best regards,</p>

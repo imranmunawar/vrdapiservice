@@ -29,6 +29,8 @@ class UserSettings extends Model
       'show_email',
       'job_email',
       'recruiter_img',
+      'allow_schedule',
+      'scheduling_percentage',
       'user_image',
       'user_cv',
       'fair_id',

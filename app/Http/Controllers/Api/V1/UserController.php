@@ -174,6 +174,8 @@ class UserController extends Controller
                 'show_email'            => array_key_exists('show_email', $data) ? $data['show_email'] : 0,
                 'job_email'             => array_key_exists('job_email', $data) ? $data['job_email'] : 0,
                 'recruiter_img'         => array_key_exists('recruiter_img', $data) ? $data['recruiter_img'] : '',
+                'allow_schedule'        => isset($data['allow_schedule']) ? 1 : 0,
+                'scheduling_percentage' => $data['scheduling_percentage']
               ]);
 
               
@@ -326,6 +328,8 @@ class UserController extends Controller
                 'show_email'            => array_key_exists('show_email', $data) ? $data['show_email'] : 0,
                 'job_email'             => array_key_exists('job_email', $data) ? $data['job_email'] : 0,
                 'recruiter_img'         => array_key_exists('recruiter_img', $data) ? $data['recruiter_img'] : '',
+                'allow_schedule'        => isset($data['allow_schedule']) ? 1 : 0,
+                'scheduling_percentage' => $data['scheduling_percentage']
               ];
 
              $setting->update($settingDataToUpdate);

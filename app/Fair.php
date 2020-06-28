@@ -54,6 +54,8 @@ class Fair extends Model
         'fair_status',
         'chat_status',
         'total_hall',
+        'back_scheduling',
+        'front_scheduling',
         'layout',
         'presenter',
         'stand_receptionist',

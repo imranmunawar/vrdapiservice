@@ -277,20 +277,18 @@
                                                             <tbody>
                                                                <tr style="border-collapse:collapse">
                                                                   <td class="esd-block-text" align="left" style="margin:0; padding:0">
-                                                                     <h3 style='font-family:arial, "helvetica neue", helvetica, sans-serif; line-height:120%; margin:0; mso-line-height-rule:exactly; color:#666; font-size:20px; font-style:normal; font-weight:normal'>Hi, {{ $name }},<br></h3>
+                                                                     <h3 style='font-family:arial, "helvetica neue", helvetica, sans-serif; line-height:120%; margin:0; mso-line-height-rule:exactly; color:#666; font-size:20px; font-style:normal; font-weight:normal'>Hi, {{ $candidate_name }},<br></h3>
                                                                   </td>
                                                                </tr>
                                                                <tr style="border-collapse:collapse">
                                                                   <td class="esd-block-text es-p15t" align="left" style="margin:0; padding:0; padding-top:15px">
-                                                                     <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:15px; line-height:150%; color:#999'> Interview on {{ $date }} from {{ $start_time }} to {{ $end_time }} at {{ $fairname }} has been Declined by {{$recruiterName}}.</p>
+                                                                     <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:15px; line-height:150%; color:#999'>Your interview request for the time slot on {{ $candidate_date }} from {{ $candidate_start_time }} to {{ $candidate_end_time }} at {{ $fairname }} has sent successfullly.</p>
                                                                   </td>
                                                                </tr>
                                                                <tr style="border-collapse:collapse">
-                                                                 <td class="esd-block-text es-p15t" align="left" style="margin:0; padding:0; padding-top:15px">
-                                                                   <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:13px; line-height:150%; color:#999'>
-                                                                        {{$notes}}
-                                                                     </p>
-                                                                 </td>
+                                                                  <td class="esd-block-text es-p15t" align="left" style="margin:0; padding:0; padding-top:15px">
+                                                                     <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:14px; line-height:150%; color:#999'>  If you change your mind and want to cancel your interview, please. <a href="{{$ccancelLink}}" style="color:#0083be;text-decoration:none" target="_blank">click here</a></p>
+                                                                  </td>
                                                                </tr>
                                                                <tr style="border-collapse:collapse">
                                                                   <td class="esd-block-text es-p15t" align="left" style="margin:0; padding:0; padding-top:15px">
@@ -298,11 +296,6 @@
                                                                   </td>
                                                                </tr>
                                                                
-                                                               <tr style="border-collapse:collapse">
-                                                                  <td class="esd-block-text es-p25t" align="left" style="margin:0; padding:0; padding-top:25px">
-                                                                     <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:14px; line-height:150%; color:#999'>Good Luck and See you at the event.<br></p>
-                                                                  </td>
-                                                               </tr>
                                                                <tr style="border-collapse:collapse">
                                                                   <td class="esd-block-text es-p15t" align="left" style="margin:0; padding:0; padding-top:15px">
                                                                      <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:14px; line-height:150%; color:#999'>Best regards,</p>
@@ -354,7 +347,7 @@
                                                                </tr>
                                                                <tr style="border-collapse:collapse">
                                                                   <td esdev-links-color="#333333" align="center" class="esd-block-text es-m-txt-c" style="margin:0; padding:0">
-                                                                     <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:13px; line-height:150%; color:#999'><a href="{{ url('/emails/unsubscribe/'.$faircandidate_id.'/'.$candidate_id) }}" target="_blank" style='-ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:14px; text-decoration:none; color:#999' class="unsubscribe">Unsubscribe</a></p>
+                                                                     <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:13px; line-height:150%; color:#999'><a href="{{ url('/emails/unsubscribe/'.$candidate_id.'/'.$candidate_id) }}" target="_blank" style='-ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:14px; text-decoration:none; color:#999' class="unsubscribe">Unsubscribe</a></p>
                                                                   </td>
                                                                </tr>
                                                                <tr style="border-collapse:collapse">

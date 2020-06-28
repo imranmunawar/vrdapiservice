@@ -763,8 +763,9 @@ Route::group(['namespace' => 'Api\V1'], function () {
     Route::get('/candidate/interview/cancel/{u_id}', 'RecruiterSchedulingController@candidateCancelSchedule');
     Route::get('/interview/invitation/{u_id}', 'RecruiterSchedulingController@invitationLink');
     Route::post('/interview/fetch/schedules', 'RecruiterSchedulingController@fetchSchedules');
-    Route::get('/interview/book/schedule/{u_id}', 'RecruiterSchedulingController@bookSchedule');
+    Route::get('/interview/book/schedule/{u_id}/{confirm_by}', 'RecruiterSchedulingController@bookSchedule');
     Route::post('/candidate/cancel/interview', 'RecruiterSchedulingController@candidateCancelInterview');
+    Route::post('/recruiter/cancel/interview/from-mail', 'RecruiterSchedulingController@recruiterCancelInterview');
     Route::post('/candidate/schedule/detail', 'RecruiterSchedulingController@getCandidateSchedule');
     // Front Interview
     Route::post('/front/join/interview',[

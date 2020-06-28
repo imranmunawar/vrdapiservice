@@ -245,7 +245,7 @@
                                                          <table width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse; border-spacing:0; mso-table-lspace:0; mso-table-rspace:0">
                                                             <tbody>
                                                                <tr style="border-collapse:collapse">
-                                                                  <td class="esd-block-image" align="center" style="margin:0; padding:0; font-size:0"><a href="https://viewstripo.email/" target="_blank" style='-ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:14px; text-decoration:none; color:#677d9e'><img src="https://virtualrecruitmentdays.com/wp-content/uploads/2019/10/logo.png" alt="Financial logo" title="Financial logo" width="134" style="-ms-interpolation-mode:bicubic; border:0; display:block; outline:none; text-decoration:none"></a></td>
+                                                                  <td class="esd-block-image" align="center" style="margin:0; padding:0; font-size:0"><a href="https://viewstripo.email/" target="_blank" style='-ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:14px; text-decoration:none; color:#677d9e'><img src="https://virtualrecruitmentdays.com/wp-content/uploads/2019/10/logo.png" alt="Virtual Recruitment Days Logo" title="Virtual Recruitment Days Logo" width="134" style="-ms-interpolation-mode:bicubic; border:0; display:block; outline:none; text-decoration:none"></a></td>
                                                                </tr>
                                                             </tbody>
                                                          </table>
@@ -282,13 +282,13 @@
                                                                </tr>
                                                                <tr style="border-collapse:collapse">
                                                                   <td class="esd-block-text es-p15t" align="left" style="margin:0; padding:0; padding-top:15px">
-                                                                     <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:15px; line-height:150%; color:#999'>Interview on {{ $date }} from {{ $start_time }} to {{ $end_time }} in {{ $fairname }} has been Canceled by @if($cancelBy == 'candidate'){{$candidateName}} @else {{$recruiterName}} @endif.</p>
+                                                                     <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:15px; line-height:150%; color:#999'>Interview on {{ $date }} from {{ $start_time }} to {{ $end_time }} at {{ $fairname }} has been Declined by @if($cancelBy == 'candidate'){{$candidateName}} @else {{$recruiterName}}@endif</p>
                                                                   </td>
                                                                </tr>
                                                                <tr style="border-collapse:collapse">
                                                                  <td class="esd-block-text es-p15t" align="left" style="margin:0; padding:0; padding-top:15px">
                                                                    @if($cancelBy == 'candidate')
-                                                                   <h3>Candiadate Notes :</h3>
+                                                                   <h3>Candidate Notes :</h3>
                                                                    <p style="color:#404040;font-family: 'Poppins', sans-serif;background: #f1f1f1;font-size:14px;font-weight:normal;margin-bottom:20px;margin-top:0px;padding: 10px">
                                                                        {{$notes}}
                                                                    </p>
@@ -301,11 +301,6 @@
                                                                   </td>
                                                                </tr>
                                                                
-                                                               <tr style="border-collapse:collapse">
-                                                                  <td class="esd-block-text es-p25t" align="left" style="margin:0; padding:0; padding-top:25px">
-                                                                     <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:14px; line-height:150%; color:#999'>Good Luck and See you at the event.<br></p>
-                                                                  </td>
-                                                               </tr>
                                                                <tr style="border-collapse:collapse">
                                                                   <td class="esd-block-text es-p15t" align="left" style="margin:0; padding:0; padding-top:15px">
                                                                      <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:14px; line-height:150%; color:#999'>Best regards,</p>

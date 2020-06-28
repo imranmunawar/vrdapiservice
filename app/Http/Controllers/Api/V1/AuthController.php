@@ -201,7 +201,6 @@ class AuthController extends Controller
         ];
 
         return $detail;
-
     }
   
     /**
@@ -222,20 +221,24 @@ class AuthController extends Controller
         $userArr['userEmail']          = $userEmail;
 
         if ($role == 'Recruiter' || $role == 'Company Admin') {
-            $userSetting = UserSettings::where('user_id',$userId)->select('fair_id','company_id','recruiter_status')->first();
+            $userSetting = UserSettings::where('user_id',$userId)->select('fair_id','company_id','recruiter_status','allow_schedule')->first();
             UserSettings::where('user_id',$userId)->update(['recruiter_status'=>'online']);
-            $userFairId      = $userSetting->fair_id;
-            $organiserId     = $userSetting->organiser_id;
-            $companyId       = $userSetting->company_id;
-            $compnayLogo     = Company::where('id',$companyId)->select('company_logo')->first();
-            $recruiterStatus = $userSetting->recruiter_status;
+            $userFairId         = $userSetting->fair_id;
+            $organiserId        = $userSetting->organiser_id;
+            $companyId          = $userSetting->company_id;
+            $allowSchedule      = $userSetting->allow_schedule;
+            $fairBackScheduling = 
+            $compnayLogo        = Company::where('id',$companyId)->select('company_logo')->first();
+            $recruiterStatus    = $userSetting->recruiter_status;
             $userArr['userFairId']         = $userFairId;
             $userArr['companyId']          = $companyId;
             $userArr['recruiterStatus']    = $recruiterStatus;
+            $userArr['allowSchedule']      = $allowSchedule;
             $userArr['chatId']             = $userFairId.'f'.$userId;
             $userArr['userCompanyLogo']       = $compnayLogo->company_logo;
-            $userFairSetting = Fair::where('id',$userFairId)->select('organiser_id')->first();
-            $userArr['ChatApiDetail'] = $this->getCometChatApiDetail($userFairSetting->organiser_id);
+            $userFairSetting                  = Fair::where('id',$userFairId)->select('organiser_id','back_scheduling')->first();
+            $userArr['ChatApiDetail']         = $this->getCometChatApiDetail($userFairSetting->organiser_id);
+            $userArr['fairBackScheduling']    =  $userFairSetting->back_scheduling;
         }
 
         if ($role == 'Organizer') {
