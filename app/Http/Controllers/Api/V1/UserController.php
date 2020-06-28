@@ -97,8 +97,7 @@ class UserController extends Controller
               'last_name'     => $data['lname'],
               'name'          => $data['fname'].' '.$data['lname'],
               'email'         => $data['email'],
-              'password'      => bcrypt($data['password']),
-              'plan_password' => $data['password'],
+              'password'      => bcrypt($data['password'])
             ]);
             $user->roles()->attach($role);
             $user_id = $user->id;

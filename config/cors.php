@@ -20,7 +20,11 @@ return [
         'allow_credentials' => false,
 
         'allow_origins' => [
-            '*',
+            'https://v2.virtualrecruitmentdays.com',
+            'https://live.virtualopendays.com',
+            'https://admin.virtualopendays.com',
+            'https://admin.virtualrecruitmentdays.com',
+            'http://localhost:3000'
         ],
 
         'allow_methods' => [
