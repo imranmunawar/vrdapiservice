@@ -10,14 +10,16 @@ use DateTime;
 use DateTimeZone;
 use App\Fair;
 use App\User;
+use App\AgendaView;
 use App\Company;
 use App\UserSettings;
 use App\FairCandidates;
 use App\RecruiterSchedule;
 use App\RecruiterScheduleInvite;
 use App\RecruiterScheduleBooked;
+use App\InterviewCompleteNote;
 use App\CandidateScheduleNote;
-use Spatie\CalendarLinks\Link;
+// use Spatie\CalendarLinks\Link;
 use App\Http\Requests;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\Request;
@@ -265,11 +267,12 @@ class RecruiterSchedulingController extends Controller {
 				'status'    => $interview->status,
 				"name"      => $request_by == 'recruiter' ? $interview->CandidateDetails->name : $interview->RecruiterDetails->name,
 				'email'     => $request_by == 'recruiter' ? $interview->CandidateDetails->email : $interview->RecruiterDetails->email,
-				'company'      => $this->getRecruiterCompany($interview->RecruiterUserSetting->company_id),
-				'slot'         => $date,
-				'invited_by'   => $interview->invited_by,
-				'candidate_id' => $interview->candidate_id,
-	    		"url"          => env('BACKEND_URL').'fair/candidate/detail/'.$interview->candidate_id
+				'company'         => $this->getRecruiterCompany($interview->RecruiterUserSetting->company_id),
+				'slot'            => $date,
+				'invited_by'      => $interview->invited_by,
+				'candidate_id'    => $interview->candidate_id,
+				'is_shortlisted'  => User::isCandidateShortlisted($interview->fair_id,$interview->recruiter_id,$interview->candidate_id),
+	    		"url"             => env('BACKEND_URL').'fair/candidate/detail/'.$interview->candidate_id
 			);
 		}
 
@@ -672,6 +675,7 @@ class RecruiterSchedulingController extends Controller {
 		$candidate    = User::find($candidate_id);
 		$recruiter    = User::find($recruiter_id);
 		$fair         = Fair::find($fair_id);
+
 		$recruiterSchedule = RecruiterSchedule::find($slot_id);
 		// Check if Invited By Candidate
 		if ($invited_by == 'candidate') {
@@ -826,6 +830,8 @@ class RecruiterSchedulingController extends Controller {
 		$schedules    = RecruiterSchedule::where('recruiter_id',$recruiter_id)->where('days',$date)->orderBy('days', 'ASC')->get();
 		$fair         = Fair::find($fair_id);
 
+		// return $schedules; die;
+
 		foreach ($schedules as $key => $row) {
 			if(!RecruiterScheduleBooked::where('fair_id',$fair_id)->where('recruiter_id',$recruiter_id)->where('start_time',$row->start_time)->where('end_time',$row->end_time)->where('date',$row->days)->exists()){
 				if (!RecruiterScheduleInvite::where('slot_id',$row->id)->where('status','pending')->exists()) {
@@ -858,7 +864,7 @@ class RecruiterSchedulingController extends Controller {
                     }else{
                     	$slots[] = [
 							'id'   => $row->id,
-							'slot' =>  $startTime.' - '.$end_time
+							'slot' => $row->start_time.' - '.$row->end_time
 						];
                     }
 				}
@@ -1063,17 +1069,20 @@ class RecruiterSchedulingController extends Controller {
 		return $response;
 	}
 
-	public function generateAddToCalendarLink($startDateTime,$endDateTime,$fairname){
-		$dateFrom = date('Y-m-d H:i', strtotime($startDateTime));
-		$dateTo   = date('Y-m-d H:i', strtotime($endDateTime));
-		$from     = DateTime::createFromFormat('Y-m-d H:i',$dateFrom);
-		$to       = DateTime::createFromFormat('Y-m-d H:i',$dateTo);
+	public function generateAddToCalendarLink($date,$start_time,$end_time,$fairname){
+		// $dateFrom = date('Y-m-d H:i', strtotime($startDateTime));
+		// $dateTo   = date('Y-m-d H:i', strtotime($endDateTime));
+		// $from     = DateTime::createFromFormat('Y-m-d H:i',$dateFrom);
+		// $to       = DateTime::createFromFormat('Y-m-d H:i',$dateTo);
 
-		$link = Link::create('Interview at '.$fairname, $from, $to)
-		    ->description('Interview has successfully scheduled')
-		    ->address('Fair Address');
+		// $link = Link::create('Interview at '.$fairname, $from, $to)
+		//     ->description('Interview has successfully scheduled')
+		//     ->address('Fair Address');
 
-		return $link->google();
+		// return $link->google();
+		$dates = date('Ymd', strtotime($date))."T".date('His', strtotime($start_time))."/".date('Ymd', strtotime($date))."T".date('His', strtotime($end_time));
+
+		return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=Interview at '.$fairname.'&dates='.$dates.'&sprop=&sprop=name';
 	}
 
 	public function bookSchedule($u_id,$confirm_by = ''){
@@ -1147,7 +1156,7 @@ class RecruiterSchedulingController extends Controller {
 					$d1                 = $this->localDateTime($slotDate.$start_time,$candidate_timezone,$fair_timezone);
                     $date               = date("F jS, Y", strtotime($d1));
 					// $calendar_time      = date('Ymd', strtotime($slot->days))."T".date('His', strtotime($start_time))."/".date('Ymd', strtotime($slot->days))."T".date('His', strtotime($end_time));
-				    $calendar_time = $this->generateAddToCalendarLink($date.$this->localTime($start_time,$candidate_timezone,$fair_timezone),$date.$this->localTime($end_time,$candidate_timezone,$fair_timezone),$fairname);
+				    $calendar_time = $this->generateAddToCalendarLink($date.$this->localTime($start_time,$candidate_timezone,$fair_timezone),$this->localTime($start_time,$candidate_timezone,$fair_timezone),$this->localTime($end_time,$candidate_timezone,$fair_timezone),$fairname);
                     //Email For Candidate
 					Mail::send('emails.interview-confirm',
 						[
@@ -1172,7 +1181,7 @@ class RecruiterSchedulingController extends Controller {
 					    $message->to($email, $name)->subject('Interview Successfully Scheduled at '.$fairname);
 					});
 
-					$calendar_time = $this->generateAddToCalendarLink($slotDate.$start_time,$slotDate.$end_time,$fairname);
+					$calendar_time = $this->generateAddToCalendarLink($slotDate,$slotDate.$start_time,$slotDate.$end_time,$fairname);
 					$date          = $this->getFormattedDate($slotDate);
 
 					// Email For Recuiter
@@ -1222,6 +1231,42 @@ class RecruiterSchedulingController extends Controller {
 	        ],200);
 		}
 	}
+
+	public function interviewMarkComplete(Request $request){
+		$notes  = $request->notes;
+		$u_id   = $request->u_id;
+		$action = $request->action;
+		$attended = $action == 'completed' ? 1 : 0;
+        $slot  = RecruiterScheduleInvite::where('u_id',$u_id)->select('slot_id','recruiter_id','candidate_id')->first();
+		RecruiterScheduleInvite::where('u_id',$u_id)->update(array('status'   => $action));
+		RecruiterSchedule::where('id',$slot->slot_id)->update(array('status'  => $action));
+		RecruiterScheduleBooked::where('u_id',$u_id)->update(array('attended' => $attended));
+		if (!InterviewCompleteNote::where('slot_id',$slot->slot_id)->where('recruiter_id',$slot->recruiter_id)->where('candidate_id',$slot->candidate_id)->exists()) {
+			CandidateScheduleNote::create([
+				'slot_id'      => $slot->slot_id,
+				'candidate_id' => $slot->candidate_id,
+				'recruiter_id' => $slot->recruiter_id,
+				'notes'        => $notes
+			]);
+		}
+
+
+		if($action == 'completed'){
+			return response()->json([
+	           'code'    => 'success',
+	           'message' => 'Interview Marked Completed'
+	        ], 200);
+		}
+
+		return response()->json([
+           'code'    => 'success',
+           'message' => 'Interview Marked As No-Show'
+        ], 200);
+		
+
+	}
+
+
 	/**
 	 * Candidate Section.
 	 *

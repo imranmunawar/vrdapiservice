@@ -282,7 +282,7 @@
                                                                </tr>
                                                                <tr style="border-collapse:collapse">
                                                                   <td class="esd-block-text es-p15t" align="left" style="margin:0; padding:0; padding-top:15px">
-                                                                     <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:15px; line-height:150%; color:#999'>Your interview request for the time slot on {{ $candidate_date }} from {{ $candidate_start_time }} to {{ $candidate_end_time }} at {{ $fairname }} has sent successfullly.</p>
+                                                                     <p style='margin:0; -ms-text-size-adjust:none; -webkit-text-size-adjust:none; mso-line-height-rule:exactly; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:15px; line-height:150%; color:#999'>Your interview request for the time slot on {{ $candidate_date }} from {{ $candidate_start_time }} to {{ $candidate_end_time }} at {{ $fairname }} was sent successfullly.</p>
                                                                   </td>
                                                                </tr>
                                                                <tr style="border-collapse:collapse">

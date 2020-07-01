@@ -34,6 +34,7 @@ class RecruiterScheduleInvite extends Model
         'company_id',
         'recruiter_id',
         'candidate_id',
+        'invited_by',
         'slot_id',
         'notes',
         'status'

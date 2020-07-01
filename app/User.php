@@ -140,4 +140,14 @@ class User extends Authenticatable
         }
     }
 
+    public static function isCandidateShortlisted($fair_id, $recruiter_id,$candidate_id)
+    {
+        $agendaView = New AgendaView;
+        if($agendaView->where('fair_id', $fair_id)->where('recruiter_id',$recruiter_id)->where('candidate_id',$candidate_id)->where('shortlisted',1)->exists()){
+            return 1;
+        }
+
+        return 0;
+    }
+
 }

@@ -752,6 +752,7 @@ Route::group(['namespace' => 'Api\V1','middleware' => 'auth:api'], function () {
       'uses' => 'RecruiterSchedulingController@blukDeleteSlots',
       'as'   => 'blukDeleteSlots'
     ]);
+    Route::post('/candidate/mark/interview/complete', 'RecruiterSchedulingController@interviewMarkComplete')->name('interviewMarkComplete');
 
 });
 

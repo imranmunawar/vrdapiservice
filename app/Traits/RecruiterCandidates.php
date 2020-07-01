@@ -252,23 +252,23 @@ trait RecruiterCandidates
           // echo "asdasdas"; die;
           return $value;
         }
+        
         // return $interval;
         
       });
       $matched = array();
       foreach ($filtered as $key => $value) {
         // return $value->user_id; die;
-        $candidate_questionnaires = CandidateTest::where('candidate_id','=', $value->user_id)->where('fair_id', '=',$fair_id)->count();
+        $candidate_questionnaires = CandidateTest::where('candidate_id',$value->user_id)->where('fair_id',$fair_id)->count();
         if($candidate_questionnaires > 0){
-          $matchRecr = MatchRecruiter::where('recruiter_id', '=', $recruiter_id)->where('candidate_id', '=', $value->user_id)->where('fair_id', '=', $fair_id)->with('candidate','candidateSetting')->first();
-          $agenda = AgendaView::where('recruiter_id', '=', $matchRecr->recruiter_id)->where('candidate_id', '=', $matchRecr->candidate_id)->where('fair_id', '=', $matchRecr->fair_id)->first();
-          if (!$agenda) {
+          $matchRecr = MatchRecruiter::where('recruiter_id',$recruiter_id)->where('candidate_id',$value->user_id)->where('fair_id',$fair_id)->with('candidate','candidateSetting')->first();
+          if (!AgendaView::where('recruiter_id',$matchRecr['recruiter_id'])->where('candidate_id',$matchRecr['candidate_id'])->where('fair_id',$matchRecr['fair_id'])->exists()) {
             $arr = [
-              'candidate_id' => $matchRecr->candidate_id,
+              'candidate_id' => $matchRecr['candidate_id'],
               'recruiter_id' => $matchRecr['recruiter_id'],
-              'company_id'   => $matchRecr->company_id,
-              'fair_id'      => $matchRecr->fair_id,
-              'percentage'   => $matchRecr->percentage,
+              'company_id'   => $matchRecr['company_id'],
+              'fair_id'      => $matchRecr['fair_id'],
+              'percentage'   => $matchRecr['percentage'],
               'name'         => $matchRecr['candidate']['name'],
               'email'        => $matchRecr['candidate']['email'],
               'user_image'   => $matchRecr['candidateSetting']['user_image'],
@@ -276,21 +276,22 @@ trait RecruiterCandidates
               'country'      => $matchRecr['candidateSetting']['user_country'],
               'avatar'       => $matchRecr['candidateSetting']['user_image'],
               'last_seen'    => \Carbon\Carbon::parse($value->updated_at)->diffForHumans(),
-              'is_candidate_take_test'   => User::isCandidateTakeTest($fair_id,$matchRecr->candidate_id),
-              'is_candidate_attend_fair' => User::isCandidateAttendFair($fair_id,$matchRecr->candidate_id),
-              'is_candidate_in_hall'     => User::isCandidateInMainHall($fair_id,$matchRecr->candidate_id),
+              'is_candidate_take_test'   => User::isCandidateTakeTest($fair_id,$matchRecr['candidate_id']),
+              'is_candidate_attend_fair' => User::isCandidateAttendFair($fair_id,$matchRecr['candidate_id']),
+              'is_candidate_in_hall'     => User::isCandidateInMainHall($fair_id,$matchRecr['candidate_id']),
               'agenda_viewed'            => 0
             ];
             array_push($matched,$arr);
           }
           else{
+            $agenda = AgendaView::where('recruiter_id',$matchRecr['recruiter_id'])->where('candidate_id',$matchRecr['candidate_id'])->where('fair_id',$matchRecr['fair_id'])->first();
             if ($agenda->shortlisted == 0 && $agenda->rejected == 0) {
               $arr = [
-                'candidate_id' => $matchRecr->candidate_id,
-                'recruiter_id' => $matchRecr->recruiter_id,
-                'company_id'   => $matchRecr->company_id,
-                'fair_id'      => $matchRecr->fair_id,
-                'percentage'   => $matchRecr->percentage,
+                'candidate_id' => $matchRecr['candidate_id'],
+                'recruiter_id' => $matchRecr['recruiter_id'],
+                'company_id'   => $matchRecr['company_id'],
+                'fair_id'      => $matchRecr['fair_id'],
+                'percentage'   => $matchRecr['percentage'],
                 'name'         => $matchRecr['candidate']['name'],
                 'email'        => $matchRecr['candidate']['email'],
                 'user_image'   => $matchRecr['candidateSetting']['user_image'],
@@ -298,9 +299,9 @@ trait RecruiterCandidates
                 'country'      => $matchRecr['candidateSetting']['user_country'],
                 'avatar'       => $matchRecr['candidateSetting']['user_image'],
                 'last_seen'    => \Carbon\Carbon::parse($value->updated_at)->diffForHumans(),
-                'is_candidate_take_test'   => User::isCandidateTakeTest($fair_id,$matchRecr->candidate_id),
-                'is_candidate_attend_fair' => User::isCandidateAttendFair($fair_id,$matchRecr->candidate_id),
-                'is_candidate_in_hall'     => User::isCandidateInMainHall($fair_id,$matchRecr->candidate_id),
+                'is_candidate_take_test'   => User::isCandidateTakeTest($fair_id,$matchRecr['candidate_id']),
+                'is_candidate_attend_fair' => User::isCandidateAttendFair($fair_id,$matchRecr['candidate_id']),
+                'is_candidate_in_hall'     => User::isCandidateInMainHall($fair_id,$matchRecr['candidate_id']),
                 'agenda_viewed'            => $agenda->view
               ];
               array_push($matched,$arr);
