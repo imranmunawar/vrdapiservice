@@ -37,6 +37,7 @@ class CandidateJob extends Model {
     protected $fillable = array(
       'candidate_id',
       'job_id',
+      'recruiter_id',
       'fair_id',
       'company_id'
     );

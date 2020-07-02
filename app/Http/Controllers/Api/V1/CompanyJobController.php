@@ -54,6 +54,17 @@ class CompanyJobController extends Controller
         return response()->json($companyJobs);
     }
 
+    public function fillRecruiters(){
+        $candidateJobs = CandidateJob::all();
+
+        foreach ($candidateJobs as $key => $job) {
+            $company = CompanyJob::find($job->job_id);
+                   CandidateJob::where('job_id',$job->job_id)->update(['recruiter_id'=>$company->recruiter_id]);
+
+        }
+
+    }
+
     /**
      * Show the form for creating a new resource.
      *

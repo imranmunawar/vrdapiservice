@@ -397,19 +397,21 @@ class CandidateController extends Controller
     }
 
     public function applyJob(Request $request){
-        $fair_id      = $request->fair_id;
-        $candidate_id = $request->candidate_id;
-        $job_id       = $request->job_id;
-        $company_id   = $request->company_id;
-        $candidateJob = CandidateJob::where('candidate_id',$candidate_id)->where('job_id',$job_id); 
+        $fair_id        = $request->fair_id;
+        $candidate_id   = $request->candidate_id;
+        $job_id         = $request->job_id;
+        $company_id     = $request->company_id;
+        $recruiter_id   = $request->recruiter_id;
+        $candidateJob   = CandidateJob::where('candidate_id',$candidate_id)->where('job_id',$job_id); 
         if($candidateJob->exists()){
             $candidateJob->delete();
         }else{
             CandidateJob::create(array(
-                'candidate_id' => $candidate_id,
-                'job_id'       => $job_id,
-                'fair_id'      => $fair_id,
-                'company_id'   => $company_id
+                'candidate_id'   => $candidate_id,
+                'job_id'         => $job_id,
+                'fair_id'        => $fair_id,
+                'company_id'     => $company_id,
+                'recruiter_id'   => $recruiter_id
             ));
 
             $this->jobApplyEmail($request);

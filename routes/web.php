@@ -33,6 +33,14 @@ Route::post('password/reset', 'Auth\ResetPasswordController@reset')->name('auth.
 Route::get('/home', 'HomeController@index')->name('home');
 
 Route::group(['namespace' => 'Api\V1'], function () { 
+
+    // Get Fair Job detailt
+    Route::get('fill/recruiters',[
+        'uses' => 'CompanyJobController@fillRecruiters',
+        'as'   => 'fillRecruiters'
+    ]); 
+
+
     // Get Fair Job detailt
     Route::get('front/job/detail/{job_id}/{candidate_id?}',[
         'uses' => 'CompanyJobController@detail',
