@@ -133,13 +133,32 @@ class StatsController extends Controller
     public function recruiterStats($recruiter_id,$fair_id){
 
         $data = [];
-        $data["agendaViewsCount"] = AgendaView::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('view',1)->count();
+        $applicationsCount = 0;
+        $agendaViewsCount  = 0;
 
-        $data["jobApplicationsCount"] = CandidateJob::where('fair_id',$fair_id)
-                                                      ->whereHas('jobs', function($query) use ($recruiter_id){
-                                                       $query->where('recruiter_id',$recruiter_id);
-                                                      })->count();
+        $views = AgendaView::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('view',1)->get();
+        if ($views) {
+            foreach ($views as $key => $view) {
+                if (User::where('id',$view->candidate_id)->exists()) {
+                     $agendaViewsCount++;
+                }
+            }
+        }
 
+        $jobs = CandidateJob::where('fair_id',$fair_id)
+                    ->whereHas('jobs', function($query) use ($recruiter_id){
+                    $query->where('recruiter_id',$recruiter_id);
+                    })->get();
+        if ($jobs) {
+            foreach ($jobs as $key => $job) {
+                if (User::where('id',$job->candidate_id)->exists()) {
+                     $applicationsCount++;
+                }
+            }
+        }
+
+        $data["agendaViewsCount"] = $agendaViewsCount;
+        $data["jobApplicationsCount"] = $applicationsCount;
         $data["shortlistedCount"] = AgendaView::where('recruiter_id',$recruiter_id)->where('fair_id',$fair_id)->where('shortlisted',1)->where('rejected',0)->count();
 
 
