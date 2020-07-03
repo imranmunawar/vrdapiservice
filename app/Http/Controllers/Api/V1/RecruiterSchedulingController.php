@@ -17,7 +17,6 @@ use App\FairCandidates;
 use App\RecruiterSchedule;
 use App\RecruiterScheduleInvite;
 use App\RecruiterScheduleBooked;
-use App\InterviewCompleteNote;
 use App\CandidateScheduleNote;
 // use Spatie\CalendarLinks\Link;
 use App\Http\Requests;
@@ -1241,14 +1240,13 @@ class RecruiterSchedulingController extends Controller {
 		RecruiterScheduleInvite::where('u_id',$u_id)->update(array('status'   => $action));
 		RecruiterSchedule::where('id',$slot->slot_id)->update(array('status'  => $action));
 		RecruiterScheduleBooked::where('u_id',$u_id)->update(array('attended' => $attended));
-		if (!InterviewCompleteNote::where('slot_id',$slot->slot_id)->where('recruiter_id',$slot->recruiter_id)->where('candidate_id',$slot->candidate_id)->exists()) {
-			CandidateScheduleNote::create([
-				'slot_id'      => $slot->slot_id,
-				'candidate_id' => $slot->candidate_id,
-				'recruiter_id' => $slot->recruiter_id,
-				'notes'        => $notes
-			]);
-		}
+		
+		CandidateScheduleNote::create([
+			'slot_id'      => $slot->slot_id,
+			'candidate_id' => $slot->candidate_id,
+			'recruiter_id' => $slot->recruiter_id,
+			'notes'        => $notes
+		]);
 
 
 		if($action == 'completed'){

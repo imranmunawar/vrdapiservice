@@ -556,7 +556,8 @@ class FairController extends Controller
     public function registeredCandidates($fair_id){
         $candidatesArr = [];
         $candidates    = FairCandidates::where('fair_id',$fair_id)->with('candidate','candidateInfo','candidateTest','candidateTurnout')
-            ->orderBy('created_at', 'desc')
+            ->orderBy("created_at",'DESC')
+            ->groupBy('candidate_id')
             ->get();
 
         if ($candidates) {

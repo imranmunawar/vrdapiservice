@@ -11,14 +11,14 @@ trait ZoomMeetings {
       "topic" => $topic,
       "type" => 2,
       "start_time" => $start_time,
-      "duration" => $duration,
-      "timezone" => $timzone,
-      "password" => $password,
-      "settings" => array(
-        "host_video" => true,
-        "participant_video" => true,
-        "join_before_host" => false,
-        "auto_recording" => 'cloud'
+      "duration"   => $duration,
+      "timezone"   => $timzone,
+      "password"   => $password,
+      "settings"   => array(
+      "host_video" => true,
+      "participant_video" => true,
+      "join_before_host"  => false,
+      "auto_recording"    => 'cloud'
       )
     );
     // return json_encode($data);

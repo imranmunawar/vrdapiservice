@@ -236,9 +236,10 @@ class AuthController extends Controller
             $userArr['allowSchedule']      = $allowSchedule;
             $userArr['chatId']             = $userFairId.'f'.$userId;
             $userArr['userCompanyLogo']       = $compnayLogo->company_logo;
-            $userFairSetting                  = Fair::where('id',$userFairId)->select('organiser_id','back_scheduling')->first();
+            $userFairSetting                  = Fair::where('id',$userFairId)->select('organiser_id','back_scheduling','scheduling_plugin')->first();
             $userArr['ChatApiDetail']         = $this->getCometChatApiDetail($userFairSetting->organiser_id);
             $userArr['fairBackScheduling']    =  $userFairSetting->back_scheduling;
+            $userArr['schedulingPlugin']      = $userFairSetting->scheduling_plugin;
         }
 
         if ($role == 'Organizer') {

@@ -56,6 +56,7 @@ class Fair extends Model
         'total_hall',
         'back_scheduling',
         'front_scheduling',
+        'scheduling_plugin',
         'layout',
         'presenter',
         'stand_receptionist',
